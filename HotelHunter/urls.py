@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+import hotel_finder
+import hotel_finder.views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', hotel_finder.views.get_hotels_nearby),
 ]
