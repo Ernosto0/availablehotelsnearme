@@ -1,62 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
+
     <meta charset="UTF-8">
-    <title>Available Hotels on Map</title>
-    <style>
-        /* Set the height and width of the map */
-        #map {
-            height: 500px;
-            width: 100%;
-        }
-    </style>
-    <!-- Load the Google Maps JavaScript API -->
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap">
-    </script>
-    <script>
-        const hotels = {{ hotels|safe }};  // Hotel data from Django
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Hotel Markers</title>
 
-        // Initialize the Google Map
-        function initMap() {
-            const mapOptions = {
-                zoom: 13,  // Map zoom level
-                center: { lat: 48.8566, lng: 2.3522 }  // Center the map on Paris (for now)
-            };
-            const map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-            // Loop through the hotels and place markers on the map
-            hotels.forEach(hotel => {
-                const hotelLocation = {
-                    lat: parseFloat(hotel.latitude),
-                    lng: parseFloat(hotel.longitude)
-                };
-
-                const marker = new google.maps.Marker({
-                    position: hotelLocation,
-                    map: map,
-                    title: hotel.hotel_name
-                });
-
-                // Add an info window with hotel name and price
-                const infoWindow = new google.maps.InfoWindow({
-                    content: `<h3>${hotel.hotel_name}</h3><p>Price: ${hotel.price} EUR</p>`
-                });
-
-                // Show the info window when the marker is clicked
-                marker.addListener("click", () => {
-                    infoWindow.open(map, marker);
-                });
-            });
-        }
-    </script>
+    <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
 
-<h3>Available Hotels Nearby</h3>
-
-<!-- The map will be displayed here -->
+<h3>Available Hotels on Map</h3>
 <div id="map"></div>
+
+<!-- Include your JavaScript file -->
+<script src="{% static 'script.js' %}"></script>
 
 </body>
 </html>

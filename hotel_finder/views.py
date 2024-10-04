@@ -14,17 +14,19 @@ def display_hotel_map(request):
     latitude = 48.8566
     longitude = 2.3522
 
-    hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
+    # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
     
-    if hotel_ids:
-        check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-        check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
-        available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
+    # if hotel_ids:
+    #     check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+    #     check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
+    #     available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
 
         # Now pass the available hotels (with names, latitudes, longitudes, etc.) to the template
-        return render(request, 'map.html', {'hotels': available_hotels})
-    else:
-        return render(request, 'error.html', {'message': 'No hotel IDs found'})
+        # return render(request, 'main.html', {'hotels': available_hotels})
+    return render(request, 'main.html', )
+
+    # else:
+    #     return render(request, 'error.html', {'message': 'No hotel IDs found'})
 
 # The 'map.html' template will contain the Google Maps API integration from above
 

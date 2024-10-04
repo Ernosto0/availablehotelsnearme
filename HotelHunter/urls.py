@@ -22,5 +22,5 @@ import hotel_finder.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', hotel_finder.views.get_hotels_nearby),
+    path('', hotel_finder.views.display_hotel_map),
 ]
