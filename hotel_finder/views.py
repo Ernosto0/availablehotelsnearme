@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 import requests
 from datetime import datetime, timedelta
@@ -10,32 +11,36 @@ def display_hotel_map(request):
     if not access_token:
         return render(request, 'error.html', {'message': 'Unable to obtain access token'})
 
-    # Example coordinates for Paris (you can use dynamic coordinates as well)
     latitude = 48.8566
     longitude = 2.3522
 
-    # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
-    
-    # if hotel_ids:
-    #     check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-    #     check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
-    #     available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
+    hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
 
-        # Now pass the available hotels (with names, latitudes, longitudes, etc.) to the template
-        # return render(request, 'main.html', {'hotels': available_hotels})
-    return render(request, 'main.html', )
+    if hotel_ids:
+        check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+        check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
+        available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
 
-    # else:
-    #     return render(request, 'error.html', {'message': 'No hotel IDs found'})
+        if available_hotels:
+        # Now pass the available hotels to the template
+            context = {
+                'hotels': available_hotels  # This is a Python list/dict
+            }
+            print('contex:', context)
+            return render(request, 'main.html', context)
+        else:
+            return render(request, 'error.html', {'message': 'No hotels available'})
+    else:
+        return render(request, 'error.html', {'message': 'No hotel IDs found'})
 
 # The 'map.html' template will contain the Google Maps API integration from above
 
 
 def get_access_token():
     
-    client_id = '4KKwAbHAs5KhMYDc82fF7mZjpVO1WPj0'
-    client_secret = 'fn73Xn1YGGiMNqz8'
-    url = 'https://test.api.amadeus.com/v1/security/oauth2/token'  # Test environment URL
+    client_id = '3wcQWRrX2lgSRESxG5lbfVebTQbOPfZj'
+    client_secret = 'Xjzpxk6nNJKX4ymL'
+    url = 'https://api.amadeus.com/v1/security/oauth2/token'  # Test environment URL
 
     data = {
         'grant_type': 'client_credentials',
@@ -55,7 +60,7 @@ def get_access_token():
 
 def get_hotels_by_geolocation(access_token, latitude, longitude, radius=1):
     print('Fetching hotels by geolocation...')
-    url = "https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-geocode"  # Test URL
+    url = "https://api.amadeus.com/v1/reference-data/locations/hotels/by-geocode"  # Test URL
 
     headers = {'Authorization': f'Bearer {access_token}'}
     params = {
@@ -81,7 +86,7 @@ def get_hotels_by_geolocation(access_token, latitude, longitude, radius=1):
 
 def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token):
     print('Checking hotel availability...')
-    url = "https://test.api.amadeus.com/v3/shopping/hotel-offers"  # Test URL
+    url = "https://api.amadeus.com/v3/shopping/hotel-offers"  # Test URL
     headers = {'Authorization': f'Bearer {access_token}'}
 
     valid_hotel_ids = hotel_ids.copy()  # Copy hotel IDs to filter invalid ones

@@ -1,18 +1,7 @@
 // script.js
 
 // Mock hotel data (replace with real data later)
-const hotels = [
-    {"hotel_name": "Hotel Alpha", "latitude": 48.8566, "longitude": 2.3522, "price": "100.00"},
-    {"hotel_name": "Hotel Beta", "latitude": 48.8567, "longitude": 2.3530, "price": "120.00"},
-    {"hotel_name": "Hotel Gamma", "latitude": 48.8570, "longitude": 2.3540, "price": "90.00"},
-    {"hotel_name": "Hotel Delta", "latitude": 48.8555, "longitude": 2.3525, "price": "200.00"},
-    {"hotel_name": "Hotel Epsilon", "latitude": 48.8580, "longitude": 2.3500, "price": "85.00"},
-    {"hotel_name": "Hotel Zeta", "latitude": 48.8550, "longitude": 2.3510, "price": "110.00"},
-    {"hotel_name": "Hotel Eta", "latitude": 48.8568, "longitude": 2.3490, "price": "150.00"},
-    {"hotel_name": "Hotel Theta", "latitude": 48.8575, "longitude": 2.3485, "price": "95.00"},
-    {"hotel_name": "Hotel Iota", "latitude": 48.8590, "longitude": 2.3550, "price": "130.00"},
-    {"hotel_name": "Hotel Kappa", "latitude": 48.8540, "longitude": 2.3475, "price": "160.00"}
-];
+
 
 // Initialize the map
 function initMap() {

@@ -1,18 +1,11 @@
-// script.js
 
 // Mock hotel data (only names, no latitude/longitude)
-const hotels = [
-    { "hotel_name": "Hotel Alpha, Paris" },
-    { "hotel_name": "Hotel Beta, Paris" },
-    { "hotel_name": "Hotel Gamma, Paris" },
-    { "hotel_name": "Hotel Delta, Paris" },
-    { "hotel_name": "Hotel Epsilon, Paris" }
-];
+
 
 // Initialize the map
-function initMap() {
+function initMap(hotels) {
     const centerLocation = { lat: 48.8566, lng: 2.3522 };  // Center the map on Paris
-
+    console.log("init map function");
     const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 13,
         center: centerLocation,
@@ -20,10 +13,15 @@ function initMap() {
 
     const geocoder = new google.maps.Geocoder();  // Geocoder object
 
-    // Geocode each hotel and add a marker for each
-    hotels.forEach(hotel => {
-        geocodeHotelName(hotel.hotel_name, geocoder, map);
-    });
+    console.log(hotels);
+    // Check if hotels data is available before iterating
+    if (hotels && Array.isArray(hotels)) {
+        hotels.forEach(hotel => {
+            geocodeHotelName(hotel.hotel_name, geocoder, map);
+        });
+    } else {
+        console.error("Hotels data is undefined or not an array");
+    }
 }
 
 // Geocode the hotel name and add a marker to the map
