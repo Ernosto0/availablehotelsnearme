@@ -5,27 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Map</title>
 
-    <!-- Load static tag -->
     {% load static %}
 
-    <script src="{% static 'script.js' %}"></script> <!-- Your script.js file -->
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+
+    <script src="{% static 'script.js' %}"></script>
 </head>
 <body>
-    <div id="map" style="height: 500px; width: 100%;"></div>
+    <div id="map" style="height: 500px; width: 100%; position: relative;"></div>
 
-    <!-- Embed the hotels data using Django's json_script filter -->
-    <script id="hotels-data" type="application/json">
-        {{ hotels|json_script:"hotels" }}
+    <!-- Info panel floating on the left corner of the map -->
+    <div id="info-panel" style="position: absolute; top: 10px; left: 10px; width: 250px; background: white; border: 1px solid #ccc; padding: 10px; display: none;">
+        <img id="hotel-photo" src="" alt="Hotel photo" style="width: 100%; height: auto; display: block;">
+        <h2 id="hotel-name"></h2>
+        <p id="hotel-price"></p>
+    </div>
+
+    <script type="text/javascript">
+        window.hotels = {{ hotels|safe }};
+        console.log("Embedded hotels data:", hotels);
     </script>
 
     <script>
-        // Parse the hotels data from the embedded JSON script
-        const hotels = JSON.parse(document.getElementById('hotels-data').textContent);
-
-        console,log("Hotels data from template:")
-        console.log("Hotels data from template:", hotels);
-
-        // Initialize the map once the DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             initMap(hotels);
         });

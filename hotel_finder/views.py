@@ -3,9 +3,7 @@ from django.shortcuts import render
 import requests
 from datetime import datetime, timedelta
 
-# Your existing functions for getting access token, hotels, etc. should be here
-
-# Example Django view to render the map with hotel locations
+hotels=[{"hotel_name": "JEU DE PAUME", "room_type": "SUPERIOR_ROOM", "price": "372.13"}, {"hotel_name": "Citadines Les Halles Paris - Europe", "room_type": "DELUXE_ROOM", "price": "358.48"}, {"hotel_name": "9CONFIDENTIEL", "room_type": "SUPERIOR_ROOM", "price": "483.33"}, {"hotel_name": "Le Grand Mazarin", "room_type": "STANDARD_ROOM", "price": "770.73"}, {"hotel_name": "HIGHSTAY Louvre Rivoli Area", "room_type": "STANDARD_ROOM", "price": "681.50"}, {"hotel_name": "Hotel Bourg Tibourg", "room_type": "STANDARD_ROOM", "price": "605.00"}, {"hotel_name": "Novotel Paris Les Halles", "room_type": "SUPERIOR_ROOM", "price": "483.13"}, {"hotel_name": "Hotel Britannique", "room_type": "STANDARD_ROOM", "price": "465.20"}, {"hotel_name": "Hotel Des Ducs D Anjou", "room_type": "STANDARD_ROOM", "price": "304.00"}, {"hotel_name": "Hotel Duo", "room_type": "STANDARD_ROOM", "price": "252.13"}, {"hotel_name": "LE TEMPLE DE JEANNE", "room_type": "STANDARD_ROOM", "price": "510.20"}, {"hotel_name": "HIGHSTAY Arts et Metiers Le Marais Area", "room_type": "STANDARD_ROOM", "price": "913.40"}, {"hotel_name": "Grand Hotel Malher", "room_type": "SUPERIOR_ROOM", "price": "547.56"}, {"hotel_name": "Maison Colbert Member of Melia Collection", "room_type": "STANDARD_ROOM", "price": "779.00"}, {"hotel_name": "Hotel Dandy", "room_type": "SUPERIOR_ROOM", "price": "376.13"}, {"hotel_name": "Hotel Handsome", "room_type": "STANDARD_ROOM", "price": "288.20"}, {"hotel_name": "Snob Hotel", "room_type": "SUPERIOR_ROOM", "price": "411.13"}]
 def display_hotel_map(request):
     access_token = get_access_token()
     if not access_token:
@@ -14,33 +12,35 @@ def display_hotel_map(request):
     latitude = 48.8566
     longitude = 2.3522
 
-    hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
+    # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
 
-    if hotel_ids:
-        check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-        check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
-        available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
+    # if hotel_ids:
+    #     check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+    #     check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
+    #     available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
 
-        if available_hotels:
-        # Now pass the available hotels to the template
-            context = {
-                'hotels': available_hotels  # This is a Python list/dict
-            }
-            print('contex:', context)
-            return render(request, 'main.html', context)
-        else:
-            return render(request, 'error.html', {'message': 'No hotels available'})
+        # if available_hotels:
+        #     context = {
+        #         'hotels': json.dumps(available_hotels)  # Convert to JSON string
+        #     }
+        #     print(context)
+        #     return render(request, 'main.html', context)
+    if hotels:
+            return render(request, 'main.html', {'hotels': hotels})
+
+        # else:
+        #     return render(request, 'error.html', {'message': 'No hotels available'})
+    
     else:
         return render(request, 'error.html', {'message': 'No hotel IDs found'})
 
-# The 'map.html' template will contain the Google Maps API integration from above
 
 
 def get_access_token():
     
     client_id = '3wcQWRrX2lgSRESxG5lbfVebTQbOPfZj'
     client_secret = 'Xjzpxk6nNJKX4ymL'
-    url = 'https://api.amadeus.com/v1/security/oauth2/token'  # Test environment URL
+    url = 'https://api.amadeus.com/v1/security/oauth2/token'  
 
     data = {
         'grant_type': 'client_credentials',
