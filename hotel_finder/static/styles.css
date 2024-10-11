@@ -4,8 +4,9 @@
 #map {
     height: 500px;
     width: 100%;
+    position: relative;
+    z-index: 1;  /* Ensure map stays on top */
 }
-
 /* Marker style */
 .custom-marker {
     background-color: white;
@@ -45,5 +46,6 @@
     border: 1px solid #ccc;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 10;  /* Ensure panel floats above map */
     display: none;  /* Initially hidden */
 }
