@@ -82,19 +82,31 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
             <h3>${hotelName}</h3>
             <p>${hotelPrice} EUR</p>
         `;
-
+    
         this.div = div;
-
+    
         const panes = this.getPanes();
         panes.overlayMouseTarget.appendChild(div);
-
-        // Add click event to show info panel in the left corner
+    
+        // Add click event to show info panel after API response is ready
         div.addEventListener('click', debounce(() => {
             console.log('Clicked on hotel:', hotelName);
-            getHotelPhoto(location, hotelName, hotelPrice);
-            showInfoPanel(hotelName, hotelPrice);
+    
+            // Fetch hotel photo and other details from Places API
+            getHotelPhoto(location, hotelName, hotelPrice)
+                .then(data => {
+                    const { photoUrl, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours } = data;
+                    
+                    // Show the info panel only after all details are fetched
+                    showInfoPanel(hotelName, hotelPrice, photoUrl, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours);
+                })
+                .catch(error => {
+                    console.error('Error fetching place details:', error);
+                });
+    
         }, 300));  // Delay click handling by 300ms
     };
+    
 
     CustomMarker.prototype.draw = function () {
         const overlayProjection = this.getProjection();
@@ -117,12 +129,9 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
     new CustomMarker(location, map);
 }
 
-// Function to show the info panel on the left corner of the map
 
 
 
-// Function to get the photo and additional details of the hotel using Places API
-// Function to get the photo and additional details of the hotel using Places API
 // Function to get the photo and additional details of the hotel using Places API
 function getHotelPhoto(location, hotelName, hotelPrice) {
     const service = new google.maps.places.PlacesService(document.createElement('div'));
