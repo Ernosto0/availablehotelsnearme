@@ -11,6 +11,9 @@ function initMap() {
         center: centerLocation,
     });
 
+    // Show the loading spinner when starting to fetch hotels
+    document.getElementById('loading-spinner').style.display = 'block';
+
     // Initialize the geocoder
     const geocoder = new google.maps.Geocoder(); 
 
@@ -19,16 +22,28 @@ function initMap() {
 
     // Check if hotels data is available before iterating
     if (window.hotels && Array.isArray(window.hotels)) {
+        let remainingRequests = window.hotels.length;
+
         window.hotels.forEach(hotel => {
-            geocodeHotelName(hotel.hotel_name, hotel.price, geocoder, map);
+            geocodeHotelName(hotel.hotel_name, hotel.price, geocoder, map, () => {
+                // Decrement the remaining requests
+                remainingRequests--;
+
+                // Hide the spinner once all hotels are processed
+                if (remainingRequests === 0) {
+                    document.getElementById('loading-spinner').style.display = 'none';
+                }
+            });
         });
     } else {
         console.error("Hotels data is undefined or not an array");
+        document.getElementById('loading-spinner').style.display = 'none';
     }
 }
 
+
 // Geocode the hotel name and create a custom marker
-function geocodeHotelName(hotelName, hotelPrice, geocoder, map) {
+function geocodeHotelName(hotelName, hotelPrice, geocoder, map, onComplete) {
     geocoder.geocode({ 'address': hotelName }, function(results, status) {
         if (status === 'OK') {
             const location = results[0].geometry.location;
@@ -36,12 +51,17 @@ function geocodeHotelName(hotelName, hotelPrice, geocoder, map) {
             // Create a custom marker with hotel details
             createCustomMarker(location, hotelName, hotelPrice, map);
 
-            // Now, let's fetch the place details to get the photo
+            // Invoke the callback after the geocoding completes
+            onComplete();
         } else {
             console.log('Geocode was not successful for the following reason: ' + status);
+
+            // Invoke the callback even if geocoding fails, so the spinner can hide
+            onComplete();
         }
     });
 }
+
 
 // Create a custom marker using OverlayView
 function createCustomMarker(location, hotelName, hotelPrice, map) {
@@ -69,11 +89,11 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
         panes.overlayMouseTarget.appendChild(div);
 
         // Add click event to show info panel in the left corner
-        div.addEventListener('click', () => {
+        div.addEventListener('click', debounce(() => {
             console.log('Clicked on hotel:', hotelName);
             getHotelPhoto(location, hotelName, hotelPrice);
             showInfoPanel(hotelName, hotelPrice);
-        });
+        }, 300));  // Delay click handling by 300ms
     };
 
     CustomMarker.prototype.draw = function () {
@@ -208,6 +228,13 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
+    };
+}
 
 // Load Google Maps API dynamically
 function loadGoogleMapsAPI() {
