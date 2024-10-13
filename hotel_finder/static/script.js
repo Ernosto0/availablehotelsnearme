@@ -93,7 +93,7 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
             console.log('Clicked on hotel:', hotelName);
     
             // Fetch hotel photo and other details from Places API
-            getHotelPhoto(location, hotelName, hotelPrice)
+            fetchHotelDetails(location, hotelName, hotelPrice)
                 .then(data => {
                     const { photoUrl, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours } = data;
                     
@@ -133,35 +133,38 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
 
 
 // Function to get the photo and additional details of the hotel using Places API
-function getHotelPhoto(location, hotelName, hotelPrice) {
-    const service = new google.maps.places.PlacesService(document.createElement('div'));
-    const request = {
-        location: location,
-        radius: 50,  // Search within a small radius around the location
-        query: hotelName
-    };
+// Function to get the photo and additional details of the hotel using Places API
+function fetchHotelDetails(location, hotelName, hotelPrice) {
+    return new Promise((resolve, reject) => {  // Return a new promise
+        const service = new google.maps.places.PlacesService(document.createElement('div'));
+        const request = {
+            location: location,
+            radius: 50,  // Search within a small radius around the location
+            query: hotelName
+        };
 
-    // Perform a text search to get basic details and place_id
-    service.textSearch(request, function(results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-            const hotel = results[0];
-            const placeId = hotel.place_id;
+        // Perform a text search to get basic details and place_id
+        service.textSearch(request, function(results, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+                const hotel = results[0];
+                const placeId = hotel.place_id;
 
-            // Use a promise to wait for place details before displaying the info window
-            getPlaceDetails(service, placeId, hotelName, hotelPrice)
-                .then(data => {
-                    // Once the promise resolves, show the info panel with the data
-                    const { photoUrl,  hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, } = data;
-                    showInfoPanel(hotelName, hotelPrice, photoUrl, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, );
-                })
-                .catch(error => {
-                    console.error('Error fetching place details:', error);
-                });
-        } else {
-            console.error('Places search was not successful: ' + status);
-        }
+                // Use a promise to wait for place details before displaying the info window
+                getPlaceDetails(service, placeId, hotelName, hotelPrice)
+                    .then(data => {
+                        // Resolve the promise with the data
+                        resolve(data);
+                    })
+                    .catch(error => {
+                        reject('Error fetching place details: ' + error);
+                    });
+            } else {
+                reject('Places search was not successful: ' + status);
+            }
+        });
     });
 }
+
 
 // Function to get place details using place_id with a promise
 function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
