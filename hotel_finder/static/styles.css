@@ -2,7 +2,7 @@
 
 /* Style the map container */
 #map {
-    height: 500px;
+    height: 1000px;
     width: 100%;
     position: relative;
     z-index: 1;  /* Ensure map stays on top */
@@ -39,13 +39,38 @@
 /* Info panel floating on the left corner of the map */
 #info-panel {
     position: absolute;
-    top: 10px;
+    top: 70px;
     left: 10px;
     width: 250px;
-    background: white;
+    background: rgb(255, 255, 255);
     border: 1px solid #ccc;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     z-index: 10;  /* Ensure panel floats above map */
     display: none;  /* Initially hidden */
 }
+
+
+/* CSS for the photo gallery */
+/* CSS for the photo gallery */
+.photo-gallery-img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+
+    /* Add a transition for smooth effect */
+    transition: opacity 0.5s ease-in-out; /* Smooth fade-in and fade-out */
+}
+
+#photo-gallery {
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+}
+

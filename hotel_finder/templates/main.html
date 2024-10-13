@@ -21,15 +21,25 @@
     </div>
     
     <!-- Info panel floating on the left corner of the map -->
-    <div id="info-panel" >
-        <img id="hotel-photo" src="" alt="Hotel photo" style="width: 100%; height: auto; display: block;">
+    <div id="info-panel" style="display: none;">
+        <div id="photo-gallery" class="gallery">
+            <button id="prev-photo" onclick="prevPhoto()">Previous</button>
+            <img id="hotel-photo" class="photo-gallery-img active" src="initial-photo-url.jpg" alt="Hotel Photo">
+            <button id="next-photo" onclick="nextPhoto()">Next</button>
+        </div>
+        
+
         <h2 id="hotel-name"></h2>
         <p id="hotel-price"></p>
+        
+        
+        
         <p id="hotel-rating"></p>
         <p id="hotel-phone"></p>
-        <a id="hotel-website" href="" target="_blank">Website</a>
+        <a id="hotel-website" href="#" target="_blank">Visit Website</a>
         <p id="hotel-opening-hours"></p>
     </div>
+    
 
     <script type="text/javascript">
         window.hotels = {{ hotels|safe }};

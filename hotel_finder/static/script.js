@@ -82,31 +82,30 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
             <h3>${hotelName}</h3>
             <p>${hotelPrice} EUR</p>
         `;
-    
+
         this.div = div;
-    
+
         const panes = this.getPanes();
         panes.overlayMouseTarget.appendChild(div);
-    
+
         // Add click event to show info panel after API response is ready
         div.addEventListener('click', debounce(() => {
             console.log('Clicked on hotel:', hotelName);
-    
-            // Fetch hotel photo and other details from Places API
+
+            // Fetch hotel photos and other details from Places API
             fetchHotelDetails(location, hotelName, hotelPrice)
                 .then(data => {
-                    const { photoUrl, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours } = data;
+                    const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours } = data;
                     
-                    // Show the info panel only after all details are fetched
-                    showInfoPanel(hotelName, hotelPrice, photoUrl, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours);
+                    // Show the info panel with multiple photos (photo gallery)
+                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours);
                 })
                 .catch(error => {
                     console.error('Error fetching place details:', error);
                 });
-    
-        }, 300));  // Delay click handling by 300ms
+
+        }, 300));  // Delay click handling by 300ms to debounce
     };
-    
 
     CustomMarker.prototype.draw = function () {
         const overlayProjection = this.getProjection();
@@ -128,6 +127,7 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
     // Instantiate the custom marker
     new CustomMarker(location, map);
 }
+
 
 
 
@@ -171,33 +171,34 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
     return new Promise((resolve, reject) => {
         const request = {
             placeId: placeId,
-            fields: ['name',  'rating', 'user_ratings_total', 'photos', 'formatted_phone_number', 'opening_hours', 'website']
+            fields: ['name', 'rating', 'user_ratings_total', 'photos', 'formatted_phone_number', 'opening_hours', 'website']
         };
 
-        // Fetch the data
-        service.getDetails(request, function(place, status) {
+        service.getDetails(request, function (place, status) {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
-                // Extract additional hotel details
-                const hotelRating = place.rating !== undefined ? place.rating : 'N/A';  // Fallback to 'N/A' if rating is undefined
-                const userRatingsTotal = place.user_ratings_total !== undefined ? place.user_ratings_total : 'No reviews';  // Fallback if undefined
-                const hotelWebsite = place.website || '#';  // Use '#' if no website is available
+                const hotelRating = place.rating !== undefined ? place.rating : 'N/A';
+                const userRatingsTotal = place.user_ratings_total !== undefined ? place.user_ratings_total : 'No reviews';
+                const hotelWebsite = place.website || '#';
                 const hotelPhoneNumber = place.formatted_phone_number || 'No phone number available';
                 const openingHours = place.opening_hours ? (place.opening_hours.isOpen() ? 'Open now' : 'Closed') : 'Hours not available';
 
-                // Fetch the first photo if available
-                const photoUrl = place.photos && place.photos.length > 0 
-                                 ? place.photos[0].getUrl({ maxWidth: 300, maxHeight: 200 }) 
-                                 : 'https://via.placeholder.com/300x200';
+                // Log the photos data to verify if they are fetched correctly
+                console.log('Place photos:', place.photos);
 
-                // Resolve the promise with all the data
+                // Ensure 'photos' exists and is an array with at least one photo
+                const photos = Array.isArray(place.photos) && place.photos.length > 0
+                               ? place.photos.map(photo => photo.getUrl({ maxWidth: 300, maxHeight: 200 }))
+                               : ['https://via.placeholder.com/300x200'];  // Use a placeholder image if no photos are available
+
+                console.log('Processed photos URLs:', photos);  // Log the processed photo URLs
+
                 resolve({
-                    photoUrl,
+                    photos,
                     hotelRating,
                     userRatingsTotal,
                     hotelWebsite,
                     hotelPhoneNumber,
-                    openingHours,
-                    
+                    openingHours
                 });
             } else {
                 reject('Place details request failed: ' + status);
@@ -208,22 +209,36 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
 
 
 
-// Function to show the info panel with hotel details 
+// Function to show the info panel with hotel details
+let currentPhotoIndex = 0;
+let photoUrls = [];
+
+// Function to show the info panel with hotel details and photos
 function showInfoPanel(
-    hotelName,           // Hotel name
-    hotelPrice,          // Hotel price
-    photoUrl,            // Photo URL
-    hotelRating,         // Rating
-    userRatingsTotal,    // Total number of user ratings
-    hotelWebsite,        // Hotel website
-    hotelPhoneNumber,    // Phone number
-    openingHours,        // Opening hours
-              // User review
+    hotelName,
+    hotelPrice,
+    photos,  // Array of photos
+    hotelRating,
+    userRatingsTotal,
+    hotelWebsite,
+    hotelPhoneNumber,
+    openingHours
 ) {
-    // Populate the info panel with hotel details and photo
+    // Store the photos in a global variable for gallery navigation
+    photoUrls = photos;
+    currentPhotoIndex = 0;  // Start with the first photo
+    console.log(photos)
+    // Check if there are photos to display
+    if (photos) {
+        
+        document.getElementById('hotel-photo').src = photos[currentPhotoIndex];  // Display the first photo
+    } else {
+        document.getElementById('hotel-photo').src = 'https://via.placeholder.com/300x200';  // Fallback to placeholder
+    }
+
+    // Populate other hotel details
     document.getElementById('hotel-name').innerText = hotelName;
     document.getElementById('hotel-price').innerText = `Price: ${hotelPrice} EUR`;
-    document.getElementById('hotel-photo').src = photoUrl;
     document.getElementById('hotel-rating').innerText = `Rating: ${hotelRating} (${userRatingsTotal} reviews)`;
     document.getElementById('hotel-phone').innerText = `Phone: ${hotelPhoneNumber}`;
     document.getElementById('hotel-website').href = hotelWebsite;
@@ -232,6 +247,23 @@ function showInfoPanel(
     // Display the info panel
     document.getElementById('info-panel').style.display = 'block';
 }
+
+// Function to go to the next photo
+function nextPhoto() {
+    if (photoUrls && photoUrls.length > 0) {
+        currentPhotoIndex = (currentPhotoIndex + 1) % photoUrls.length;  // Loop through the photos
+        document.getElementById('hotel-photo').src = photoUrls[currentPhotoIndex];
+    }
+}
+
+// Function to go to the previous photo
+function prevPhoto() {
+    if (photoUrls && photoUrls.length > 0) {
+        currentPhotoIndex = (currentPhotoIndex - 1 + photoUrls.length) % photoUrls.length;  // Loop through the photos
+        document.getElementById('hotel-photo').src = photoUrls[currentPhotoIndex];
+    }
+}
+
 
 // Call this function when the DOM is ready
 document.addEventListener('DOMContentLoaded', function () {
