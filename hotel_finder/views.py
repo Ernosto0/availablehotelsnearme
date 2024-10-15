@@ -2,8 +2,9 @@ import json
 from django.shortcuts import render
 import requests
 from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor, as_completed\
 
-hotels=[{"hotel_name": "JEU DE PAUME", "room_type": "SUPERIOR_ROOM", "price": "372.13"}, {"hotel_name": "Citadines Les Halles Paris - Europe", "room_type": "DELUXE_ROOM", "price": "358.48"}, {"hotel_name": "9CONFIDENTIEL", "room_type": "SUPERIOR_ROOM", "price": "483.33"}, {"hotel_name": "Le Grand Mazarin", "room_type": "STANDARD_ROOM", "price": "770.73"}, {"hotel_name": "HIGHSTAY Louvre Rivoli Area", "room_type": "STANDARD_ROOM", "price": "681.50"}, {"hotel_name": "Hotel Bourg Tibourg", "room_type": "STANDARD_ROOM", "price": "605.00"}, {"hotel_name": "Novotel Paris Les Halles", "room_type": "SUPERIOR_ROOM", "price": "483.13"}, {"hotel_name": "Hotel Britannique", "room_type": "STANDARD_ROOM", "price": "465.20"}, {"hotel_name": "Hotel Des Ducs D Anjou", "room_type": "STANDARD_ROOM", "price": "304.00"}, {"hotel_name": "Hotel Duo", "room_type": "STANDARD_ROOM", "price": "252.13"}, {"hotel_name": "LE TEMPLE DE JEANNE", "room_type": "STANDARD_ROOM", "price": "510.20"}, {"hotel_name": "HIGHSTAY Arts et Metiers Le Marais Area", "room_type": "STANDARD_ROOM", "price": "913.40"}, {"hotel_name": "Grand Hotel Malher", "room_type": "SUPERIOR_ROOM", "price": "547.56"}, {"hotel_name": "Maison Colbert Member of Melia Collection", "room_type": "STANDARD_ROOM", "price": "779.00"}, {"hotel_name": "Hotel Dandy", "room_type": "SUPERIOR_ROOM", "price": "376.13"}, {"hotel_name": "Hotel Handsome", "room_type": "STANDARD_ROOM", "price": "288.20"}, {"hotel_name": "Snob Hotel", "room_type": "SUPERIOR_ROOM", "price": "411.13"}]
+# hotels=[{"hotel_name": "JEU DE PAUME", "room_type": "SUPERIOR_ROOM", "price": "372.13"}, {"hotel_name": "Citadines Les Halles Paris - Europe", "room_type": "DELUXE_ROOM", "price": "358.48"}, {"hotel_name": "9CONFIDENTIEL", "room_type": "SUPERIOR_ROOM", "price": "483.33"}, {"hotel_name": "Le Grand Mazarin", "room_type": "STANDARD_ROOM", "price": "770.73"}, {"hotel_name": "HIGHSTAY Louvre Rivoli Area", "room_type": "STANDARD_ROOM", "price": "681.50"}, {"hotel_name": "Hotel Bourg Tibourg", "room_type": "STANDARD_ROOM", "price": "605.00"}, {"hotel_name": "Novotel Paris Les Halles", "room_type": "SUPERIOR_ROOM", "price": "483.13"}, {"hotel_name": "Hotel Britannique", "room_type": "STANDARD_ROOM", "price": "465.20"}, {"hotel_name": "Hotel Des Ducs D Anjou", "room_type": "STANDARD_ROOM", "price": "304.00"}, {"hotel_name": "Hotel Duo", "room_type": "STANDARD_ROOM", "price": "252.13"}, {"hotel_name": "LE TEMPLE DE JEANNE", "room_type": "STANDARD_ROOM", "price": "510.20"}, {"hotel_name": "HIGHSTAY Arts et Metiers Le Marais Area", "room_type": "STANDARD_ROOM", "price": "913.40"}, {"hotel_name": "Grand Hotel Malher", "room_type": "SUPERIOR_ROOM", "price": "547.56"}, {"hotel_name": "Maison Colbert Member of Melia Collection", "room_type": "STANDARD_ROOM", "price": "779.00"}, {"hotel_name": "Hotel Dandy", "room_type": "SUPERIOR_ROOM", "price": "376.13"}, {"hotel_name": "Hotel Handsome", "room_type": "STANDARD_ROOM", "price": "288.20"}, {"hotel_name": "Snob Hotel", "room_type": "SUPERIOR_ROOM", "price": "411.13"}]
 def display_hotel_map(request):
     access_token = get_access_token()
     if not access_token:
@@ -12,24 +13,24 @@ def display_hotel_map(request):
     latitude = 48.8566
     longitude = 2.3522
 
-    # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
+    hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
 
-    # if hotel_ids:
-    #     check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-    #     check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
-    #     available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
+    if hotel_ids:
+        check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+        check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
+        available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
 
-        # if available_hotels:
-        #     context = {
-        #         'hotels': json.dumps(available_hotels)  # Convert to JSON string
-        #     }
-        #     print(context)
-        #     return render(request, 'main.html', context)
-    if hotels:
-            return render(request, 'main.html', {'hotels': hotels})
+        if available_hotels:
+            context = {
+                'hotels': json.dumps(available_hotels)  # Convert to JSON string
+            }
+            print(context)
+            return render(request, 'main.html', context)
+    # if hotels:
+    #         return render(request, 'main.html', {'hotels': hotels})
 
-        # else:
-        #     return render(request, 'error.html', {'message': 'No hotels available'})
+        else:
+            return render(request, 'error.html', {'message': 'No hotels available'})
     
     else:
         return render(request, 'error.html', {'message': 'No hotel IDs found'})
@@ -74,7 +75,7 @@ def get_hotels_by_geolocation(access_token, latitude, longitude, radius=1):
     if response.status_code == 200:
         hotels = response.json().get('data', [])
         # Limit results to the first 30 hotels
-        limited_hotels = hotels[:30]  # Limit to 30 hotels
+        limited_hotels = hotels[:100]  # Limit to 30 hotels
         hotel_ids = [hotel['hotelId'] for hotel in limited_hotels]
         print(f"Found {len(hotel_ids)} hotels near the location ({latitude}, {longitude}).")
         return hotel_ids
@@ -84,17 +85,23 @@ def get_hotels_by_geolocation(access_token, latitude, longitude, radius=1):
         return []
     
 
+
+def chunk_list(lst, chunk_size):
+    """Helper function to split a list into chunks."""
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]
+
 def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token):
     print('Checking hotel availability...')
-    url = "https://api.amadeus.com/v3/shopping/hotel-offers"  # Test URL
+    url = "https://api.amadeus.com/v3/shopping/hotel-offers"
     headers = {'Authorization': f'Bearer {access_token}'}
-
-    valid_hotel_ids = hotel_ids.copy()  # Copy hotel IDs to filter invalid ones
-
     available_hotels = []
 
-    for i in range(0, len(hotel_ids), 20):  # Process hotels in batches of 20
-        hotel_batch = hotel_ids[i:i + 20]
+    # Split hotel_ids into chunks of 20
+    hotel_chunks = list(chunk_list(hotel_ids, 20))
+
+    def fetch_availability_for_chunk(hotel_batch):
+        """Helper function to fetch availability for a batch of hotels."""
         params = {
             'hotelIds': ','.join(hotel_batch),
             'checkInDate': check_in_date,
@@ -110,7 +117,6 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                 hotel_name = hotel.get('hotel', {}).get('name', 'Unknown Hotel')
                 offers = hotel.get('offers', [])
                 if offers:
-                    print(f"\n{hotel_name} has availability.")
                     for offer in offers:
                         room_type = offer.get('room', {}).get('typeEstimated', {}).get('category', 'Unknown room type')
                         price = offer.get('price', {}).get('total', 'Unknown price')
@@ -119,25 +125,24 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                             'room_type': room_type,
                             'price': price
                         })
-                else:
-                    print(f"\n{hotel_name} has no available offers.")
         else:
             print(f"Failed to check availability. Status Code: {response.status_code}")
-            errors = response.json().get('errors', [])
-            for error in errors:
-                error_code = error.get('code')
-                error_detail = error.get('detail')
-                error_hotel_ids = error.get('source', {}).get('parameter', '').replace('hotelIds=', '').split(',')
-                print(f"Error: {error_detail} (Hotel IDs: {error_hotel_ids})")
 
-                # Remove invalid hotel IDs based on the error type
-                if error_code == 1257:  # Invalid property code
-                    valid_hotel_ids = [hotel_id for hotel_id in valid_hotel_ids if hotel_id not in error_hotel_ids]
-                elif error_code in [3664, 3289]:  # No rooms available or rate not available
-                    valid_hotel_ids = [hotel_id for hotel_id in valid_hotel_ids if hotel_id not in error_hotel_ids]
+        return available_hotels  # Return available hotels for this batch
 
-    # Retry with valid hotel IDs only
-    if valid_hotel_ids != hotel_ids:
-        print(f"Retrying with valid hotel IDs: {valid_hotel_ids}")
-        check_hotel_availability(valid_hotel_ids, check_in_date, check_out_date, access_token)
-    return available_hotels
+    # Use ThreadPoolExecutor to parallelize requests
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_chunk = {executor.submit(fetch_availability_for_chunk, chunk): chunk for chunk in hotel_chunks}
+
+        for future in as_completed(future_to_chunk):
+            try:
+                result = future.result()
+                available_hotels.extend(result)  # Append available hotels from each future
+            except Exception as exc:
+                print(f"Generated an exception: {exc}")
+
+    # Remove duplicates by hotel_name
+    unique_hotels = {hotel['hotel_name']: hotel for hotel in available_hotels}.values()
+
+    return list(unique_hotels)
+
