@@ -1,10 +1,9 @@
 // Initialize the map with global hotel data
 
 
-
-function initMap() {
-    const centerLocation = { lat: 48.8566, lng: 2.3522 };  // Center the map on Paris
-
+function initMap(userLatitude, userLongitude) {
+    const centerLocation = { lat: userLatitude, lng: userLongitude };  
+    
     // Initialize the map
     const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 13,
@@ -17,7 +16,6 @@ function initMap() {
     // Initialize the geocoder
     const geocoder = new google.maps.Geocoder(); 
 
-    // Now hotels is available as a global variable
     console.log("Hotels data in initMap:", window.hotels);
 
     // Check if hotels data is available before iterating
@@ -40,6 +38,7 @@ function initMap() {
         document.getElementById('loading-spinner').style.display = 'none';
     }
 }
+
 
 
 // Geocode the hotel name and create a custom marker
@@ -129,10 +128,6 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
 }
 
 
-
-
-
-// Function to get the photo and additional details of the hotel using Places API
 // Function to get the photo and additional details of the hotel using Places API
 function fetchHotelDetails(location, hotelName, hotelPrice) {
     return new Promise((resolve, reject) => {  // Return a new promise
@@ -266,10 +261,94 @@ function prevPhoto() {
 
 
 // Call this function when the DOM is ready
-document.addEventListener('DOMContentLoaded', function () {
-    // Load Google Maps API dynamically and trigger initMap once the API is loaded
-    loadGoogleMapsAPI();
+document.addEventListener('DOMContentLoaded', function() {
+    if (navigator.geolocation) {
+        // Attempt to get the user's location
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const userLatitude = position.coords.latitude; // Get latitude
+                const userLongitude = position.coords.longitude; // Get longitude
+                
+                console.log(`User's location: ${userLatitude}, ${userLongitude}`);
+                
+                // Send the user's location to the backend
+                fetch(`/hotels/map/?latitude=${userLatitude}&longitude=${userLongitude}`, {
+                    method: 'GET',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error("Error from backend:", data.error);
+                        alert("Unable to fetch hotels: " + data.error);
+                        return;
+                    }
+
+                    // Set global hotels variable and initialize map
+                    window.hotels = data.hotels;
+                    console.log("Hotels fetched from backend:", window.hotels);
+
+                    initMap(userLatitude, userLongitude); // Initialize map with user location
+                })
+                .catch(error => {
+                    console.error("Error fetching hotels:", error);
+                    alert("Unable to fetch hotels. Showing default location.");
+                    initMap(48.8566, 2.3522); // Default to Paris
+                });
+            },
+            error => {
+                console.error("Geolocation error:", error);
+                alert("Unable to retrieve your location. Showing a default location.");
+
+                // Fallback to a default location (e.g., Paris)
+                fetch(`/hotels/map/?latitude=48.8566&longitude=2.3522`, {
+                    method: 'GET',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error("Error from backend:", data.error);
+                        alert("Unable to fetch hotels: " + data.error);
+                        return;
+                    }
+
+                    window.hotels = data.hotels;
+                    console.log("Hotels fetched from backend:", window.hotels);
+
+                    initMap(48.8566, 2.3522); // Initialize map with default location
+                })
+                .catch(error => {
+                    console.error("Error fetching hotels:", error);
+                });
+            }
+        );
+    } else {
+        console.error("Geolocation is not supported by this browser.");
+        alert("Geolocation is not supported. Showing a default location.");
+
+        // Fallback to default location (e.g., Paris)
+        fetch(`/hotels/map/?latitude=48.8566&longitude=2.3522`, {
+            method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("Error from backend:", data.error);
+                alert("Unable to fetch hotels: " + data.error);
+                return;
+            }
+
+            window.hotels = data.hotels;
+            console.log("Hotels fetched from backend:", window.hotels);
+
+            initMap(48.8566, 2.3522); // Initialize map with default location
+        })
+        .catch(error => {
+            console.error("Error fetching hotels:", error);
+        });
+    }
 });
+
+
 
 
 function debounce(func, delay) {
@@ -288,4 +367,13 @@ function loadGoogleMapsAPI() {
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
+
+    // Set global variables to hold the user's location for the callback
+    window.userLatitude = userLatitude;
+    window.userLongitude = userLongitude;
+
+    // Define the callback function dynamically
+    window.initMapWithUserLocation = function () {
+        initMap(userLatitude, userLongitude);
+    };
 }

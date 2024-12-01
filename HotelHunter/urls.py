@@ -20,7 +20,9 @@ from django.urls import path
 import hotel_finder
 import hotel_finder.views
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', hotel_finder.views.display_hotel_map),
+    path('hotels/map/', hotel_finder.views.display_hotel_map, name='hotel_map'),
 ]

@@ -8,7 +8,6 @@
     {% load static %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
-
     <script src="{% static 'script.js' %}"></script>
 </head>
 <body>
@@ -27,28 +26,96 @@
             <img id="hotel-photo" class="photo-gallery-img active" src="initial-photo-url.jpg" alt="Hotel Photo">
             <button id="next-photo" onclick="nextPhoto()">Next</button>
         </div>
-        
-
         <h2 id="hotel-name"></h2>
         <p id="hotel-price"></p>
-        
-        
-        
         <p id="hotel-rating"></p>
         <p id="hotel-phone"></p>
         <a id="hotel-website" href="#" target="_blank">Visit Website</a>
         <p id="hotel-opening-hours"></p>
+        <a id="hotel-directions" href="#" target="_blank">Get Directions</a>
     </div>
     
-
     <script type="text/javascript">
-        window.hotels = {{ hotels|safe }};
-        console.log("Embedded hotels data:", hotels);
-    </script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if the browser supports geolocation
+            if (navigator.geolocation) {
+                // Get the users location
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const userLatitude = position.coords.latitude;
+                        const userLongitude = position.coords.longitude;
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initMap(hotels);
+                        console.log(`User's location: ${userLatitude}, ${userLongitude}`);
+
+                        // Fetch hotels from the backend using the user's location
+                        fetch(`/hotels/map/?latitude=${userLatitude}&longitude=${userLongitude}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    console.error("Error from backend:", data.error);
+                                    alert("Unable to fetch hotels: " + data.error);
+                                    return;
+                                }
+
+                                // Set the hotels data globally
+                                window.hotels = data.hotels;
+                                console.log("Hotels fetched from backend:", window.hotels);
+
+                                // Initialize the map with the user's location
+                                initMap(userLatitude, userLongitude);
+                            })
+                            .catch(error => {
+                                console.error("Error fetching hotels:", error);
+                                alert("Unable to fetch hotels. Please try again later.");
+                            });
+                    },
+                    error => {
+                        console.error("Geolocation error:", error);
+                        alert("Unable to retrieve your location. Showing default location.");
+
+                        // Fetch hotels for the default location (e.g., Paris)
+                        fetch(`/hotels/map/?latitude=48.8566&longitude=2.3522`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    console.error("Error from backend:", data.error);
+                                    alert("Unable to fetch hotels: " + data.error);
+                                    return;
+                                }
+
+                                window.hotels = data.hotels;
+                                console.log("Hotels fetched from backend:", window.hotels);
+
+                                initMap(48.8566, 2.3522); // Initialize map with the default location
+                            })
+                            .catch(error => {
+                                console.error("Error fetching hotels for default location:", error);
+                            });
+                    }
+                );
+            } else {
+                console.error("Geolocation is not supported by this browser.");
+                alert("Geolocation is not supported. Showing default location.");
+
+                // Fetch hotels for the default location (e.g., Paris)
+                fetch(`/hotels/map/?latitude=48.8566&longitude=2.3522`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error("Error from backend:", data.error);
+                            alert("Unable to fetch hotels: " + data.error);
+                            return;
+                        }
+
+                        window.hotels = data.hotels;
+                        console.log("Hotels fetched from backend:", window.hotels);
+
+                        initMap(48.8566, 2.3522); // Initialize map with the default location
+                    })
+                    .catch(error => {
+                        console.error("Error fetching hotels for default location:", error);
+                    });
+            }
         });
     </script>
 </body>

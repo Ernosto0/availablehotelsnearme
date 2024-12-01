@@ -2,7 +2,7 @@
 
 /* Style the map container */
 #map {
-    height: 1000px;
+    height: 800px;
     width: 100%;
     position: relative;
     z-index: 1;  /* Ensure map stays on top */
