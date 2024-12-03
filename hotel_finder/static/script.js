@@ -261,92 +261,73 @@ function prevPhoto() {
 
 
 // Call this function when the DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    const mapElement = document.getElementById('map');
+    const loadingSpinner = document.getElementById('loading-spinner');
+
     if (navigator.geolocation) {
-        // Attempt to get the user's location
+        // Get the user's location
         navigator.geolocation.getCurrentPosition(
             position => {
-                const userLatitude = position.coords.latitude; // Get latitude
-                const userLongitude = position.coords.longitude; // Get longitude
-                
-                console.log(`User's location: ${userLatitude}, ${userLongitude}`);
-                
-                // Send the user's location to the backend
-                fetch(`/hotels/map/?latitude=${userLatitude}&longitude=${userLongitude}`, {
-                    method: 'GET',
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error("Error from backend:", data.error);
-                        alert("Unable to fetch hotels: " + data.error);
-                        return;
-                    }
+                const userLatitude = position.coords.latitude;
+                const userLongitude = position.coords.longitude;
 
-                    // Set global hotels variable and initialize map
-                    window.hotels = data.hotels;
-                    console.log("Hotels fetched from backend:", window.hotels);
+                console.log(`User's location: Latitude=${userLatitude}, Longitude=${userLongitude}`);
 
-                    initMap(userLatitude, userLongitude); // Initialize map with user location
-                })
-                .catch(error => {
-                    console.error("Error fetching hotels:", error);
-                    alert("Unable to fetch hotels. Showing default location.");
-                    initMap(48.8566, 2.3522); // Default to Paris
-                });
+                // Show the loading spinner
+                loadingSpinner.style.display = 'block';
+
+                // Fetch hotel data from the backend
+                fetch(`/hotels/map/?latitude=${encodeURIComponent(userLatitude)}&longitude=${encodeURIComponent(userLongitude)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingSpinner.style.display = 'none'; // Hide spinner
+
+                        if (data.error) {
+                            alert('Error fetching hotels: ' + data.error);
+                            console.error('Backend Error:', data.error);
+                            return;
+                        }
+
+                        console.log('Fetched Hotel Data:', data.hotels);
+
+                        // Initialize the map with hotel data
+                        initMap(userLatitude, userLongitude, data.hotels);
+                    })
+                    .catch(error => {
+                        loadingSpinner.style.display = 'none'; // Hide spinner
+                        console.error('Fetch Error:', error);
+                        alert('Failed to fetch hotel data. Please try again.');
+                    });
             },
             error => {
-                console.error("Geolocation error:", error);
-                alert("Unable to retrieve your location. Showing a default location.");
-
-                // Fallback to a default location (e.g., Paris)
-                fetch(`/hotels/map/?latitude=48.8566&longitude=2.3522`, {
-                    method: 'GET',
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error("Error from backend:", data.error);
-                        alert("Unable to fetch hotels: " + data.error);
-                        return;
-                    }
-
-                    window.hotels = data.hotels;
-                    console.log("Hotels fetched from backend:", window.hotels);
-
-                    initMap(48.8566, 2.3522); // Initialize map with default location
-                })
-                .catch(error => {
-                    console.error("Error fetching hotels:", error);
-                });
+                console.error('Geolocation Error:', error);
+                alert('Unable to retrieve your location. Using default location.');
+                initMap(48.8566, 2.3522, []); // Default to Paris with no hotels
             }
         );
     } else {
-        console.error("Geolocation is not supported by this browser.");
-        alert("Geolocation is not supported. Showing a default location.");
-
-        // Fallback to default location (e.g., Paris)
-        fetch(`/hotels/map/?latitude=48.8566&longitude=2.3522`, {
-            method: 'GET',
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.error("Error from backend:", data.error);
-                alert("Unable to fetch hotels: " + data.error);
-                return;
-            }
-
-            window.hotels = data.hotels;
-            console.log("Hotels fetched from backend:", window.hotels);
-
-            initMap(48.8566, 2.3522); // Initialize map with default location
-        })
-        .catch(error => {
-            console.error("Error fetching hotels:", error);
-        });
+        alert('Geolocation is not supported by your browser. Using default location.');
+        initMap(48.8566, 2.3522, []); // Default to Paris with no hotels
     }
 });
+
+function initMap(latitude, longitude, hotels) {
+    const map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: latitude, lng: longitude },
+        zoom: 13,
+    });
+
+    hotels.forEach(hotel => {
+        new google.maps.Marker({
+            position: { lat: hotel.latitude, lng: hotel.longitude },
+            map: map,
+            title: hotel.name,
+        });
+    });
+}
+
+
 
 
 
