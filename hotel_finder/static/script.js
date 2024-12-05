@@ -2,8 +2,10 @@
 
 
 
-function initMap() {
-    const centerLocation = { lat: 48.8566, lng: 2.3522 };  // Center the map on Paris
+function initMap(lat = 48.8566, lng = 2.3522) {  // Default to Paris if lat/lng are not provided
+    console.log('Initializing map with user location:', { lat, lng });
+
+    const centerLocation = { lat, lng };  // Center the map on the user's location
 
     // Initialize the map
     const map = new google.maps.Map(document.getElementById("map"), {
@@ -15,7 +17,7 @@ function initMap() {
     document.getElementById('loading-spinner').style.display = 'block';
 
     // Initialize the geocoder
-    const geocoder = new google.maps.Geocoder(); 
+    const geocoder = new google.maps.Geocoder();
 
     // Now hotels is available as a global variable
     console.log("Hotels data in initMap:", window.hotels);
@@ -42,8 +44,10 @@ function initMap() {
 }
 
 
+
 // Geocode the hotel name and create a custom marker
 function geocodeHotelName(hotelName, hotelPrice, geocoder, map, onComplete) {
+    console.log('Geocoding hotel:', hotelName);
     geocoder.geocode({ 'address': hotelName }, function(results, status) {
         if (status === 'OK') {
             const location = results[0].geometry.location;
@@ -267,9 +271,49 @@ function prevPhoto() {
 
 // Call this function when the DOM is ready
 document.addEventListener('DOMContentLoaded', function () {
-    // Load Google Maps API dynamically and trigger initMap once the API is loaded
-    loadGoogleMapsAPI();
+    console.log('DOM is ready');
+    // Check if the user's browser supports Geolocation API
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const userLatitude = position.coords.latitude;
+            const userLongitude = position.coords.longitude;
+
+            // Send the user's location to the backend
+            fetchUserLocation(userLatitude, userLongitude);
+
+            // Load Google Maps API dynamically and initialize the map
+            loadGoogleMapsAPI(userLatitude, userLongitude);
+        }, function (error) {
+            console.error('Error getting location:', error.message);
+            alert('Unable to get your location. Default location will be used.');
+            loadGoogleMapsAPI(); // Fallback to default behavior
+        });
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+        alert('Geolocation is not supported by your browser.');
+        loadGoogleMapsAPI(); // Fallback to default behavior
+    }
 });
+
+
+function fetchUserLocation(latitude, longitude) {
+    console.log('User location:', latitude, longitude);
+    fetch('/set-user-location/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken() // Ensure CSRF token is included
+        },
+        body: JSON.stringify({ latitude, longitude })
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Location sent to backend:', data);
+        })
+        .catch(error => {
+            console.error('Error sending location to backend:', error);
+        });
+}
 
 
 function debounce(func, delay) {
@@ -288,4 +332,11 @@ function loadGoogleMapsAPI() {
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
+}
+function getCSRFToken() {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
 }

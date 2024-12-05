@@ -1,8 +1,11 @@
 import json
+from django.http import JsonResponse
 from django.shortcuts import render
 import requests
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed\
+
+user_location = {}
 
 # hotels=[{"hotel_name": "JEU DE PAUME", "room_type": "SUPERIOR_ROOM", "price": "372.13"}, {"hotel_name": "Citadines Les Halles Paris - Europe", "room_type": "DELUXE_ROOM", "price": "358.48"}, {"hotel_name": "9CONFIDENTIEL", "room_type": "SUPERIOR_ROOM", "price": "483.33"}, {"hotel_name": "Le Grand Mazarin", "room_type": "STANDARD_ROOM", "price": "770.73"}, {"hotel_name": "HIGHSTAY Louvre Rivoli Area", "room_type": "STANDARD_ROOM", "price": "681.50"}, {"hotel_name": "Hotel Bourg Tibourg", "room_type": "STANDARD_ROOM", "price": "605.00"}, {"hotel_name": "Novotel Paris Les Halles", "room_type": "SUPERIOR_ROOM", "price": "483.13"}, {"hotel_name": "Hotel Britannique", "room_type": "STANDARD_ROOM", "price": "465.20"}, {"hotel_name": "Hotel Des Ducs D Anjou", "room_type": "STANDARD_ROOM", "price": "304.00"}, {"hotel_name": "Hotel Duo", "room_type": "STANDARD_ROOM", "price": "252.13"}, {"hotel_name": "LE TEMPLE DE JEANNE", "room_type": "STANDARD_ROOM", "price": "510.20"}, {"hotel_name": "HIGHSTAY Arts et Metiers Le Marais Area", "room_type": "STANDARD_ROOM", "price": "913.40"}, {"hotel_name": "Grand Hotel Malher", "room_type": "SUPERIOR_ROOM", "price": "547.56"}, {"hotel_name": "Maison Colbert Member of Melia Collection", "room_type": "STANDARD_ROOM", "price": "779.00"}, {"hotel_name": "Hotel Dandy", "room_type": "SUPERIOR_ROOM", "price": "376.13"}, {"hotel_name": "Hotel Handsome", "room_type": "STANDARD_ROOM", "price": "288.20"}, {"hotel_name": "Snob Hotel", "room_type": "SUPERIOR_ROOM", "price": "411.13"}]
 def display_hotel_map(request):
@@ -10,8 +13,18 @@ def display_hotel_map(request):
     if not access_token:
         return render(request, 'error.html', {'message': 'Unable to obtain access token'})
 
-    latitude = 48.8566
-    longitude = 2.3522
+    # Retrieve location from the session
+    user_location = request.session.get('user_location', {})
+    print("User location from session:", user_location)
+
+    # Use user's location if available; otherwise, fallback to default
+    latitude = user_location.get('latitude', 48.8566)  # Default to Paris
+    longitude = user_location.get('longitude', 2.3522)  # Default to Paris
+    print("P")
+    print("Latitude:", latitude)
+    print("Longitude:", longitude)
+
+    
 
     hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
 
@@ -24,16 +37,30 @@ def display_hotel_map(request):
             context = {
                 'hotels': json.dumps(available_hotels)  # Convert to JSON string
             }
-            print(context)
             return render(request, 'main.html', context)
-    # if hotels:
-    #         return render(request, 'main.html', {'hotels': hotels})
-
         else:
             return render(request, 'error.html', {'message': 'No hotels available'})
-    
-    else:
-        return render(request, 'error.html', {'message': 'No hotel IDs found'})
+
+    return render(request, 'error.html', {'message': 'No hotel IDs found'})
+
+
+
+  # Store user location globally (or use session for user-specific data)
+
+def set_user_location(request):
+    print('Setting user location...')
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+
+        print(f"Received location: Latitude: {latitude}, Longitude: {longitude}")
+
+        if latitude and longitude:
+            # Store location in session
+            request.session['user_location'] = {'latitude': latitude, 'longitude': longitude}
+            return JsonResponse({'message': 'Location received successfully'})
+        return JsonResponse({'error': 'Invalid data'}, status=400)
 
 
 
@@ -145,4 +172,5 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
     unique_hotels = {hotel['hotel_name']: hotel for hotel in available_hotels}.values()
 
     return list(unique_hotels)
+
 

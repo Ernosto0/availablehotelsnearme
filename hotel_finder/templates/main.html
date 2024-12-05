@@ -43,13 +43,48 @@
 
     <script type="text/javascript">
         window.hotels = {{ hotels|safe }};
-        console.log("Embedded hotels data:", hotels);
-    </script>
-
-    <script>
+        console.log("Embedded hotels data:", window.hotels);
+    
         document.addEventListener('DOMContentLoaded', function() {
-            initMap(hotels);
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            
+            
+            // Send the user's location to the backend
+            fetch('/set-user-location/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify({ latitude, longitude }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Location received successfully') {
+                        // Load the map after setting location
+                        initMap(latitude, longitude);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending location to backend:', error);
+                    alert('Failed to set location. Using default location.');
+                    initMap(); // Fallback to default map location
+                });
+        }, function(error) {
+            console.error('Geolocation error:', error.message);
+            alert('Failed to get location. Using default location.');
+            initMap(); // Fallback to default map location
         });
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+        alert('Geolocation is not supported by your browser.');
+        initMap(); // Fallback to default map location
+    }
+});
+
     </script>
 </body>
 </html>
