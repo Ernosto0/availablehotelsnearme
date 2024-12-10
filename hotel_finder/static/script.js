@@ -31,7 +31,7 @@ function initMap(lat = 48.8566, lng = 2.3522) {  // Default to Paris if lat/lng 
     console.log("Hotels data in initMap:", window.hotels);
 
     // Check if hotels data is available before iterating
-    if (window.hotels && Array.isArray(window.hotels)) {
+    if (window.hotels && Array.isArray(window.hotels) && window.hotels.length > 0) {
         let remainingRequests = window.hotels.length;
 
         window.hotels.forEach(hotel => {
@@ -47,8 +47,9 @@ function initMap(lat = 48.8566, lng = 2.3522) {  // Default to Paris if lat/lng 
         });
     } else {
         console.error("Hotels data is undefined or not an array");
-        if (loadingSpinner) loadingSpinner.style.display = 'none';
+        loadingSpinner.style.display = 'none';
     }
+    
 }
 
 
@@ -371,8 +372,6 @@ function loadGoogleMapsAPI(lat, lng) {
 
 
 
-
-
 function getCSRFToken() {
     const cookieValue = document.cookie
         .split('; ')
@@ -380,3 +379,4 @@ function getCSRFToken() {
         ?.split('=')[1];
     return cookieValue || '';
 }
+

@@ -24,7 +24,7 @@ def display_hotel_map(request):
     print("Latitude:", latitude)
     print("Longitude:", longitude)
 
-    
+    context = {}
 
     hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
 
@@ -35,13 +35,24 @@ def display_hotel_map(request):
 
         if available_hotels:
             context = {
-                'hotels': json.dumps(available_hotels)  # Convert to JSON string
+                'hotels': json.dumps(available_hotels), # Convert to JSON string
+                'no_hotels_available': False 
             }
-            return render(request, 'main.html', context)
+            
         else:
-            return render(request, 'error.html', {'message': 'No hotels available'})
-
-    return render(request, 'error.html', {'message': 'No hotel IDs found'})
+            print("No hotels available.")
+            context = {
+        'no_hotels_available': True,
+        'hotels': json.dumps([])  # Empty list
+    }
+            
+    else:
+        print("No hotels found.")
+        context = {
+        'no_hotels_available': True,
+        'hotels': json.dumps([])  # Empty list
+    }
+    return render(request, 'main.html', context)
 
 
 

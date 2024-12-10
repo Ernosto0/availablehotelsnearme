@@ -40,6 +40,12 @@
         <p id="hotel-opening-hours"></p>
     </div>
         
+    <div id="no-hotels-popup" class="popup hidden">
+        <p>No hotels available around your area.</p>
+        <button id="popup-close-btn">Close</button>
+    </div>
+    
+
     {% csrf_token %}
     <script type="text/javascript">
         window.hotels = {{ hotels|safe }};
@@ -93,6 +99,27 @@
         loadGoogleMapsAPI(48.8566, 2.3522); // Default to Paris
     }
 });
+
+       // Function to show the popup
+       function showNoHotelsPopup() {
+            console.log('No hotels available popup');
+            const popup = document.getElementById('no-hotels-popup');
+            popup.classList.remove('hidden');
+        }
+
+        // Close button functionality
+        document.getElementById('popup-close-btn').addEventListener('click', () => {
+            const popup = document.getElementById('no-hotels-popup');
+            popup.classList.add('hidden');
+        });
+
+        // Check if no hotels are available from the backend
+        const noHotelsAvailable = {{ no_hotels_available|default:"false"|lower }};
+        if (noHotelsAvailable) {
+            console.log('No hotels available');
+            
+            showNoHotelsPopup();
+        }
 
     </script>
     
