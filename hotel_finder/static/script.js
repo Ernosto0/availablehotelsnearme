@@ -125,10 +125,6 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
     new CustomMarker(location, map);
 }
 
-
-
-
-
 // Function to get the photo and additional details of the hotel using Places API
 // Function to get the photo and additional details of the hotel using Places API
 function fetchHotelDetails(location, hotelName, hotelPrice) {
