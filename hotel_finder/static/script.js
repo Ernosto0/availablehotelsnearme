@@ -7,14 +7,22 @@ function initMap(lat = 48.8566, lng = 2.3522) {  // Default to Paris if lat/lng 
 
     const centerLocation = { lat, lng };  // Center the map on the user's location
 
+    // Check if the map element exists
+    const mapElement = document.getElementById("map");
+    if (!mapElement) {
+        console.error('Map element not found!');
+        return;
+    }
+
     // Initialize the map
-    const map = new google.maps.Map(document.getElementById("map"), {
+    const map = new google.maps.Map(mapElement, {
         zoom: 13,
         center: centerLocation,
     });
 
     // Show the loading spinner when starting to fetch hotels
-    document.getElementById('loading-spinner').style.display = 'block';
+    const loadingSpinner = document.getElementById('loading-spinner');
+    if (loadingSpinner) loadingSpinner.style.display = 'block';
 
     // Initialize the geocoder
     const geocoder = new google.maps.Geocoder();
@@ -32,14 +40,14 @@ function initMap(lat = 48.8566, lng = 2.3522) {  // Default to Paris if lat/lng 
                 remainingRequests--;
 
                 // Hide the spinner once all hotels are processed
-                if (remainingRequests === 0) {
-                    document.getElementById('loading-spinner').style.display = 'none';
+                if (remainingRequests === 0 && loadingSpinner) {
+                    loadingSpinner.style.display = 'none';
                 }
             });
         });
     } else {
         console.error("Hotels data is undefined or not an array");
-        document.getElementById('loading-spinner').style.display = 'none';
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
     }
 }
 
@@ -277,21 +285,21 @@ document.addEventListener('DOMContentLoaded', function () {
         navigator.geolocation.getCurrentPosition(function (position) {
             const userLatitude = position.coords.latitude;
             const userLongitude = position.coords.longitude;
-
+            console.log('User location :', userLatitude, userLongitude);
             // Send the user's location to the backend
             fetchUserLocation(userLatitude, userLongitude);
 
-            // Load Google Maps API dynamically and initialize the map
-            loadGoogleMapsAPI(userLatitude, userLongitude);
+            
         }, function (error) {
             console.error('Error getting location:', error.message);
             alert('Unable to get your location. Default location will be used.');
-            loadGoogleMapsAPI(); // Fallback to default behavior
+             // Default to Paris (latitude, longitude)
         });
+        
     } else {
         console.error('Geolocation is not supported by this browser.');
         alert('Geolocation is not supported by your browser.');
-        loadGoogleMapsAPI(); // Fallback to default behavior
+        // Fallback to default behavior
     }
 });
 
@@ -325,14 +333,46 @@ function debounce(func, delay) {
 }
 
 // Load Google Maps API dynamically
-function loadGoogleMapsAPI() {
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDvxJfUnj_5qojubJNy8IcGkESmG7D9dlI&libraries=places&callback=initMap`;
+let isGoogleMapsAPILoaded = false;
 
+function loadGoogleMapsAPI(lat, lng) {
+    if (isGoogleMapsAPILoaded) {
+        console.log("Google Maps API already loaded.");
+        console.log("Initializing map with user location in loadGoogleMapsAPI function:", { lat, lng }); 
+        initMap(lat, lng); // Pass the correct lat/lng dynamically
+        return;
+    }
+
+    if (typeof google !== "undefined" && typeof google.maps !== "undefined") {
+        console.log("Google Maps API already available.");
+        console.log("Initializing map with user location in loadGoogleMapsAPI function:", { lat, lng });
+        initMap(lat, lng); // Pass the correct lat/lng dynamically
+        isGoogleMapsAPILoaded = true;
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDvxJfUnj_5qojubJNy8IcGkESmG7D9dlI&libraries=places&callback=initMapCallback`;
     script.async = true;
     script.defer = true;
+
     document.head.appendChild(script);
+
+    // Define a global callback to dynamically initialize the map
+    window.initMapCallback = function () {
+        console.log("Google Maps API initialized via callback.");
+        console.log("Initializing map with user location in initMapCallback function:", { lat, lng });
+        initMap(lat, lng); // Pass the correct lat/lng dynamically
+        isGoogleMapsAPILoaded = true;
+    };
+
+    console.log("Google Maps API script added.");
 }
+
+
+
+
+
 function getCSRFToken() {
     const cookieValue = document.cookie
         .split('; ')

@@ -47,20 +47,22 @@ def display_hotel_map(request):
 
   # Store user location globally (or use session for user-specific data)
 
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
 def set_user_location(request):
     print('Setting user location...')
     if request.method == 'POST':
         data = json.loads(request.body)
         latitude = data.get('latitude')
         longitude = data.get('longitude')
-
-        print(f"Received location: Latitude: {latitude}, Longitude: {longitude}")
-
+        print("Latitude:", latitude)
+        print("Longitude:", longitude)
         if latitude and longitude:
-            # Store location in session
             request.session['user_location'] = {'latitude': latitude, 'longitude': longitude}
             return JsonResponse({'message': 'Location received successfully'})
         return JsonResponse({'error': 'Invalid data'}, status=400)
+
 
 
 
@@ -154,7 +156,7 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                         })
         else:
             print(f"Failed to check availability. Status Code: {response.status_code}")
-
+        print(f"Processed {len(hotel_batch)} hotels.")
         return available_hotels  # Return available hotels for this batch
 
     # Use ThreadPoolExecutor to parallelize requests

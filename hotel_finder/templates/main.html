@@ -39,18 +39,27 @@
         <a id="hotel-website" href="#" target="_blank">Visit Website</a>
         <p id="hotel-opening-hours"></p>
     </div>
-    
-
+        
+    {% csrf_token %}
     <script type="text/javascript">
         window.hotels = {{ hotels|safe }};
         console.log("Embedded hotels data:", window.hotels);
     
-        document.addEventListener('DOMContentLoaded', function() {
+        function getCSRFToken() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+            return cookieValue || '';
+        }
+    
+        document.addEventListener('DOMContentLoaded', function () {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
+        navigator.geolocation.getCurrentPosition(function (position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
-            
+
+            console.log('User location:', latitude, longitude);
             
             // Send the user's location to the backend
             fetch('/set-user-location/', {
@@ -64,27 +73,28 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.message === 'Location received successfully') {
-                        // Load the map after setting location
-                        initMap(latitude, longitude);
+                        console.log('Sending to JS and initializing the map:', latitude, longitude);
+                        loadGoogleMapsAPI(latitude, longitude); // Load API with correct coordinates
                     }
                 })
                 .catch(error => {
                     console.error('Error sending location to backend:', error);
                     alert('Failed to set location. Using default location.');
-                    initMap(); // Fallback to default map location
+                    loadGoogleMapsAPI(48.8566, 2.3522); // Default to Paris
                 });
-        }, function(error) {
+        }, function (error) {
             console.error('Geolocation error:', error.message);
             alert('Failed to get location. Using default location.');
-            initMap(); // Fallback to default map location
+            loadGoogleMapsAPI(48.8566, 2.3522); // Default to Paris
         });
     } else {
         console.error('Geolocation is not supported by this browser.');
         alert('Geolocation is not supported by your browser.');
-        initMap(); // Fallback to default map location
+        loadGoogleMapsAPI(48.8566, 2.3522); // Default to Paris
     }
 });
 
     </script>
+    
 </body>
 </html>
