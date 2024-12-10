@@ -9,6 +9,7 @@
 
 :root {
     --blue: #4285F4;
+    --darkblue:#043f9d;
 }
 
 .container {
@@ -103,7 +104,7 @@
 }
 
 .info-buttons button:hover {
-    background-color: #043f9d;
+    background-color: var(--darkblue);
 
 }
 
@@ -144,7 +145,7 @@
     border: 2px solid black;
     border-radius: 10px;
     margin-top: 15px;
-    background: linear-gradient(to right, #304352, #d7d2cc);
+    background: linear-gradient(to right, #373b44, #4286f4);
     font-size: 15px;
 }
 
@@ -157,11 +158,25 @@
 
 #hotel-website {
     color: white;
+    background-color: var(--blue);
+    padding: 10px 30px;
+    display: flex;
+    justify-content: center;
+    border-radius: 20px;
+    margin: 20px 0;
+    text-decoration: none;
+    transition: 250ms all ease-in-out;
+}
+
+#hotel-website:hover {
+    border: 2px solid black;
+    background-color: white;
+    color: var(--darkblue);
 }
 
 #close-btn {
     cursor: pointer;
-    font-size: 30px;
+    font-size: 20px;
     text-align: right;
     background-color: var(--blue);
     color: white;
@@ -171,7 +186,7 @@
 }
 
 #close-btn:hover {
-    background-color: #043f9d;
+    background-color: var(--darkblue);
 }
 
 .footer {
