@@ -1,7 +1,4 @@
 // Initialize the map with global hotel data
-
-
-
 function initMap() {
     const centerLocation = { lat: 48.8566, lng: 2.3522 };  // Center the map on Paris
 
@@ -245,7 +242,7 @@ function showInfoPanel(
     document.getElementById('hotel-opening-hours').innerText = `Status: ${openingHours}`;
 
     // Display the info panel
-    document.getElementById('info-panel').style.display = 'block';
+    document.getElementById('info-panel').classList.add("activate");
 }
 
 // Function to go to the next photo
@@ -289,3 +286,5 @@ function loadGoogleMapsAPI() {
     script.defer = true;
     document.head.appendChild(script);
 }
+
+console.log("sa")

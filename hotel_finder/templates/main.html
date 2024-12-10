@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,47 +9,56 @@
     {% load static %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+        integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="{% static 'script.js' %}"></script>
 </head>
+
 <body>
-    <div id="map"></div>
-
-    <div id="loading-spinner" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1000;">
-        <div class="spinner">
-            Loading hotels...
+    <section class="container">
+        <div id="loading-spinner"
+            style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1000;">
+            <div class="spinner">
+                Loading hotels...
+            </div>
         </div>
-    </div>
-    
-    <!-- Info panel floating on the left corner of the map -->
-    <div id="info-panel" style="display: none;">
-        <div id="photo-gallery" class="gallery">
-            <button id="prev-photo" onclick="prevPhoto()">Previous</button>
-            <img id="hotel-photo" class="photo-gallery-img active" src="initial-photo-url.jpg" alt="Hotel Photo">
-            <button id="next-photo" onclick="nextPhoto()">Next</button>
+        <div id="info-panel">
+            <i class="fa-solid fa-xmark" id="close-btn"></i>
+            <div id="photo-gallery" class="gallery">
+                <img id="hotel-photo" class="photo-gallery-img active" src="initial-photo-url.jpg" alt="Hotel Photo">
+                <div class="info-buttons">
+                    <button id="prev-photo" onclick="prevPhoto()"><i class="fa-solid fa-arrow-left"></i></button>
+                    <button id="next-photo" onclick="nextPhoto()"><i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+            <h2 id="hotel-name"></h2>
+            <div class="hotel-desc">
+                <p id="hotel-price"></p>
+                <p id="hotel-rating"></p>
+                <p id="hotel-phone"></p>
+                <a id="hotel-website" href="#" target="_blank">Visit Website</a>
+                <p id="hotel-opening-hours"></p>
+            </div>
         </div>
-        
-
-        <h2 id="hotel-name"></h2>
-        <p id="hotel-price"></p>
-        
-        
-        
-        <p id="hotel-rating"></p>
-        <p id="hotel-phone"></p>
-        <a id="hotel-website" href="#" target="_blank">Visit Website</a>
-        <p id="hotel-opening-hours"></p>
-    </div>
-    
-
+        <div id="map"></div>
+    </section>
+    <section class="footer">
+        <h1>Hotel Finder</h1>
+    </section>
     <script type="text/javascript">
-        window.hotels = {{ hotels|safe }};
+        window.hotels = {{ hotels | safe }};
         console.log("Embedded hotels data:", hotels);
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             initMap(hotels);
+        });
+    </script>
+    <script>
+        document.getElementById('close-btn').addEventListener("click", (e) => {
+        document.getElementById('info-panel').classList.remove("activate");
         });
     </script>
 </body>
