@@ -145,7 +145,7 @@
     border: 2px solid black;
     border-radius: 10px;
     margin-top: 15px;
-    background: -webkit-linear-gradient(to right, #373b44, #4286f4);
+    background: linear-gradient(to right, #373b44, #4286f4);
     font-size: 15px;
 }
 
