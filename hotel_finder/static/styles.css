@@ -1,11 +1,29 @@
 /* styles.css */
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", serif;
+}
+
+:root {
+    --blue: #4285F4;
+    --darkblue:#043f9d;
+}
+
+.container {
+    display: flex;
+}
+
+
 /* Style the map container */
 #map {
-    height: 1000px;
-    width: 100%;
-    position: relative;
-    z-index: 1;  /* Ensure map stays on top */
+    height: 100vh;
+    width: 100vw;
+    z-index: 0;
 }
 /* Marker style */
 .custom-marker {
@@ -23,10 +41,37 @@
     position: absolute; /* Allow precise positioning */
 }
 
+.custom-marker::before {
+    content: "";
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid black; 
+    z-index: -1; 
+}
+
+.custom-marker::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid white;
+}
+
 .custom-marker h3 {
     margin: 0;
-    font-size:10px;
-    color: #4285F4;
+    font-size: 10px;
+    color: var(--blue);
 }
 
 .custom-marker p {
@@ -38,31 +83,37 @@
 
 /* Info panel floating on the left corner of the map */
 #info-panel {
-    position: absolute;
-    top: 70px;
-    left: 10px;
-    width: 250px;
-    background: rgb(255, 255, 255);
-    border: 1px solid #ccc;
-    padding: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    z-index: 10;  /* Ensure panel floats above map */
-    display: none;  /* Initially hidden */
-}
-
-
-/* CSS for the photo gallery */
-/* CSS for the photo gallery */
-.photo-gallery-img {
-    width: 100%;
-    max-width: 600px;
+    width: 0;
     height: auto;
-    object-fit: cover;
-    border-radius: 10px;
-
-    /* Add a transition for smooth effect */
-    transition: opacity 0.5s ease-in-out; /* Smooth fade-in and fade-out */
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 0;
+    opacity: 0;
+    transition: all 250ms ease-in-out;
 }
+
+#info-panel.activate {
+    opacity: 1;
+    width: 35vw;
+    padding: 10px;
+}
+
+.info-buttons button {
+    background-color: var(--blue);
+    padding: 10px;
+    margin-top: 20px;
+    border: none;
+    color: white;
+    transition: all ease-in-out .2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.info-buttons button:hover {
+    background-color: var(--darkblue);
+
+}
+
 
 #photo-gallery {
     max-width: 100%;
@@ -72,6 +123,169 @@
     flex-direction: column;
     text-align: center;
     padding: 10px;
+}
+
+.photo-gallery-img {
+    width: 100%;
+    height: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 7px;
+    transition: opacity 0.5s ease-in-out;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#hotel-name {
+    text-align: center;
+    font-weight: bolder;
+}
+
+.hotel-desc {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    padding-left: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-weight: 500;
+    color: white;
+    border: 2px solid black;
+    border-radius: 10px;
+    margin-top: 15px;
+    background: linear-gradient(to right, #373b44, #4286f4);
+    font-size: 15px;
+}
+
+#hotel-price {
+    font-size: 20px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#hotel-website {
+    color: white;
+    background-color: var(--blue);
+    padding: 10px 30px;
+    display: flex;
+    justify-content: center;
+    border-radius: 20px;
+    margin: 20px 0;
+    text-decoration: none;
+    transition: 250ms all ease-in-out;
+}
+
+#hotel-website:hover {
+    border: 2px solid black;
+    background-color: white;
+    color: var(--darkblue);
+}
+
+#close-btn {
+    cursor: pointer;
+    font-size: 20px;
+    text-align: right;
+    background-color: var(--blue);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 50%;
+    transition: 250ms all ease;
+}
+
+#close-btn:hover {
+    background-color: var(--darkblue);
+}
+
+.footer {
+    background-color: #333;
+    height: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer h1 {
+    color: white;
+}
+
+@media (max-width:992px) {
+    #map {}
+
+    #info-panel {
+        width: 45vw;
+    }
+
+    #info-panel.activate {
+        opacity: 1;
+        width: 45vw;
+        padding: 10px;
+    }
+}
+
+@media (max-width:768px) {}
+
+@media (max-width:576px) {
+    .container {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        justify-content: center;
+    }
+
+    #map {
+        width: 100vw;
+    }
+
+    #info-panel {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 0;
+        width: 100vw;
+        height: 0;
+        min-height: 100vh;
+        z-index: -999;
+    }
+
+    #info-panel.activate {
+        opacity: 1;
+        bottom: 0;
+        height: 120vh;
+        width: 100vw;
+        padding: 10px;
+        z-index: 999;
+    }
+
+    .photo-gallery-img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        max-height: 600px;
+    }
+
+    .hotel-desc {
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        padding-left: 30px;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        font-weight: 500;
+        color: white;
+        border: 2px solid black;
+        border-radius: 10px;
+        margin-top: 15px;
+        background: linear-gradient(to right, #304352, #d7d2cc);
+        font-size: 20px;
+    }
+
+    #hotel-price {
+        font-size: 25px;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+        text-align: center;
+    }
 }
 
 .popup {

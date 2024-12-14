@@ -16,7 +16,7 @@ function initMap(lat = 48.8566, lng = 2.3522) {  // Default to Paris if lat/lng 
 
     // Initialize the map
     const map = new google.maps.Map(mapElement, {
-        zoom: 13,
+        zoom: 15,
         center: centerLocation,
     });
 
@@ -258,7 +258,7 @@ function showInfoPanel(
     document.getElementById('hotel-opening-hours').innerText = `Status: ${openingHours}`;
 
     // Display the info panel
-    document.getElementById('info-panel').style.display = 'block';
+    document.getElementById('info-panel').classList.add("activate");
 }
 
 // Function to go to the next photo
