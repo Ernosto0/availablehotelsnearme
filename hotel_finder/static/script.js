@@ -60,9 +60,14 @@ function geocodeHotelName(hotelName, hotelPrice, geocoder, map, onComplete) {
     geocoder.geocode({ 'address': hotelName }, function(results, status) {
         if (status === 'OK') {
             const location = results[0].geometry.location;
+            
+            const lat = location.lat();  // Extract latitude
+            const lng = location.lng();  // Extract longitude
+
+            console.log('Geocoded location:', location.lat(), location.lng());
 
             // Create a custom marker with hotel details
-            createCustomMarker(location, hotelName, hotelPrice, map);
+            createCustomMarker(location, hotelName, hotelPrice, map, lat, lng);
 
             // Invoke the callback after the geocoding completes
             onComplete();
@@ -77,7 +82,7 @@ function geocodeHotelName(hotelName, hotelPrice, geocoder, map, onComplete) {
 
 
 // Create a custom marker using OverlayView
-function createCustomMarker(location, hotelName, hotelPrice, map) {
+function createCustomMarker(location, hotelName, hotelPrice, map, lat, lng) {
     // Define a new custom OverlayView
     const CustomMarker = function (position, map) {
         this.position = position;
@@ -101,17 +106,18 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
         const panes = this.getPanes();
         panes.overlayMouseTarget.appendChild(div);
 
+
         // Add click event to show info panel after API response is ready
         div.addEventListener('click', debounce(() => {
             console.log('Clicked on hotel:', hotelName);
-
+            
             // Fetch hotel photos and other details from Places API
-            fetchHotelDetails(location, hotelName, hotelPrice)
+            fetchHotelDetails(location, hotelName, hotelPrice,lat,lng)
                 .then(data => {
-                    const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours } = data;
+                    const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours,lat, lng } = data;
                     
                     // Show the info panel with multiple photos (photo gallery)
-                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours);
+                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, lat, lng);
                 })
                 .catch(error => {
                     console.error('Error fetching place details:', error);
@@ -147,7 +153,7 @@ function createCustomMarker(location, hotelName, hotelPrice, map) {
 
 // Function to get the photo and additional details of the hotel using Places API
 // Function to get the photo and additional details of the hotel using Places API
-function fetchHotelDetails(location, hotelName, hotelPrice) {
+function fetchHotelDetails(location, hotelName, hotelPrice,lat,lng) {
     return new Promise((resolve, reject) => {  // Return a new promise
         const service = new google.maps.places.PlacesService(document.createElement('div'));
         const request = {
@@ -166,7 +172,11 @@ function fetchHotelDetails(location, hotelName, hotelPrice) {
                 getPlaceDetails(service, placeId, hotelName, hotelPrice)
                     .then(data => {
                         // Resolve the promise with the data
-                        resolve(data);
+                        resolve({
+                            ...data,
+                            lat: lat,  // Pass the latitude
+                            lng: lng   // Pass the longitude
+                        });
                     })
                     .catch(error => {
                         reject('Error fetching place details: ' + error);
@@ -235,7 +245,9 @@ function showInfoPanel(
     userRatingsTotal,
     hotelWebsite,
     hotelPhoneNumber,
-    openingHours
+    openingHours,
+    lat,
+    lng
 ) {
     // Store the photos in a global variable for gallery navigation
     photoUrls = photos;
@@ -256,6 +268,16 @@ function showInfoPanel(
     document.getElementById('hotel-phone').innerText = `Phone: ${hotelPhoneNumber}`;
     document.getElementById('hotel-website').href = hotelWebsite;
     document.getElementById('hotel-opening-hours').innerText = `Status: ${openingHours}`;
+
+    
+     // Set up the Get Directions button with dynamic coordinates
+    const directionsBtn = document.getElementById('directions-btn');
+    if (directionsBtn) {
+         directionsBtn.onclick = function() {
+             const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+             window.open(directionsUrl, '_blank');
+         };
+     }
 
     // Display the info panel
     document.getElementById('info-panel').classList.add("activate");
