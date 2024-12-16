@@ -83,8 +83,11 @@
         document.addEventListener('DOMContentLoaded', function () {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
+            // const latitude = position.coords.latitude;
+            // const longitude = position.coords.longitude;
+
+            const latitude = 37.774929  // Default to San Francisco for testing
+            const longitude = -122.419416
 
             console.log('User location:', latitude, longitude);
             

@@ -18,8 +18,12 @@ def display_hotel_map(request):
     print("User location from session:", user_location)
 
     # Use user's location if available; otherwise, fallback to default
-    latitude = user_location.get('latitude', 48.8566)  # Default to Paris
-    longitude = user_location.get('longitude', 2.3522)  # Default to Paris
+    # latitude = user_location.get('latitude', 48.8566)  # Default to Paris
+    # longitude = user_location.get('longitude', 2.3522)  # Default to Paris
+
+    latitude = 37.774929
+    longitude = -122.419418
+
     print("P")
     print("Latitude:", latitude)
     print("Longitude:", longitude)
