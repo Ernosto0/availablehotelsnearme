@@ -68,6 +68,8 @@
     border-top: 10px solid white;
 }
 
+
+
 .custom-marker h3 {
     margin: 0;
     font-size: 10px;
@@ -78,6 +80,64 @@
     margin: 0;
     font-size: 8px;
     color: #333;
+}
+
+.custom-marker.cheapest-marker {
+    border: 3px solid gold; /* Highlight with a bold gold border */
+    background-color: #fffacd; /* Light yellow background */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); /* Glow effect */
+}
+
+.cheapest-marker::after {
+    content: "Cheapest";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: gold;
+    color: black;
+    padding: 2px 6px;
+    font-size: 10px;
+    border-radius: 3px;
+    font-weight: bold;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.marker-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: gold;
+    color: black;
+    padding: 5px;
+    font-size: 12px;
+    border-radius: 3px;
+    white-space: nowrap;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+    display: none;
+}
+
+.cheapest-marker:hover .marker-tooltip {
+    display: block;
+}
+
+#loading-spinner {
+    border: 20px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid var(--blue); /* Blue */
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    animation: spin 2s linear infinite;
+    position: fixed; /* Change to fixed to ensure it stays centered */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 

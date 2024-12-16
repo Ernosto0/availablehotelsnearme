@@ -1,7 +1,5 @@
 // Initialize the map with global hotel data
 
-
-
 function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng are not provided
     console.log('Initializing map with user location:', { lat, lng });
 
@@ -20,18 +18,30 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng a
         center: centerLocation,
     });
 
+    
+
     // Show the loading spinner when starting to fetch hotels
     const loadingSpinner = document.getElementById('loading-spinner');
     if (loadingSpinner) loadingSpinner.style.display = 'block';
 
     // Check if hotels data is available
     if (window.hotels && Array.isArray(window.hotels) && window.hotels.length > 0) {
+
+        const cheapestHotel = calculateCheapestHotel(window.hotels);
+        console.log('Cheapest Hotel:', cheapestHotel);
+        window.cheapestHotel = cheapestHotel; // Store it globally for later use
+
+
         window.hotels.forEach(hotel => {
             const { hotel_name, price, location } = hotel;
             if (location && location.latitude && location.longitude) {
                 // Create a marker directly using latitude and longitude
+
                 const hotelLocation = { lat: location.latitude, lng: location.longitude };
-                createCustomMarker(hotelLocation, hotel_name, price, map);
+                const isCheapest = hotel_name === cheapestHotel.hotel_name; // Compare by unique property
+                console.log(`Creating marker for ${hotel_name}, isCheapest: ${isCheapest}`);
+                createCustomMarker(hotelLocation, hotel_name, price, map, isCheapest);
+                
             } else {
                 console.error(`Missing location data for hotel: ${hotel_name}`);
             }
@@ -49,7 +59,7 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng a
 
 
 // Create a custom marker using OverlayView
-function createCustomMarker(location, hotelName, hotelPrice, map, lat, lng) {
+function createCustomMarker(location, hotelName, hotelPrice, map, isCheapest = false) {
     // Define a new custom OverlayView
     const CustomMarker = function (position, map) {
         this.position = position;
@@ -67,12 +77,24 @@ function createCustomMarker(location, hotelName, hotelPrice, map, lat, lng) {
             <h3>${hotelName}</h3>
             <p>${hotelPrice} EUR</p>
         `;
+        
+        console.log(`Creating marker for ${hotelName}, isCheapest: ${isCheapest}`);
+
+        if (isCheapest) {
+            div.classList.add('cheapest-marker');
+            const tooltip = document.createElement('div');
+            tooltip.className = 'marker-tooltip';
+            tooltip.innerText = 'This is the cheapest hotel!';
+            div.appendChild(tooltip);
+        }
 
         this.div = div;
 
         const panes = this.getPanes();
         panes.overlayMouseTarget.appendChild(div);
 
+        const lat = location.lat;
+        const lng = location.lng;
 
         // Add click event to show info panel after API response is ready
         div.addEventListener('click', debounce(() => {
@@ -276,6 +298,18 @@ function showInfoPanel(
 
     toggleReviewButtons();
 
+    console.log(window.userLocation)
+    console.log(lat, lng)
+    if (window.userLocation) {
+        const userLat = window.userLocation.latitude;
+        const userLng = window.userLocation.longitude;
+        const distance = calculateDistance(userLat, userLng, lat, lng).toFixed(2); // Get distance in km
+        console.log('Distance:', distance, 'km');
+
+        document.getElementById('hotel-distance').innerText = `Distance: ${distance} km`;
+    } else {
+        console.warn('User location is not available for distance calculation.');
+    }
 
      // Set up the Get Directions button with dynamic coordinates
     const directionsBtn = document.getElementById('directions-btn');
@@ -285,6 +319,13 @@ function showInfoPanel(
              window.open(directionsUrl, '_blank');
          };
      }
+
+    if (hotelName === window.cheapestHotel.hotel_name) {
+        document.getElementById('hotel-name').innerText = `${hotelName} (Cheapest!)`;
+    } else {
+        document.getElementById('hotel-name').innerText = hotelName;
+    }
+    
 
      document.getElementById('next-review').onclick = () => {
         if (currentReviewIndex < reviews.length - 1) {
@@ -343,6 +384,50 @@ function prevPhoto() {
     }
 }
 
+// Calculate the distance between hotel and user in kilometers
+function calculateDistance(lat1, lng1, lat2, lng2) {
+    print(lat1, lng1, lat2, lng2)
+    print("calculate distance")
+    const toRadians = (degrees) => degrees * (Math.PI / 180);
+    const earthRadius = 6371; // Radius of Earth in kilometers
+
+    const dLat = toRadians(lat2 - lat1);
+    const dLng = toRadians(lng2 - lng1);
+
+    const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return earthRadius * c; // Distance in kilometers
+}
+
+function calculateCheapestHotel(hotels) {
+    if (!hotels || hotels.length === 0) {
+        console.error("No hotels available to calculate the cheapest.");
+        return null;
+    }
+
+    let cheapestHotel = null;
+
+    hotels.forEach(hotel => {
+        // Parse the price to a number, and handle invalid/missing prices
+        const price = parseFloat(hotel.price);
+        if (isNaN(price)) {
+            console.warn(`Skipping hotel due to invalid price: ${hotel.hotel_name}`);
+            return;
+        }
+
+        // Compare the parsed price
+        if (!cheapestHotel || price < parseFloat(cheapestHotel.price)) {
+            cheapestHotel = { ...hotel, price }; // Store the hotel with the parsed price
+        }
+    });
+
+    return cheapestHotel;
+}
+
 
 // Call this function when the DOM is ready
 document.addEventListener('DOMContentLoaded', function () {
@@ -350,11 +435,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check if the user's browser supports Geolocation API
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-            const userLatitude = position.coords.latitude;
-            const userLongitude = position.coords.longitude;
-            console.log('User location :', userLatitude, userLongitude);
-            // Send the user's location to the backend
-            fetchUserLocation(userLatitude, userLongitude);
+            window.userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        };
+        console.log('User location:', window.userLocation);
+
+        
+        fetchUserLocation(window.userLocation.latitude, window.userLocation.longitude);
 
             
         }, function (error) {

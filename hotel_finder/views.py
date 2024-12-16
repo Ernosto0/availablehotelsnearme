@@ -3,60 +3,48 @@ from django.http import JsonResponse
 from django.shortcuts import render
 import requests
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor, as_completed\
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from django.views.decorators.csrf import csrf_exempt
 
 user_location = {}
 
-# hotels=[{"hotel_name": "JEU DE PAUME", "room_type": "SUPERIOR_ROOM", "price": "372.13"}, {"hotel_name": "Citadines Les Halles Paris - Europe", "room_type": "DELUXE_ROOM", "price": "358.48"}, {"hotel_name": "9CONFIDENTIEL", "room_type": "SUPERIOR_ROOM", "price": "483.33"}, {"hotel_name": "Le Grand Mazarin", "room_type": "STANDARD_ROOM", "price": "770.73"}, {"hotel_name": "HIGHSTAY Louvre Rivoli Area", "room_type": "STANDARD_ROOM", "price": "681.50"}, {"hotel_name": "Hotel Bourg Tibourg", "room_type": "STANDARD_ROOM", "price": "605.00"}, {"hotel_name": "Novotel Paris Les Halles", "room_type": "SUPERIOR_ROOM", "price": "483.13"}, {"hotel_name": "Hotel Britannique", "room_type": "STANDARD_ROOM", "price": "465.20"}, {"hotel_name": "Hotel Des Ducs D Anjou", "room_type": "STANDARD_ROOM", "price": "304.00"}, {"hotel_name": "Hotel Duo", "room_type": "STANDARD_ROOM", "price": "252.13"}, {"hotel_name": "LE TEMPLE DE JEANNE", "room_type": "STANDARD_ROOM", "price": "510.20"}, {"hotel_name": "HIGHSTAY Arts et Metiers Le Marais Area", "room_type": "STANDARD_ROOM", "price": "913.40"}, {"hotel_name": "Grand Hotel Malher", "room_type": "SUPERIOR_ROOM", "price": "547.56"}, {"hotel_name": "Maison Colbert Member of Melia Collection", "room_type": "STANDARD_ROOM", "price": "779.00"}, {"hotel_name": "Hotel Dandy", "room_type": "SUPERIOR_ROOM", "price": "376.13"}, {"hotel_name": "Hotel Handsome", "room_type": "STANDARD_ROOM", "price": "288.20"}, {"hotel_name": "Snob Hotel", "room_type": "SUPERIOR_ROOM", "price": "411.13"}]
 def display_hotel_map(request):
-    access_token = get_access_token()
-    if not access_token:
-        return render(request, 'error.html', {'message': 'Unable to obtain access token'})
-
-    # Retrieve location from the session
-    user_location = request.session.get('user_location', {})
-    print("User location from session:", user_location)
-
-    # Use user's location if available; otherwise, fallback to default
-    # latitude = user_location.get('latitude', 48.8566)  # Default to Paris
-    # longitude = user_location.get('longitude', 2.3522)  # Default to Paris
-
-    latitude = 37.774929
-    longitude = -122.419418
-
-    print("P")
-    print("Latitude:", latitude)
-    print("Longitude:", longitude)
-
-    context = {}
-
-    hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
-
-    if hotel_ids:
-        check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-        check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
-        available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
-
-        if available_hotels:
-            context = {
-                'hotels': json.dumps(available_hotels), # Convert to JSON string
-                'no_hotels_available': False 
-            }
-            
-        else:
-            print("No hotels available.")
-            context = {
-        'no_hotels_available': True,
-        'hotels': json.dumps([])  # Empty list
-    }
-            
-    else:
-        print("No hotels found.")
-        context = {
-        'no_hotels_available': True,
-        'hotels': json.dumps([])  # Empty list
+    # Render the page without hotel data initially
+    context = {
+        'hotels': json.dumps([]),  # Empty list
+        'no_hotels_available': False  # Default to no hotels available
     }
     return render(request, 'main.html', context)
+
+
+@csrf_exempt
+def fetch_hotels(request):
+    if request.method == 'POST':
+        # Get user location from the session
+        user_location = request.session.get('user_location', {})
+        if not user_location:
+            return JsonResponse({'error': 'User location not set'}, status=400)
+
+        # latitude = user_location.get('latitude')
+        # longitude = user_location.get('longitude')
+
+        latitude = 37.7749
+        longitude = -122.4194
+
+        # Get access token
+        access_token = get_access_token()
+        if not access_token:
+            return JsonResponse({'error': 'Unable to obtain access token'}, status=500)
+
+        # Fetch hotels by geolocation
+        hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
+        if hotel_ids:
+            check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+            check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
+            available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
+            return JsonResponse({'hotels': available_hotels})
+        return JsonResponse({'hotels': []})
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 
@@ -166,7 +154,7 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                 
                 # Debug print for location
                 print(f"Processing hotel: {hotel_name}")
-                print(f"Location: Latitude={latitude}, Longitude={longitude}")
+               
                 
                 offers = hotel.get('offers', [])
                 if offers:
