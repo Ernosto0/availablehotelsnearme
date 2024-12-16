@@ -2,10 +2,10 @@
 
 
 
-function initMap(lat = 48.8566, lng = 2.3522) {  // Default to Paris if lat/lng are not provided
+function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng are not provided
     console.log('Initializing map with user location:', { lat, lng });
 
-    const centerLocation = { lat, lng };  // Center the map on the user's location
+    const centerLocation = { lat, lng }; // Center the map on the user's location
 
     // Check if the map element exists
     const mapElement = document.getElementById("map");
@@ -24,61 +24,28 @@ function initMap(lat = 48.8566, lng = 2.3522) {  // Default to Paris if lat/lng 
     const loadingSpinner = document.getElementById('loading-spinner');
     if (loadingSpinner) loadingSpinner.style.display = 'block';
 
-    // Initialize the geocoder
-    const geocoder = new google.maps.Geocoder();
-
-    // Now hotels is available as a global variable
-    console.log("Hotels data in initMap:", window.hotels);
-
-    // Check if hotels data is available before iterating
+    // Check if hotels data is available
     if (window.hotels && Array.isArray(window.hotels) && window.hotels.length > 0) {
-        let remainingRequests = window.hotels.length;
-
         window.hotels.forEach(hotel => {
-            geocodeHotelName(hotel.hotel_name, hotel.price, geocoder, map, () => {
-                // Decrement the remaining requests
-                remainingRequests--;
-
-                // Hide the spinner once all hotels are processed
-                if (remainingRequests === 0 && loadingSpinner) {
-                    loadingSpinner.style.display = 'none';
-                }
-            });
+            const { hotel_name, price, location } = hotel;
+            if (location && location.latitude && location.longitude) {
+                // Create a marker directly using latitude and longitude
+                const hotelLocation = { lat: location.latitude, lng: location.longitude };
+                createCustomMarker(hotelLocation, hotel_name, price, map);
+            } else {
+                console.error(`Missing location data for hotel: ${hotel_name}`);
+            }
         });
+
+        // Hide the spinner after all hotels are processed
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
     } else {
         console.error("Hotels data is undefined or not an array");
-        loadingSpinner.style.display = 'none';
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
     }
-    
 }
 
 
-
-// Geocode the hotel name and create a custom marker
-function geocodeHotelName(hotelName, hotelPrice, geocoder, map, onComplete) {
-    console.log('Geocoding hotel:', hotelName);
-    geocoder.geocode({ 'address': hotelName }, function(results, status) {
-        if (status === 'OK') {
-            const location = results[0].geometry.location;
-            
-            const lat = location.lat();  // Extract latitude
-            const lng = location.lng();  // Extract longitude
-
-            console.log('Geocoded location:', location.lat(), location.lng());
-
-            // Create a custom marker with hotel details
-            createCustomMarker(location, hotelName, hotelPrice, map, lat, lng);
-
-            // Invoke the callback after the geocoding completes
-            onComplete();
-        } else {
-            console.log('Geocode was not successful for the following reason: ' + status);
-
-            // Invoke the callback even if geocoding fails, so the spinner can hide
-            onComplete();
-        }
-    });
-}
 
 
 // Create a custom marker using OverlayView
@@ -114,10 +81,10 @@ function createCustomMarker(location, hotelName, hotelPrice, map, lat, lng) {
             // Fetch hotel photos and other details from Places API
             fetchHotelDetails(location, hotelName, hotelPrice,lat,lng)
                 .then(data => {
-                    const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours,lat, lng } = data;
+                    const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours,lat, lng, reviewData  } = data;
                     
                     // Show the info panel with multiple photos (photo gallery)
-                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, lat, lng);
+                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, lat, lng, reviewData );
                 })
                 .catch(error => {
                     console.error('Error fetching place details:', error);
@@ -194,7 +161,11 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
     return new Promise((resolve, reject) => {
         const request = {
             placeId: placeId,
-            fields: ['name', 'rating', 'user_ratings_total', 'photos', 'formatted_phone_number', 'opening_hours', 'website']
+            fields: [
+                'name', 'rating', 'user_ratings_total', 'photos', 
+                'formatted_phone_number', 'opening_hours', 'website',
+                'price_level', 'reviews'
+            ]
         };
 
         service.getDetails(request, function (place, status) {
@@ -204,24 +175,30 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
                 const hotelWebsite = place.website || '#';
                 const hotelPhoneNumber = place.formatted_phone_number || 'No phone number available';
                 const openingHours = place.opening_hours ? (place.opening_hours.isOpen() ? 'Open now' : 'Closed') : 'Hours not available';
-
-                // Log the photos data to verify if they are fetched correctly
-                console.log('Place photos:', place.photos);
-
-                // Ensure 'photos' exists and is an array with at least one photo
+                const priceLevel = place.price_level !== undefined ? place.price_level : 'No price level available';
+                
+                // Handle photos
                 const photos = Array.isArray(place.photos) && place.photos.length > 0
-                               ? place.photos.map(photo => photo.getUrl({ maxWidth: 300, maxHeight: 200 }))
-                               : ['https://via.placeholder.com/300x200'];  // Use a placeholder image if no photos are available
+                    ? place.photos.map(photo => photo.getUrl({ maxWidth: 300, maxHeight: 200 }))
+                    : ['https://via.placeholder.com/300x200']; // Fallback image
 
-                console.log('Processed photos URLs:', photos);  // Log the processed photo URLs
-
+                // Optionally, retrieve reviews (you can limit the number of reviews if necessary)
+                const reviewData  = place.reviews ? place.reviews.slice(0, 5).map(review => ({
+                    author_name: review.author_name,
+                    rating: review.rating,
+                    text: review.text,
+                    time: review.time
+                })) : [];
+                console.log(priceLevel, reviewData )
                 resolve({
                     photos,
                     hotelRating,
                     userRatingsTotal,
                     hotelWebsite,
                     hotelPhoneNumber,
-                    openingHours
+                    openingHours,
+                    priceLevel,
+                    reviewData 
                 });
             } else {
                 reject('Place details request failed: ' + status);
@@ -232,11 +209,14 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
 
 
 
-// Function to show the info panel with hotel details
+
 let currentPhotoIndex = 0;
 let photoUrls = [];
 
-// Function to show the info panel with hotel details and photos
+let currentReviewIndex = 0;
+let reviews = []; // This will hold all the reviews
+
+// Function to show the info panel with hotel details, photos, and reviews
 function showInfoPanel(
     hotelName,
     hotelPrice,
@@ -247,8 +227,13 @@ function showInfoPanel(
     hotelPhoneNumber,
     openingHours,
     lat,
-    lng
+    lng,
+    reviewData 
 ) {
+
+    reviews = reviewData;  // Store the reviews array globally
+    currentReviewIndex = 0;  // Reset review navigation
+
     // Store the photos in a global variable for gallery navigation
     photoUrls = photos;
     currentPhotoIndex = 0;  // Start with the first photo
@@ -269,7 +254,29 @@ function showInfoPanel(
     document.getElementById('hotel-website').href = hotelWebsite;
     document.getElementById('hotel-opening-hours').innerText = `Status: ${openingHours}`;
 
+    const reviewsContainer = document.getElementById('hotel-reviews');
+    reviewsContainer.innerHTML = '';  // Clear previous reviews
+
+    if (reviews.length > 0) {
+        reviews.forEach(review => {
+            const reviewElement = document.createElement('div');
+            reviewElement.classList.add('review');
+            reviewElement.innerHTML = `
+                <strong>${review.author_name}</strong> - Rating: ${review.rating}<br>
+                <p>${review.text}</p>
+            `;
+            reviewsContainer.appendChild(reviewElement);
+        });
+    } else {
+        reviewsContainer.innerHTML = '<p>No reviews available.</p>';
+    }
     
+    displayReview(currentReviewIndex);
+
+
+    toggleReviewButtons();
+
+
      // Set up the Get Directions button with dynamic coordinates
     const directionsBtn = document.getElementById('directions-btn');
     if (directionsBtn) {
@@ -279,9 +286,46 @@ function showInfoPanel(
          };
      }
 
+     document.getElementById('next-review').onclick = () => {
+        if (currentReviewIndex < reviews.length - 1) {
+            currentReviewIndex++;
+            displayReview(currentReviewIndex);
+            toggleReviewButtons();
+        }
+    };
+
+    document.getElementById('prev-review').onclick = () => {
+        if (currentReviewIndex > 0) {
+            currentReviewIndex--;
+            displayReview(currentReviewIndex);
+            toggleReviewButtons();
+        }
+    };
+
     // Display the info panel
     document.getElementById('info-panel').classList.add("activate");
 }
+
+function displayReview(index) {
+    const review = reviews[index];
+    const reviewElement = document.createElement('div');
+    reviewElement.classList.add('review');
+    reviewElement.innerHTML = `
+        <strong>${review.author_name}</strong> - Rating: ${review.rating}<br>
+        <p>${review.text}</p>
+    `;
+    
+    const reviewsContainer = document.getElementById('hotel-reviews');
+    reviewsContainer.innerHTML = '';  // Clear previous review
+    reviewsContainer.appendChild(reviewElement);  // Add the new review
+}
+
+function toggleReviewButtons() {
+    // Enable/disable next/prev buttons based on the current review index
+    document.getElementById('next-review').disabled = currentReviewIndex >= reviews.length - 1;
+    document.getElementById('prev-review').disabled = currentReviewIndex <= 0;
+}
+
 
 // Function to go to the next photo
 function nextPhoto() {

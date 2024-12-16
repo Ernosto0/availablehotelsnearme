@@ -151,10 +151,19 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
         }
 
         response = requests.get(url, headers=headers, params=params)
+        
         if response.status_code == 200:
             hotel_offers = response.json().get('data', [])
             for hotel in hotel_offers:
-                hotel_name = hotel.get('hotel', {}).get('name', 'Unknown Hotel')
+                hotel_data = hotel.get('hotel', {})
+                hotel_name = hotel_data.get('name', 'Unknown Hotel')
+                latitude = hotel_data.get('latitude', None)
+                longitude = hotel_data.get('longitude', None)
+                
+                # Debug print for location
+                print(f"Processing hotel: {hotel_name}")
+                print(f"Location: Latitude={latitude}, Longitude={longitude}")
+                
                 offers = hotel.get('offers', [])
                 if offers:
                     for offer in offers:
@@ -163,12 +172,17 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                         available_hotels.append({
                             'hotel_name': hotel_name,
                             'room_type': room_type,
-                            'price': price
+                            'price': price,
+                            'location': {
+                                'latitude': latitude,
+                                'longitude': longitude
+                            }
                         })
         else:
             print(f"Failed to check availability. Status Code: {response.status_code}")
         print(f"Processed {len(hotel_batch)} hotels.")
         return available_hotels  # Return available hotels for this batch
+
 
     # Use ThreadPoolExecutor to parallelize requests
     with ThreadPoolExecutor(max_workers=5) as executor:
