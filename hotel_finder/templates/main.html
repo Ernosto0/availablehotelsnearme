@@ -16,10 +16,12 @@
 </head>
 <body>
     <section class="container">
-        <div id="loading-spinner" class="spinner">
-                
-            </div>
-        </div>
+        <div id="loading-spinner" class="spinner" style="display: none;"></div>
+
+        
+
+
+        
 
         <div id="info-panel">
             <i class="fa-solid fa-xmark" id="close-btn"></i>
@@ -56,7 +58,11 @@
             
 
         </div>
+
         <div id="map"></div>
+        <button id="search-hotels-btn" class="map-button">Search Hotels</button>
+
+
     </section>
     <section class="footer">
         <h1>Hotel Finder</h1>
@@ -99,17 +105,7 @@
                 },
                 body: JSON.stringify({ latitude, longitude }),
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message === 'Location received successfully') {
-                        // Fetch hotels after location is successfully set
-                        fetchHotels(latitude, longitude);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error sending location to backend:', error);
-                    alert('Failed to set location.');
-                });
+                
         }, function (error) {
             console.error('Geolocation error:', error.message);
             alert('Failed to get location.');
@@ -120,7 +116,9 @@
 });
 
 function fetchHotels(latitude, longitude) {
-    // Show loading spinner (optional)
+    console.log('Fetching hotels...');
+
+    // Show the spinner
     const loadingSpinner = document.getElementById('loading-spinner');
     if (loadingSpinner) loadingSpinner.style.display = 'block';
 
@@ -130,23 +128,31 @@ function fetchHotels(latitude, longitude) {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCSRFToken(),
         },
+        body: JSON.stringify({ latitude, longitude }),
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.hotels && data.hotels.length > 0) {
-                window.hotels = data.hotels;
-                loadGoogleMapsAPI(latitude, longitude);
-            } else {
-                alert('No hotels available in your area.');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching hotels:', error);
-        })
-        .finally(() => {
-            if (loadingSpinner) loadingSpinner.style.display = 'none';
-        });
+    .then(response => response.json())
+    .then(data => {
+        console.log('Hotels fetched:', data.hotels);
+
+        if (data.hotels && data.hotels.length > 0) {
+            window.hotels = data.hotels;
+            const { latitude, longitude } = window.userLocation;
+            initMap(latitude, longitude);
+        } else {
+            alert('No hotels found in this area.');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching hotels:', error);
+        alert('Failed to fetch hotels.');
+    })
+    .finally(() => {
+        // Hide the spinner after fetching
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+    });
 }
+
+
 
        // Function to show the popup
        function showNoHotelsPopup() {
@@ -168,6 +174,19 @@ function fetchHotels(latitude, longitude) {
             
             showNoHotelsPopup();
         }
+
+        document.getElementById('search-hotels-btn').addEventListener('click', function () {
+    console.log('Search Hotels button clicked.');
+
+    // Fetch hotels using user's location
+    if (window.userLocation) {
+        fetchHotels(window.userLocation.latitude, window.userLocation.longitude);
+    } else {
+        alert('User location is not available.');
+    }
+});
+
+
 
     </script>
      <script>

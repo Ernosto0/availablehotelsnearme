@@ -25,6 +25,30 @@
     width: 100vw;
     z-index: 0;
 }
+
+.map-button {
+    position: absolute;
+    top: 10px; /* 10px from the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Offset by half the button's width */
+    z-index: 1000; /* Ensures it appears above the map */
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+.map-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+
+
 /* Marker style */
 .custom-marker {
     background-color: white;
@@ -89,7 +113,6 @@
 }
 
 .cheapest-marker::after {
-    content: "Cheapest";
     position: absolute;
     top: -20px;
     left: 50%;
@@ -122,23 +145,26 @@
     display: block;
 }
 
-#loading-spinner {
-    border: 20px solid #f3f3f3; /* Light grey */
-    border-top: 16px solid var(--blue); /* Blue */
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    animation: spin 2s linear infinite;
-    position: fixed; /* Change to fixed to ensure it stays centered */
+.spinner {
+    display: none; /* Initially hidden */
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000; /* Ensures it appears above all other content */
 }
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
 
 
 /* Info panel floating on the left corner of the map */

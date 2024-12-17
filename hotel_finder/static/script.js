@@ -1,5 +1,6 @@
 // Initialize the map with global hotel data
 
+
 function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng are not provided
     console.log('Initializing map with user location:', { lat, lng });
 
@@ -26,11 +27,11 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng a
 
     // Check if hotels data is available
     if (window.hotels && Array.isArray(window.hotels) && window.hotels.length > 0) {
+        console.log('Hotels data:', window.hotels);
 
         const cheapestHotel = calculateCheapestHotel(window.hotels);
         console.log('Cheapest Hotel:', cheapestHotel);
         window.cheapestHotel = cheapestHotel; // Store it globally for later use
-
 
         window.hotels.forEach(hotel => {
             const { hotel_name, price, location } = hotel;
@@ -40,6 +41,10 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng a
                 const hotelLocation = { lat: location.latitude, lng: location.longitude };
                 const isCheapest = hotel_name === cheapestHotel.hotel_name; // Compare by unique property
                 console.log(`Creating marker for ${hotel_name}, isCheapest: ${isCheapest}`);
+
+
+
+
                 createCustomMarker(hotelLocation, hotel_name, price, map, isCheapest);
                 
             } else {
@@ -137,10 +142,6 @@ function createCustomMarker(location, hotelName, hotelPrice, map, isCheapest = f
 }
 
 
-
-
-
-// Function to get the photo and additional details of the hotel using Places API
 // Function to get the photo and additional details of the hotel using Places API
 function fetchHotelDetails(location, hotelName, hotelPrice,lat,lng) {
     return new Promise((resolve, reject) => {  // Return a new promise
@@ -403,6 +404,7 @@ function calculateDistance(lat1, lng1, lat2, lng2) {
     return earthRadius * c; // Distance in kilometers
 }
 
+
 function calculateCheapestHotel(hotels) {
     if (!hotels || hotels.length === 0) {
         console.error("No hotels available to calculate the cheapest.");
@@ -442,6 +444,9 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('User location:', window.userLocation);
 
         
+        loadGoogleMapsAPI(window.userLocation.latitude, window.userLocation.longitude);
+
+
         fetchUserLocation(window.userLocation.latitude, window.userLocation.longitude);
 
             
@@ -465,7 +470,7 @@ function fetchUserLocation(latitude, longitude) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken() // Ensure CSRF token is included
+            'X-CSRFToken': getCSRFToken() 
         },
         body: JSON.stringify({ latitude, longitude })
     })
