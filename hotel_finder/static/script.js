@@ -19,7 +19,7 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng a
         center: centerLocation,
     });
 
-    
+    createUserMarker(centerLocation, map); // Add a marker for the user's location
 
     // Show the loading spinner when starting to fetch hotels
     const loadingSpinner = document.getElementById('loading-spinner');
@@ -141,6 +141,38 @@ function createCustomMarker(location, hotelName, hotelPrice, map, isCheapest = f
     new CustomMarker(location, map);
 }
 
+
+function createUserMarker(location, map) {
+    if (location && location.lat && location.lng) {
+        const userMarker = new google.maps.Marker({
+            position: location,
+            map: map,
+            title: "You are here",
+            icon: {
+                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            }
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: "<div><strong>You are here</strong></div>"
+        });
+
+        userMarker.addListener('click', () => {
+            infoWindow.open(map, userMarker);
+        });
+
+        // Add a tooltip that highlights the marker with "You are here!" when the user hovers over it
+        userMarker.addListener('mouseover', () => {
+            infoWindow.open(map, userMarker);
+        });
+
+        userMarker.addListener('mouseout', () => {
+            infoWindow.close();
+        });
+    } else {
+        console.error('Invalid user location data');
+    }
+}
 
 // Function to get the photo and additional details of the hotel using Places API
 function fetchHotelDetails(location, hotelName, hotelPrice,lat,lng) {
