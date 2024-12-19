@@ -1,70 +1,78 @@
 // Initialize the map with global hotel data
 
 
-function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris if lat/lng are not provided
+let markers = []; // Array to keep track of all markers
+
+// Initialize the map once
+function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris
     console.log('Initializing map with user location:', { lat, lng });
 
-    const centerLocation = { lat, lng }; // Center the map on the user's location
-
-    // Check if the map element exists
+    const centerLocation = { lat, lng };
     const mapElement = document.getElementById("map");
+
     if (!mapElement) {
         console.error('Map element not found!');
         return;
     }
 
     // Initialize the map
-    const map = new google.maps.Map(mapElement, {
+    map = new google.maps.Map(mapElement, {
         zoom: 15,
         center: centerLocation,
     });
 
-    createUserMarker(centerLocation, map); // Add a marker for the user's location
+    createUserMarker(centerLocation, map); // Add the user's location marker
+}
 
-    // Show the loading spinner when starting to fetch hotels
-    const loadingSpinner = document.getElementById('loading-spinner');
-    if (loadingSpinner) loadingSpinner.style.display = 'block';
+// Add hotels dynamically without reloading the map
+function updateHotelsOnMap(hotels) {
+    console.log('Updating hotels on map:', hotels);
 
-    // Check if hotels data is available
-    if (window.hotels && Array.isArray(window.hotels) && window.hotels.length > 0) {
-        console.log('Hotels data:', window.hotels);
+    // Clear existing markers
+    clearMarkers();
 
-        const cheapestHotel = calculateCheapestHotel(window.hotels);
-        console.log('Cheapest Hotel:', cheapestHotel);
-        window.cheapestHotel = cheapestHotel; // Store it globally for later use
+    const bounds = new google.maps.LatLngBounds();
 
-        window.hotels.forEach(hotel => {
-            const { hotel_name, price, location } = hotel;
-            if (location && location.latitude && location.longitude) {
-                // Create a marker directly using latitude and longitude
+    const cheapestHotel = calculateCheapestHotel(hotels);
+    console.log('Cheapest Hotel:', cheapestHotel);
+    window.cheapestHotel = cheapestHotel; // Store it globally for later use
 
-                const hotelLocation = { lat: location.latitude, lng: location.longitude };
-                const isCheapest = hotel_name === cheapestHotel.hotel_name; // Compare by unique property
-                console.log(`Creating marker for ${hotel_name}, isCheapest: ${isCheapest}`);
+    hotels.forEach(hotel => {
+        const { hotel_name, price, location, booking_link } = hotel;
 
+        if (location && location.latitude && location.longitude) {
 
+            const isCheapest = hotel_name === cheapestHotel.hotel_name; // Compare by unique property
+            const hotelLocation = { lat: location.latitude, lng: location.longitude };
+            const marker = createCustomMarker(hotelLocation, hotel_name, price, map, booking_link, isCheapest);
 
+            // Add the marker to the markers array
+            markers.push(marker);
 
-                createCustomMarker(hotelLocation, hotel_name, price, map, isCheapest);
-                
-            } else {
-                console.error(`Missing location data for hotel: ${hotel_name}`);
-            }
-        });
+            // Extend the map bounds to include this marker
+            bounds.extend(hotelLocation);
+        } else {
+            console.error(`Invalid location data for hotel: ${hotel_name}`);
+        }
+    });
 
-        // Hide the spinner after all hotels are processed
-        if (loadingSpinner) loadingSpinner.style.display = 'none';
+    // Fit the map to show all markers
+    if (!bounds.isEmpty()) {
+        map.fitBounds(bounds);
     } else {
-        console.error("Hotels data is undefined or not an array");
-        if (loadingSpinner) loadingSpinner.style.display = 'none';
+        console.warn('No valid hotels to display.');
     }
 }
 
-
+// Clear all existing markers from the map
+function clearMarkers() {
+    markers.forEach(marker => marker.setMap(null)); // Remove each marker from the map
+    markers = []; // Reset the markers array
+}
 
 
 // Create a custom marker using OverlayView
-function createCustomMarker(location, hotelName, hotelPrice, map, isCheapest = false) {
+function createCustomMarker(location, hotelName, hotelPrice, map, booking_link ,isCheapest = false) {
     // Define a new custom OverlayView
     const CustomMarker = function (position, map) {
         this.position = position;
@@ -102,7 +110,9 @@ function createCustomMarker(location, hotelName, hotelPrice, map, isCheapest = f
         const lng = location.lng;
 
         // Add click event to show info panel after API response is ready
-        div.addEventListener('click', debounce(() => {
+        div.addEventListener('click', debounce((event) => {
+            event.stopPropagation();
+            event.preventDefault(); 
             console.log('Clicked on hotel:', hotelName);
             
             // Fetch hotel photos and other details from Places API
@@ -111,13 +121,13 @@ function createCustomMarker(location, hotelName, hotelPrice, map, isCheapest = f
                     const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours,lat, lng, reviewData  } = data;
                     
                     // Show the info panel with multiple photos (photo gallery)
-                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, lat, lng, reviewData );
+                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, lat, lng, reviewData, booking_link );
                 })
                 .catch(error => {
                     console.error('Error fetching place details:', error);
                 });
 
-        }, 300));  // Delay click handling by 300ms to debounce
+            }, 300), { once: true }); // 300 ms debounce to prevent multiple clicks and show only once
     };
 
     CustomMarker.prototype.draw = function () {
@@ -149,7 +159,12 @@ function createUserMarker(location, map) {
             map: map,
             title: "You are here",
             icon: {
-                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            fillColor: '#4285F4',
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: '#ffffff'
             }
         });
 
@@ -283,9 +298,10 @@ function showInfoPanel(
     openingHours,
     lat,
     lng,
-    reviewData 
+    reviewData,
+    booking_link 
 ) {
-
+    console.log(booking_link)
     reviews = reviewData;  // Store the reviews array globally
     currentReviewIndex = 0;  // Reset review navigation
 
@@ -317,7 +333,7 @@ function showInfoPanel(
             const reviewElement = document.createElement('div');
             reviewElement.classList.add('review');
             reviewElement.innerHTML = `
-                <strong>${review.author_name}</strong> - Rating: ${review.rating}<br>
+                <strong>${review.author_name}</strong> - Rating: ${generateStars(review.rating)}<br>
                 <p>${review.text}</p>
             `;
             reviewsContainer.appendChild(reviewElement);
@@ -376,8 +392,26 @@ function showInfoPanel(
         }
     };
 
+    const bookingBtn = document.getElementById('book-hotel-btn');
+    if (bookingBtn) {
+        bookingBtn.onclick = function () {
+            window.open(booking_link, '_blank');
+        };
+    } else {
+        console.error("Element with ID 'booking-hotel-btn' does not exist in the DOM.");
+    }
+
+
     // Display the info panel
     document.getElementById('info-panel').classList.add("activate");
+
+}
+
+     // Function to generate star icons based on rating
+function generateStars(rating) {
+    const fullStar = '⭐';
+    console.log(rating)
+    return fullStar.repeat(Math.round(rating)); // Repeat the star based on rating
 }
 
 function displayReview(index) {
@@ -419,8 +453,7 @@ function prevPhoto() {
 
 // Calculate the distance between hotel and user in kilometers
 function calculateDistance(lat1, lng1, lat2, lng2) {
-    print(lat1, lng1, lat2, lng2)
-    print("calculate distance")
+    
     const toRadians = (degrees) => degrees * (Math.PI / 180);
     const earthRadius = 6371; // Radius of Earth in kilometers
 
@@ -560,7 +593,6 @@ function loadGoogleMapsAPI(lat, lng) {
 
     console.log("Google Maps API script added.");
 }
-
 
 
 function getCSRFToken() {

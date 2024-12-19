@@ -155,7 +155,9 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                 # Debug print for location
                 print(f"Processing hotel: {hotel_name}")
                
-                
+                #booking links
+                booking_link = generate_booking_com_link(hotel_name)
+
                 offers = hotel.get('offers', [])
                 if offers:
                     for offer in offers:
@@ -168,11 +170,13 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                             'location': {
                                 'latitude': latitude,
                                 'longitude': longitude
-                            }
+                            },
+                            'booking_link': booking_link
                         })
         else:
             print(f"Failed to check availability. Status Code: {response.status_code}")
         print(f"Processed {len(hotel_batch)} hotels.")
+        print(available_hotels)
         return available_hotels  # Return available hotels for this batch
 
 
@@ -192,4 +196,15 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
 
     return list(unique_hotels)
 
+
+def generate_booking_com_link(hotel_name):
+    """
+    Generate a Booking.com search link for a specific hotel.
+    """
+    base_url = "https://www.booking.com/searchresults.html"
+    params = {
+        "ss": hotel_name.replace(" ", "+"),  # Replace spaces with '+' for URL compatibility
+    }
+    query_string = "&".join(f"{key}={value}" for key, value in params.items())
+    return f"{base_url}?{query_string}"
 
