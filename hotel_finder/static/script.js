@@ -331,20 +331,36 @@ function showInfoPanel(
     const reviewsContainer = document.getElementById('hotel-reviews');
     reviewsContainer.innerHTML = '';  // Clear previous reviews
 
-    if (reviews.length > 0 && reviews) {
-        reviews.forEach(review => {
-            const reviewElement = document.createElement('div');
-            reviewElement.classList.add('review');
-            reviewElement.innerHTML = `
-                <strong>${review.author_name}</strong> - Rating: ${generateStars(review.rating)}<br>
-                <p>${review.text}</p>
-            `;
-            reviewsContainer.appendChild(reviewElement);
+    if (reviews && Array.isArray(reviews) && reviews.length > 0) {
+        reviews.forEach((review, index) => {
+            try {
+                if (!review || typeof review !== "object") {
+                    console.warn(`Invalid review at index ${index}:`, review);
+                    return;
+                }
+    
+                const reviewElement = document.createElement('div');
+                reviewElement.classList.add('review');
+    
+                const authorName = review?.author_name || 'Anonymous'; // Use optional chaining
+                const rating = review?.rating !== undefined ? generateStars(review.rating) : 'No rating';
+                const text = review?.text || 'No review text available';
+    
+                reviewElement.innerHTML = `
+                    <strong>${authorName}</strong> - Rating: ${rating}<br>
+                    <p>${text}</p>
+                `;
+                reviewsContainer.appendChild(reviewElement);
+            } catch (error) {
+                console.error(`Error processing review at index ${index}:`, error);
+            }
         });
-        
     } else {
+        console.warn('No reviews available or invalid reviews array:', reviews);
         reviewsContainer.innerHTML = '<p>No reviews available.</p>';
     }
+    
+    
     
     displayReview(currentReviewIndex);
 
@@ -434,19 +450,48 @@ function generateStars(rating) {
 
 
 function displayReview(index) {
-    const review = reviews[index];
-    const reviewElement = document.createElement('div');
-    reviewElement.classList.add('review');
-    reviewElement.innerHTML = `
-        <strong>${review.author_name}</strong> - Rating: ${generateStars(review.rating)}<br>
-        <p>${review.text}</p>
-    `;
+    // Ensure reviews is an array and the index is within bounds
+    if (!reviews || !Array.isArray(reviews) || index < 0 || index >= reviews.length) {
+        console.error(`Invalid review index: ${index}. Unable to display review.`);
+        const reviewsContainer = document.getElementById('hotel-reviews');
+        reviewsContainer.innerHTML = '<p>No reviews available.</p>';  // Fallback message
+        return;
+    }
 
-    
-    const reviewsContainer = document.getElementById('hotel-reviews');
-    reviewsContainer.innerHTML = '';  // Clear previous review
-    reviewsContainer.appendChild(reviewElement);  // Add the new review
+    const review = reviews[index];
+
+    try {
+        if (!review || typeof review !== "object") {
+            console.warn(`Invalid review at index ${index}:`, review);
+            throw new Error("Review is not a valid object.");
+        }
+
+        // Safely access review properties with defaults
+        const authorName = review?.author_name || 'Anonymous';
+        const rating = review?.rating !== undefined ? generateStars(review.rating) : 'No rating';
+        const text = review?.text || 'No review text available';
+
+        // Create the review element
+        const reviewElement = document.createElement('div');
+        reviewElement.classList.add('review');
+        reviewElement.innerHTML = `
+            <strong>${authorName}</strong> - Rating: ${rating}<br>
+            <p>${text}</p>
+        `;
+
+        // Update the reviews container
+        const reviewsContainer = document.getElementById('hotel-reviews');
+        reviewsContainer.innerHTML = '';  // Clear previous review
+        reviewsContainer.appendChild(reviewElement);  // Add the new review
+    } catch (error) {
+        console.error(`Error displaying review at index ${index}:`, error);
+
+        // Show fallback message in case of error
+        const reviewsContainer = document.getElementById('hotel-reviews');
+        reviewsContainer.innerHTML = '<p>Unable to display review. Please try again later.</p>';
+    }
 }
+
 
 
 function toggleReviewButtons() {
