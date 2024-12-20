@@ -128,6 +128,9 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
     url = "https://api.amadeus.com/v3/shopping/hotel-offers"
     headers = {'Authorization': f'Bearer {access_token}'}
     available_hotels = []
+    # currency = get_user_currency()
+
+    currency = 'USD' # Hardcoded currency for now. Change to user's currency then final deployment
 
     # Split hotel_ids into chunks of 20
     hotel_chunks = list(chunk_list(hotel_ids, 20))
@@ -139,7 +142,7 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
             'checkInDate': check_in_date,
             'checkOutDate': check_out_date,
             'adults': '1',
-            'currency': 'EUR'
+            'currency': currency, 
         }
 
         response = requests.get(url, headers=headers, params=params)
@@ -171,7 +174,8 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                                 'latitude': latitude,
                                 'longitude': longitude
                             },
-                            'booking_link': booking_link
+                            'booking_link': booking_link,
+                            'currency':currency
                         })
         else:
             print(f"Failed to check availability. Status Code: {response.status_code}")
@@ -196,7 +200,6 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
 
     return list(unique_hotels)
 
-
 def generate_booking_com_link(hotel_name):
     """
     Generate a Booking.com search link for a specific hotel.
@@ -208,3 +211,27 @@ def generate_booking_com_link(hotel_name):
     query_string = "&".join(f"{key}={value}" for key, value in params.items())
     return f"{base_url}?{query_string}"
 
+# Find user's currency by ip address
+def get_user_currency():
+    """
+    Detect user's currency using the geoPlugin API.
+    """
+    try:
+        # GeoPlugin API URL
+        url = "http://www.geoplugin.net/json.gp"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            # Extract the currency code from the response
+            currency_code = data.get('geoplugin_currencyCode', 'EUR')  # Default to EUR
+            print(f"Detected currency: {currency_code}")
+            return currency_code
+        else:
+            print(f"Failed to fetch geolocation. Status: {response.status_code}")
+    except Exception as e:
+        print(f"Error detecting user's currency: {e}")
+
+    # Fallback to default currency
+    print("Falling back to default currency: EUR")
+    return "EUR"

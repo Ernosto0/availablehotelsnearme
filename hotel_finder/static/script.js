@@ -38,7 +38,8 @@ function updateHotelsOnMap(hotels) {
     window.cheapestHotel = cheapestHotel; // Store it globally for later use
 
     hotels.forEach(hotel => {
-        const { hotel_name, price, location, booking_link } = hotel;
+        const { hotel_name, price, location, booking_link, currency } = hotel;
+        window.hotelCurrency = currency; // Store currency globally
 
         if (location && location.latitude && location.longitude) {
 
@@ -82,13 +83,13 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link ,
     };
 
     CustomMarker.prototype = new google.maps.OverlayView();
-
+    currency = window.hotelCurrency
     CustomMarker.prototype.onAdd = function () {
         const div = document.createElement('div');
         div.className = 'custom-marker';
         div.innerHTML = `
             <h3>${hotelName}</h3>
-            <p>${hotelPrice} EUR</p>
+            <p>${hotelPrice} ${currency}</p>
         `;
         
         console.log(`Creating marker for ${hotelName}, isCheapest: ${isCheapest}`);
@@ -305,6 +306,8 @@ function showInfoPanel(
     reviews = reviewData;  // Store the reviews array globally
     currentReviewIndex = 0;  // Reset review navigation
 
+    currency = window.hotelCurrency
+
     // Store the photos in a global variable for gallery navigation
     photoUrls = photos;
     currentPhotoIndex = 0;  // Start with the first photo
@@ -319,7 +322,7 @@ function showInfoPanel(
 
     // Populate other hotel details
     document.getElementById('hotel-name').innerText = hotelName;
-    document.getElementById('hotel-price').innerText = `Price: ${hotelPrice} EUR`;
+    document.getElementById('hotel-price').innerText = `Price: ${hotelPrice} ${currency}`;
     document.getElementById('hotel-rating').innerText = `Rating: ${hotelRating} (${userRatingsTotal} reviews)`;
     document.getElementById('hotel-phone').innerText = `Phone: ${hotelPhoneNumber}`;
     document.getElementById('hotel-website').href = hotelWebsite;
@@ -328,7 +331,7 @@ function showInfoPanel(
     const reviewsContainer = document.getElementById('hotel-reviews');
     reviewsContainer.innerHTML = '';  // Clear previous reviews
 
-    if (reviews.length > 0) {
+    if (reviews.length > 0 && reviews) {
         reviews.forEach(review => {
             const reviewElement = document.createElement('div');
             reviewElement.classList.add('review');
@@ -338,6 +341,7 @@ function showInfoPanel(
             `;
             reviewsContainer.appendChild(reviewElement);
         });
+        
     } else {
         reviewsContainer.innerHTML = '<p>No reviews available.</p>';
     }
@@ -407,26 +411,43 @@ function showInfoPanel(
 
 }
 
-     // Function to generate star icons based on rating
+// Function to generate star icons based on rating
+// Function to generate star icons based on rating
 function generateStars(rating) {
-    const fullStar = '⭐';
-    console.log(rating)
-    return fullStar.repeat(Math.round(rating)); // Repeat the star based on rating
+    const fullStar = '<img src="/static/images/orangeStar.png" class="star-icon">';
+    const emptyStar = '<img src="/static/images/Empty_Star.png" class="star-icon">';
+    const starCount = Math.round(rating);
+    let stars = '';
+
+    // Add full stars
+    for (let i = 0; i < starCount; i++) {
+        stars += fullStar;
+    }
+    // Add empty stars to make a total of 5
+    for (let i = starCount; i < 5; i++) {
+        stars += emptyStar;
+    }
+    console.log(starCount)
+    return stars; // Return the string of HTML for stars
 }
+
+
 
 function displayReview(index) {
     const review = reviews[index];
     const reviewElement = document.createElement('div');
     reviewElement.classList.add('review');
     reviewElement.innerHTML = `
-        <strong>${review.author_name}</strong> - Rating: ${review.rating}<br>
+        <strong>${review.author_name}</strong> - Rating: ${generateStars(review.rating)}<br>
         <p>${review.text}</p>
     `;
+
     
     const reviewsContainer = document.getElementById('hotel-reviews');
     reviewsContainer.innerHTML = '';  // Clear previous review
     reviewsContainer.appendChild(reviewElement);  // Add the new review
 }
+
 
 function toggleReviewButtons() {
     // Enable/disable next/prev buttons based on the current review index
