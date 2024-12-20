@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,19 +9,15 @@
 
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
-        integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <script src="{% static 'script.js' %}"></script>
 </head>
-
 <body>
     <section class="container">
-        <div id="loading-spinner"
-            style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1000;">
-            <div class="spinner">
-                Loading hotels...
-            </div>
-        </div>
+        <div id="loading-spinner" class="spinner" style="display: none;"></div>
+
         <div id="info-panel">
             <i class="fa-solid fa-xmark" id="close-btn"></i>
             <div id="photo-gallery" class="gallery">
@@ -40,26 +35,169 @@
                 
                 <p id="hotel-opening-hours"></p>
             </div>
-            <a id="hotel-website" href="#" target="_blank">Visit Website</a>
+            <div class="hotel-buttons">
+                <a id="hotel-website" href="#" target="_blank">Visit Website</a>
+                <button id="directions-btn">Get Directions</button>
+            </div>    
+            <p id="hotel-distance"></p>
+
+            <div id="hotel-reviews-wrapper">
+                <div id="hotel-reviews" class="reviews-container">
+                    <!-- Reviews will be displayed here -->
+                </div>
+                <div class="review-navigation">
+                    <button id="prev-review" class="navigation-btn">Previous Review</button>
+                    <button id="next-review" class="navigation-btn">Next Review</button>
+                </div>
+            </div>
         </div>
+
         <div id="map"></div>
+        <button id="search-hotels-btn" class="map-button">Search Hotels</button>
+
+
     </section>
     <section class="footer">
-        <h1>Hotel Finder</h1>
-    </section>
-    <script type="text/javascript">
-        window.hotels = {{ hotels | safe }};
-        console.log("Embedded hotels data:", hotels);
-    </script>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#about">About Us</a>
+                    <a href="#contact">Contact</a>
+                    <a href="#terms">Terms & Conditions</a>
+                    <a href="#privacy">Privacy Policy</a>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2024 AvailableHotelsAroundMe. <br> All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+        
+    <div id="no-hotels-popup" class="popup hidden">
+        <p>No hotels available around your area.</p>
+        <button id="popup-close-btn">Close</button>
+    </div>
+    
 
-    <script>
+    {% csrf_token %}
+    <script type="text/javascript">
+        window.hotels = {{ hotels|safe }};
+        console.log("Embedded hotels data:", window.hotels);
+    
+        function getCSRFToken() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+            return cookieValue || '';
+        }
+    
         document.addEventListener('DOMContentLoaded', function () {
-            initMap(hotels);
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            // const latitude = position.coords.latitude;
+            // const longitude = position.coords.longitude;
+
+            const latitude = 37.774929;
+            const longitude = -122.419416;
+
+            // Send user's location to the backend
+            fetch('/set-user-location/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify({ latitude, longitude }),
+            })
+                
+        }, function (error) {
+            console.error('Geolocation error:', error.message);
+            alert('Failed to get location.');
         });
+    } else {
+        alert('Geolocation is not supported by your browser.');
+    }
+});
+
+function fetchHotels(latitude, longitude) {
+    console.log('Fetching hotels...');
+
+    // Show the spinner
+    const loadingSpinner = document.getElementById('loading-spinner');
+    if (loadingSpinner) loadingSpinner.style.display = 'block';
+
+    fetch('/fetch-hotels/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify({ latitude, longitude }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Hotels fetched:', data.hotels);
+
+        if (data.hotels && data.hotels.length > 0) {
+            window.hotels = data.hotels;
+            const { latitude, longitude } = window.userLocation;
+            initMap(latitude, longitude);
+        } else {
+            alert('No hotels found in this area.');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching hotels:', error);
+        alert('Failed to fetch hotels.');
+    })
+    .finally(() => {
+        // Hide the spinner after fetching
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+    });
+}
+
+
+
+       // Function to show the popup
+       function showNoHotelsPopup() {
+            console.log('No hotels available popup');
+            const popup = document.getElementById('no-hotels-popup');
+            popup.classList.remove('hidden');
+        }
+
+        // Close button functionality
+        document.getElementById('popup-close-btn').addEventListener('click', () => {
+            const popup = document.getElementById('no-hotels-popup');
+            popup.classList.add('hidden');
+        });
+
+        // Check if no hotels are available from the backend
+        const noHotelsAvailable = {{ no_hotels_available|default:"false"|lower }};
+        if (noHotelsAvailable) {
+            console.log('No hotels available');
+            
+            showNoHotelsPopup();
+        }
+
+        document.getElementById('search-hotels-btn').addEventListener('click', function () {
+    console.log('Search Hotels button clicked.');
+
+    // Fetch hotels using user's location
+    if (window.userLocation) {
+        fetchHotels(window.userLocation.latitude, window.userLocation.longitude);
+    } else {
+        alert('User location is not available.');
+    }
+});
+
+
+
     </script>
-    <script>
+     <script>
         document.getElementById('close-btn').addEventListener("click", (e) => {
         document.getElementById('info-panel').classList.remove("activate");
+        document.getElementById('hotel-reviews-wrapper').style.display = 'none';
         });
     </script>
 </body>
