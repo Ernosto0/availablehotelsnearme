@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.views.decorators.csrf import csrf_exempt
 
+test_hotels= [{'hotel_name': 'Best Western Red Coach Inn', 'room_type': 'STANDARD_ROOM', 'price': '157.28', 'location': {'latitude': 37.78343, 'longitude': -122.41951}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Best+Western+Red+Coach+Inn', 'currency': 'USD'}, {'hotel_name': 'San Francisco Proper a Member of Design Hotels', 'room_type': 'STANDARD_ROOM', 'price': '241.19', 'location': {'latitude': 37.78088, 'longitude': -122.41268}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=San+Francisco+Proper+a+Member+of+Design+Hotels', 'currency': 'USD'}, {'hotel_name': 'Motel 6 San Francisco CA Civic Center', 'room_type': 'STANDARD_ROOM', 'price': '221.97', 'location': {'latitude': 37.78321, 'longitude': -122.41738}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Motel+6+San+Francisco+CA+Civic+Center', 'currency': 'USD'}, {'hotel_name': 'SF Central Hotel', 'room_type': 'STANDARD_ROOM', 'price': '84.36', 'location': {'latitude': 37.77223, 'longitude': -122.42444}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=SF+Central+Hotel', 'currency': 'USD'}, {'hotel_name': 'Signature San Francisco', 'room_type': 'STANDARD_ROOM', 'price': '135.19', 'location': {'latitude': 37.77735, 'longitude': -122.4082}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Signature+San+Francisco', 'currency': 'USD'}, {'hotel_name': 'Rodeway Inn Civic Center', 'room_type': 'STANDARD_ROOM', 'price': '80.65', 'location': {'latitude': 37.78286, 'longitude': -122.42196}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Rodeway+Inn+Civic+Center', 'currency': 'USD'}, {'hotel_name': 'SoMa House Hotel', 'room_type': 'SUPERIOR_ROOM', 'price': '120.04', 'location': {'latitude': 37.77879, 'longitude': -122.41007}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=SoMa+House+Hotel', 'currency': 'USD'}, {'hotel_name': 'Hotel Garrett', 'room_type': 'SUPERIOR_ROOM', 'price': '104.75', 'location': {'latitude': 37.77886, 'longitude': -122.411}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Hotel+Garrett', 'currency': 'USD'}, {'hotel_name': 'CIVIC CENTER MOTOR INN', 'room_type': 'STANDARD_ROOM', 'price': '173.75', 'location': {'latitude': 37.77267, 'longitude': -122.41087}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=CIVIC+CENTER+MOTOR+INN', 'currency': 'USD'}, {'hotel_name': 'Hotel Fiona', 'room_type': 'DELUXE_ROOM', 'price': '135.91', 'location': {'latitude': 37.77865, 'longitude': -122.41041}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Hotel+Fiona', 'currency': 'USD'}, {'hotel_name': 'YOTEL San Francisco', 'room_type': 'STANDARD_ROOM', 'price': '151.82', 'location': {'latitude': 37.78034, 'longitude': -122.41203}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=YOTEL+San+Francisco', 'currency': 'USD'}, {'hotel_name': 'San Francisco Inn', 'room_type': 'STANDARD_ROOM', 'price': '167.78', 'location': {'latitude': 37.77276, 'longitude': -122.41038}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=San+Francisco+Inn', 'currency': 'USD'}]
+
 user_location = {}
 
 def display_hotel_map(request):
@@ -18,31 +20,44 @@ def display_hotel_map(request):
 
 
 @csrf_exempt
+@csrf_exempt
 def fetch_hotels(request):
+    available_hotels = []  # Clear available hotels
+    
     if request.method == 'POST':
         # Get user location from the session
         user_location = request.session.get('user_location', {})
         if not user_location:
             return JsonResponse({'error': 'User location not set'}, status=400)
+        
+        # Parse the request body to get the adults value
+        try:
+            body = json.loads(request.body)
+            adults = body.get('adults', 1)
+            print(adults)  # Default to 1 if not provided
+        except json.JSONDecodeError:
+            print("Error parsing request body")
+            adults = 1  # Default to 1 adult
 
-        # latitude = user_location.get('latitude')
-        # longitude = user_location.get('longitude')
+        print("Number of adults:", adults)
 
-        latitude = 37.7749
-        longitude = -122.4194
+        # Example: Use adults in the API call
+        latitude = 37.7749  # Use session-stored latitude
+        longitude = -122.4194  # Use session-stored longitude
 
         # Get access token
         access_token = get_access_token()
         if not access_token:
             return JsonResponse({'error': 'Unable to obtain access token'}, status=500)
-
+        available_hotels = test_hotels
         # Fetch hotels by geolocation
-        hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
-        if hotel_ids:
-            check_in_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-            check_out_date = (datetime.now() + timedelta(days=8)).strftime('%Y-%m-%d')
-            available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token)
-            return JsonResponse({'hotels': available_hotels})
+        # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
+        # if hotel_ids:
+        #     check_in_date = datetime.now().strftime('%Y-%m-%d')
+        #     check_out_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        #     available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults=adults)
+        #     return JsonResponse({'hotels': available_hotels})
+        return JsonResponse({'hotels': available_hotels})
         return JsonResponse({'hotels': []})
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
@@ -118,12 +133,12 @@ def get_hotels_by_geolocation(access_token, latitude, longitude, radius=1):
     
 
 
-def chunk_list(lst, chunk_size):
+def chunk_list(lst, chunk_size,):
     """Helper function to split a list into chunks."""
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
 
-def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token):
+def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults=1):
     print('Checking hotel availability...')
     url = "https://api.amadeus.com/v3/shopping/hotel-offers"
     headers = {'Authorization': f'Bearer {access_token}'}
@@ -131,7 +146,8 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
     # currency = get_user_currency()
 
     currency = 'USD' # Hardcoded currency for now. Change to user's currency then final deployment
-
+    print("searching for", adults, "adults")
+    print(check_in_date, check_out_date)
     # Split hotel_ids into chunks of 20
     hotel_chunks = list(chunk_list(hotel_ids, 20))
 
@@ -141,7 +157,7 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
             'hotelIds': ','.join(hotel_batch),
             'checkInDate': check_in_date,
             'checkOutDate': check_out_date,
-            'adults': '1',
+            'adults': adults,
             'currency': currency, 
         }
 
