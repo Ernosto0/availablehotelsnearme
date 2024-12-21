@@ -19,6 +19,7 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris
     map = new google.maps.Map(mapElement, {
         zoom: 15,
         center: centerLocation,
+        MapId: "c0f7595962ede78b"
     });
 
     createUserMarker(centerLocation, map); // Add the user's location marker
@@ -67,23 +68,38 @@ function updateHotelsOnMap(hotels) {
 
 // Clear all existing markers from the map
 function clearMarkers() {
-    markers.forEach(marker => marker.setMap(null)); // Remove each marker from the map
-    markers = []; // Reset the markers array
+    if (!markers || !Array.isArray(markers)) {
+        console.error("Markers array is not defined or not an array");
+        markers = [];
+        return;
+    }
+
+    markers = markers.filter(marker => {
+        if (marker && marker instanceof google.maps.OverlayView) {
+            marker.setMap(null); // Removes the marker from the map
+            return false; // Remove from the array
+        } else {
+            console.warn("Encountered invalid marker:", marker);
+            return false; // Remove invalid markers
+        }
+    });
 }
+
+let highlightedMarker = null; // Global variable to store the currently highlighted marker
 
 
 // Create a custom marker using OverlayView
-function createCustomMarker(location, hotelName, hotelPrice, map, booking_link ,isCheapest = false) {
-    // Define a new custom OverlayView
+function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, isCheapest = false) {
     const CustomMarker = function (position, map) {
         this.position = position;
         this.map = map;
         this.div = null;
-        this.setMap(map);
+        this.setMap(map); // Calls Google Maps API to add this overlay
     };
 
     CustomMarker.prototype = new google.maps.OverlayView();
-    currency = window.hotelCurrency
+    const currency = window.hotelCurrency;
+
     CustomMarker.prototype.onAdd = function () {
         const div = document.createElement('div');
         div.className = 'custom-marker';
@@ -91,8 +107,6 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link ,
             <h3>${hotelName}</h3>
             <p>${hotelPrice} ${currency}</p>
         `;
-        
-        console.log(`Creating marker for ${hotelName}, isCheapest: ${isCheapest}`);
 
         if (isCheapest) {
             div.classList.add('cheapest-marker');
@@ -107,28 +121,32 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link ,
         const panes = this.getPanes();
         panes.overlayMouseTarget.appendChild(div);
 
-        const lat = location.lat;
-        const lng = location.lng;
-
-        // Add click event to show info panel after API response is ready
         div.addEventListener('click', debounce((event) => {
             event.stopPropagation();
-            event.preventDefault(); 
+            event.preventDefault();
             console.log('Clicked on hotel:', hotelName);
-            
-            // Fetch hotel photos and other details from Places API
-            fetchHotelDetails(location, hotelName, hotelPrice,lat,lng)
+
+            if (highlightedMarker) {
+                highlightedMarker.classList.remove('highlighted-marker');
+            }
+        
+            // Add highlight to the clicked marker
+            div.classList.add('highlighted-marker');
+            highlightedMarker = div; // Set the currently highlighted marker
+
+            fetchHotelDetails(location, hotelName, hotelPrice, location.lat, location.lng)
                 .then(data => {
-                    const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours,lat, lng, reviewData  } = data;
+                    const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, reviewData } = data;
+
+                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, location.lat, location.lng, reviewData, booking_link);
+
+                    // Highlight the marker after showing the info panel
                     
-                    // Show the info panel with multiple photos (photo gallery)
-                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, lat, lng, reviewData, booking_link );
                 })
                 .catch(error => {
                     console.error('Error fetching place details:', error);
                 });
-
-            }, 300), { once: true }); // 300 ms debounce to prevent multiple clicks and show only once
+        }, 300));
     };
 
     CustomMarker.prototype.draw = function () {
@@ -148,47 +166,86 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link ,
         }
     };
 
-    // Instantiate the custom marker
-    new CustomMarker(location, map);
+    // Instantiate the custom marker and add it to the markers array
+    const marker = new CustomMarker(location, map);
+    if (marker) {
+        markers.push(marker); // Only push valid markers
+    } else {
+        console.error("Failed to create marker:", location, hotelName, hotelPrice);
+    }
+
+
+    document.getElementById('close-btn').addEventListener('click', () => {
+        // Close the info panel
+        document.getElementById('info-panel').classList.remove('activate');
+    
+        // Remove highlight from the currently highlighted marker
+        if (highlightedMarker) {
+            highlightedMarker.classList.remove('highlighted-marker');
+            highlightedMarker = null; // Reset the highlighted marker
+        }
+    });
+    
+    
 }
 
 
 function createUserMarker(location, map) {
+    
     if (location && location.lat && location.lng) {
-        const userMarker = new google.maps.Marker({
+        // Create a div for custom marker content
+        const userMarkerContent = document.createElement('div');
+        userMarkerContent.innerHTML = `
+            <div style="
+                background-color: #4285F4;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid #ffffff;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);">
+            </div>
+        `;
+        
+        // Create an AdvancedMarkerElement
+        const userMarker = new google.maps.marker.AdvancedMarkerElement({
             position: location,
             map: map,
             title: "You are here",
-            icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: '#4285F4',
-            fillOpacity: 1,
-            strokeWeight: 2,
-            strokeColor: '#ffffff'
-            }
+            content: userMarkerContent,
+
         });
 
+        // Create an InfoWindow
         const infoWindow = new google.maps.InfoWindow({
-            content: "<div><strong>You are here</strong></div>"
+            content: "<div><strong>You are here</strong></div>",
         });
 
-        userMarker.addListener('click', () => {
-            infoWindow.open(map, userMarker);
+        // Add a click listener for the marker to open the InfoWindow
+        userMarkerContent.addEventListener('click', () => {
+            infoWindow.open({
+                anchor: userMarker,
+                map,
+                shouldFocus: false,
+            });
         });
 
-        // Add a tooltip that highlights the marker with "You are here!" when the user hovers over it
-        userMarker.addListener('mouseover', () => {
-            infoWindow.open(map, userMarker);
+        // Add hover effects to display the InfoWindow
+        userMarkerContent.addEventListener('mouseover', () => {
+            infoWindow.open({
+                anchor: userMarker,
+                map,
+                shouldFocus: false,
+            });
         });
 
-        userMarker.addListener('mouseout', () => {
+        userMarkerContent.addEventListener('mouseout', () => {
             infoWindow.close();
         });
     } else {
         console.error('Invalid user location data');
     }
 }
+
 
 // Function to get the photo and additional details of the hotel using Places API
 function fetchHotelDetails(location, hotelName, hotelPrice,lat,lng) {
@@ -643,7 +700,7 @@ function loadGoogleMapsAPI(lat, lng) {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDvxJfUnj_5qojubJNy8IcGkESmG7D9dlI&libraries=places&callback=initMapCallback`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDvxJfUnj_5qojubJNy8IcGkESmG7D9dlI&libraries=places,marker&callback=initMapCallback`;
     script.async = true;
     script.defer = true;
 
