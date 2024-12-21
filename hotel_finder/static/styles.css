@@ -143,31 +143,16 @@
 }
 
 
+
 .cheapest-marker:hover .marker-tooltip {
   display: block;
 }
 
-#book-hotel-btn {
-    color: white;
-    background-color: var(--blue);
-    padding: 10px 30px;
-    display: flex;
-    justify-content: center;
-    border-radius: 20px;
-    margin: 20px 0;
-    text-decoration: none;
-    transition: 250ms all ease-in-out;
-}
-
-#book-hotel-btn:hover {
-    border: 2px solid black;
-    background-color: white;
-    color: var(--darkblue);
-}
-
 .button-container {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 20px 0;
 }
 
 .spinner {
@@ -283,53 +268,42 @@
   text-align: center;
 }
 
-.hotel-buttons {
+.button-container {
   display: flex;
   justify-content: center;
   gap: 10px;
 }
 
-
-
-#directions-btn{
-    color: white;
-    background-color: var(--blue);
-    padding: 10px 30px;
-    display: flex;
-    justify-content: center;
-    border-radius: 20px;
-    margin: 20px 0;
-    text-decoration: none;
-    transition: 250ms all ease-in-out;
-}
-
 .star-icon {
-    width: 20px; /* Adjust the size as needed */
-    height: 20px; /* Adjust the size as needed */
-    margin-right: 2px; /* Spacing between stars */
+  width: 20px; /* Adjust the size as needed */
+  height: 20px; /* Adjust the size as needed */
+  margin-right: 2px; /* Spacing between stars */
 }
 
-
-#hotel-website {
-  border: none;
+#book-hotel-btn,
+#hotel-website,
+#directions-btn {
   color: white;
   background-color: var(--blue);
-  padding: 10px 30px;
-  border-radius: 20px;
-  margin: 20px 0;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: center;
+  border-radius: 10px;
+  margin: 5px 0;
   text-decoration: none;
   transition: 250ms all ease-in-out;
   cursor: pointer;
+  border: 2px solid black;
+  font-size: 14px;
 }
 
+#book-hotel-btn:hover,
 #directions-btn:hover,
 #hotel-website:hover {
   border: 2px solid black;
   background-color: white;
   color: var(--darkblue);
 }
-
-
 
 #close-btn {
   cursor: pointer;
@@ -340,12 +314,6 @@
   padding: 8px 12px;
   border-radius: 50%;
   transition: 250ms all ease;
-}
-
-#directions-btn:hover {
-  border: 2px solid black;
-  background-color: white;
-  color: var(--darkblue);
 }
 
 #close-btn:hover {
@@ -383,8 +351,6 @@
 }
 
 @media (max-width: 992px) {
-  #map {
-  }
 
   #info-panel {
     width: 45vw;
@@ -475,7 +441,7 @@
 }
 
 .review .review-title {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .review strong {
