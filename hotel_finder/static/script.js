@@ -487,8 +487,8 @@ function showInfoPanel(
 // Function to generate star icons based on rating
 // Function to generate star icons based on rating
 function generateStars(rating) {
-    const fullStar = '<img src="/static/images/orangeStar.png" class="star-icon">';
-    const emptyStar = '<img src="/static/images/Empty_Star.png" class="star-icon">';
+    const fullStar = '<img src="/static/images/yellow-star.png" class="star-icon">';
+    const emptyStar = '<img src="/static/images/black-star.png" class="star-icon">';
     const starCount = Math.round(rating);
     let stars = '';
 

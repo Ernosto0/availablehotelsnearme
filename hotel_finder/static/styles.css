@@ -269,13 +269,15 @@
   padding: 5px 10px;
   display: flex;
   justify-content: center;
+  align-items: center; /* Ensures alignment of text and image */
   border-radius: 10px;
   margin: 5px 0;
   text-decoration: none;
   transition: 250ms all ease-in-out;
   cursor: pointer;
   border: 2px solid black;
-  font-size: 14px;
+  font-size: 18px;
+  gap: 8px; /* Adds spacing between the text and the image */
 }
 
 #book-hotel-btn:hover,
@@ -284,6 +286,19 @@
   border: 2px solid black;
   background-color: white;
   color: var(--darkblue);
+}
+
+#directions-btn img.icon {
+  width: 18px; /* Adjust image width */
+  height: 18x; /* Adjust image height */
+  display: inline-block; /* Ensure proper inline alignment */
+}
+
+
+#book-hotel-btn img.icon {
+  width: 18px; /* Adjust image width */
+  height: 18x; /* Adjust image height */
+  display: inline-block; /* Ensure proper inline alignment */
 }
 
 #close-btn {
