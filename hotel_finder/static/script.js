@@ -104,8 +104,7 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, 
         const div = document.createElement('div');
         div.className = 'custom-marker';
         div.innerHTML = `
-            <h3>${hotelName}</h3>
-            <p>${hotelPrice} ${currency}</p>
+            <h4>${hotelPrice} ${currency}</h4>
         `;
 
         if (isCheapest) {
