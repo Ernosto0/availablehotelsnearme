@@ -25,26 +25,7 @@
   z-index: 0;
 }
 
-.map-button {
-  position: absolute;
-  top: 10px; /* 10px from the top */
-  left: 50%; /* Center horizontally */
-  transform: translateX(-50%); /* Offset by half the button's width */
-  z-index: 1000; /* Ensures it appears above the map */
-  background-color: #007bff; /* Blue background */
-  color: white; /* White text */
-  border: none;
-  border-radius: 5px;
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.3s ease;
-}
 
-.map-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
-}
 
 /* Marker style */
 .custom-marker {
@@ -504,3 +485,116 @@
 #popup-close-btn:hover {
   background: #ffddd4;
 }
+
+
+/* CSS for Search Panel */
+.search-panel {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background-color: #ffffff;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  transition: top 0.5s ease, opacity 0.5s ease;
+}
+
+.search-panel.hidden {
+  top: -33%; /* Adjusted so 10% of the panel remains visible */
+  opacity: 1; /* Keep the opacity at 1 so the remaining part is visible */
+}
+
+.search-panel label,
+.search-panel input,
+.search-panel button {
+    display: block;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-panel input[type="number"],
+.search-panel input[type="date"] {
+  width: calc(100% - 20px);
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.search-panel input[type="number"]:focus,
+.search-panel input[type="date"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.map-button {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  width: 100%;
+}
+
+.map-button:hover {
+  background-color: #0056b3;
+}
+
+.map-button:active {
+  background-color: #004080;
+  box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Media query for responsive adjustments */
+@media (max-width: 768px) {
+  .search-panel {
+      width: 90%;
+      padding: 10px 15px;
+  }
+
+  .search-panel input[type="number"],
+  .search-panel input[type="date"] {
+      width: 100%;
+  }
+}
+
+/* Panel handle for clicking */
+.panel-handle {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #007bff;
+  margin-top: 5px; /* Ensure the handle stays visible */
+  display: none;
+}
+
+.panel-handle.visible {
+  display: block;
+}
+
+/* Adjust Hide Panel Handle */
+#hide-panel-handle {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #007bff;
+  margin-top: 10px;
+  display: block; /* Ensure it's displayed */
+}
+
+#hide-panel-handle:hover {
+  color: #0056b3;
+}
+

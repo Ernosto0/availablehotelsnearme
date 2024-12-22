@@ -66,13 +66,27 @@
         </div>
 
         <div id="map"></div>
-        <button id="search-hotels-btn" class="map-button">Search Hotels</button>
+        
 
-        <div class="adults-input">
-            <label for="adults">Number of Users:</label>
-            <input type="number" id="adults" name="adults" min="1" max="10" value="1" default="1">
+        <div id="search-panel" class="search-panel">
+            <div id="panel-content">
+                <label for="adults">Adults:</label>
+                <input type="number" id="adults" name="adults" min="1" max="10" value="1">
+        
+                <label for="check-in">Check-in:</label>
+                <input type="date" id="check-in" name="check-in" value="2024-12-21">
+        
+                <label for="check-out">Check-out:</label>
+                <input type="date" id="check-out" name="check-out" value="2024-12-22">
+        
+                <button id="search-hotels-btn" class="map-button">Search Hotels</button>
+            </div>
+            <div id="hide-panel-handle">▲ Hide Panel</div>
+            <div id="panel-handle" class="panel-handle">▼</div>
         </div>
-
+        
+        
+        
 
     </section>
     <section class="footer">
@@ -217,6 +231,32 @@ function fetchHotels(latitude, longitude) {
         alert('User location is not available.');
     }
 });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchPanel = document.getElementById("search-panel");
+        const searchButton = document.getElementById("search-hotels-btn");
+        const hidePanelHandle = document.getElementById("hide-panel-handle");
+        const panelHandle = document.getElementById("panel-handle");
+
+        // When the search button is clicked
+        searchButton.addEventListener("click", function () {
+            searchPanel.classList.add("hidden");
+            panelHandle.classList.add("visible");
+        });
+
+        // When the hide panel handle is clicked
+        hidePanelHandle.addEventListener("click", function () {
+            searchPanel.classList.add("hidden");
+            panelHandle.classList.add("visible");
+        });
+
+        // When the handle is clicked
+        panelHandle.addEventListener("click", function () {
+            searchPanel.classList.remove("hidden");
+            panelHandle.classList.remove("visible");
+        });
+    });
+
 
 
 
