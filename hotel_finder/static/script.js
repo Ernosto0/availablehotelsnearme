@@ -39,14 +39,14 @@ function updateHotelsOnMap(hotels) {
     window.cheapestHotel = cheapestHotel; // Store it globally for later use
 
     hotels.forEach(hotel => {
-        const { hotel_name, price, location, booking_link, currency } = hotel;
+        const { hotel_name, price, location, booking_link, currency, status } = hotel;
         window.hotelCurrency = currency; // Store currency globally
 
         if (location && location.latitude && location.longitude) {
 
             const isCheapest = hotel_name === cheapestHotel.hotel_name; // Compare by unique property
             const hotelLocation = { lat: location.latitude, lng: location.longitude };
-            const marker = createCustomMarker(hotelLocation, hotel_name, price, map, booking_link, isCheapest);
+            const marker = createCustomMarker(hotelLocation, hotel_name, price, map, booking_link, status, isCheapest);
 
             // Add the marker to the markers array
             markers.push(marker);
@@ -89,7 +89,7 @@ let highlightedMarker = null; // Global variable to store the currently highligh
 
 
 // Create a custom marker using OverlayView
-function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, isCheapest = false) {
+function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, status, isCheapest = false) {
     const CustomMarker = function (position, map) {
         this.position = position;
         this.map = map;
@@ -102,7 +102,17 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, 
 
     CustomMarker.prototype.onAdd = function () {
         const div = document.createElement('div');
-        div.className = 'custom-marker';
+        div.className = 'custom-marker'; // Base class
+
+        // Add status-based color class
+        if (status === 'green') {
+            div.classList.add('green-marker');
+        } else if (status === 'yellow') {
+            div.classList.add('yellow-marker');
+        } else if (status === 'red') {
+            div.classList.add('red-marker');
+        }
+
         div.innerHTML = `
             <h4>${hotelPrice} ${currency}</h4>
         `;
@@ -138,9 +148,6 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, 
                     const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, reviewData } = data;
 
                     showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, location.lat, location.lng, reviewData, booking_link);
-
-                    // Highlight the marker after showing the info panel
-                    
                 })
                 .catch(error => {
                     console.error('Error fetching place details:', error);
@@ -173,7 +180,6 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, 
         console.error("Failed to create marker:", location, hotelName, hotelPrice);
     }
 
-
     document.getElementById('close-btn').addEventListener('click', () => {
         // Close the info panel
         document.getElementById('info-panel').classList.remove('activate');
@@ -184,9 +190,8 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, 
             highlightedMarker = null; // Reset the highlighted marker
         }
     });
-    
-    
 }
+
 
 
 function createUserMarker(location, map) {

@@ -82,25 +82,31 @@
   color: #333;
 }
 
+/* Green status */
+.green-marker {
+  border-color: #00FF00; /* Green border */
+  color: #00FF00;       /* Green price text */
+}
+
+/* Yellow status */
+.yellow-marker {
+  border-color: #ffff00; /* Yellow border */
+  color: #FFFF00;        /* Yellow price text */
+}
+
+/* Red status */
+.red-marker {
+  border-color: #FF0000; /* Red border */
+  color: #FF0000;        /* Red price text */
+}
+
 .custom-marker.cheapest-marker {
-  border: 3px solid gold; /* Highlight with a bold gold border */
+  border: 2px solid rgb(0, 255, 64); /* Highlight with a bold gold border */
   background-color: #fffacd; /* Light yellow background */
  
 }
 
-.cheapest-marker::after {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: gold;
-  color: black;
-  padding: 2px 6px;
-  font-size: 10px;
-  border-radius: 3px;
-  font-weight: bold;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-}
+
 
 .marker-tooltip {
   position: absolute;
@@ -118,9 +124,9 @@
 }
 
 .highlighted-marker {
-    border: 3px solid blue;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+    border: 5px solid blue;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 0, 255, 0.5);
 }
 
 

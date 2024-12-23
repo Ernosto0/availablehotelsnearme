@@ -49,6 +49,7 @@ def fetch_hotels(request):
         # if not access_token:
         #     return JsonResponse({'error': 'Unable to obtain access token'}, status=500)
         available_hotels = test_hotels
+        available_hotels = calculate_price_status(available_hotels)
         # Fetch hotels by geolocation
         # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
         # if hotel_ids:
@@ -250,3 +251,31 @@ def get_user_currency():
     # Fallback to default currency
     print("Falling back to default currency: EUR")
     return "EUR"
+
+def calculate_price_status(hotels):
+    """
+    Calculate the average price and assign a color status for each hotel based on its price.
+    """
+    # Extract prices and calculate the average price
+    prices = [hotel['price'] for hotel in hotels]
+    if not prices:
+        return hotels  # If no prices, return the original list
+
+    average_price = sum(prices) / len(prices)
+    print(f"Average price: {average_price}")
+
+    # Define thresholds for green, yellow, and red
+    high_threshold = average_price * 1.25  # 25% higher than average
+    low_threshold = average_price * 0.75  # 25% lower than average
+
+    # Assign color status
+    for hotel in hotels:
+        price = hotel['price']
+        if price > high_threshold:
+            hotel['status'] = 'red'
+        elif price < low_threshold:
+            hotel['status'] = 'green'
+        else:
+            hotel['status'] = 'yellow'
+    
+    return hotels
