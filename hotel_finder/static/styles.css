@@ -28,6 +28,7 @@
 
 
 /* Marker style */
+/* Base marker styling */
 .custom-marker {
   background-color: white;
   border: 1px solid #000000;
@@ -39,10 +40,11 @@
   color: #333;
   box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
   width: 80px; /* Control the width of the marker */
-  line-height: 1.2; /* Adjust the line spacing */
-  position: absolute; /* Allow precise positioning */
+  position: relative; /* Allow pseudo-elements positioning */
+  line-height: 1.2;
 }
 
+/* Arrow styling */
 .custom-marker::before {
   content: "";
   position: absolute;
@@ -69,6 +71,25 @@
   border-right: 10px solid transparent;
   border-top: 10px solid white;
 }
+
+/* Highlight effect for the marker */
+.highlighted-marker {
+  position: relative;
+  border: 3px solid rgba(47, 0, 255, 0.8); /* Highlight border */
+  box-shadow: 0px 0px 12px rgba(0, 0, 255, 0.5); /* Blue glow */
+  border-radius: 8px; /* Match the shape of the marker */
+  z-index: 1000; /* Bring to the top */
+}
+
+/* Highlight effect for the arrow */
+.highlighted-marker::before {
+  border-top-color: rgba(255, 0, 0, 0.8); /* Match highlight border */
+}
+
+.highlighted-marker::after {
+  border-top-color: white; /* Keep inner arrow white */
+}
+
 
 .custom-marker h4 {
   margin: 0;
@@ -123,11 +144,6 @@
   display: none;
 }
 
-.highlighted-marker {
-    border: 5px solid blue;
-    border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0, 0, 255, 0.5);
-}
 
 
 

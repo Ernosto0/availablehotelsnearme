@@ -3,11 +3,11 @@
 
 let markers = []; // Array to keep track of all markers
 
-// Initialize the map once
+// Initialize the map with Leaflet
+// Initialize the map with Leaflet
 function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris
-    console.log('Initializing map with user location:', { lat, lng });
+    console.log('Initializing map with MapTiler tiles:', { lat, lng });
 
-    const centerLocation = { lat, lng };
     const mapElement = document.getElementById("map");
 
     if (!mapElement) {
@@ -15,15 +15,19 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris
         return;
     }
 
-    // Initialize the map
-    map = new google.maps.Map(mapElement, {
-        zoom: 15,
-        center: centerLocation,
-        MapId: "c0f7595962ede78b"
-    });
+    // Create a map instance using Leaflet
+    map = L.map(mapElement).setView([lat, lng], 15);
 
-    createUserMarker(centerLocation, map); // Add the user's location marker
+    // Add MapTiler Streets tiles
+    L.tileLayer(`https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj	`, {
+        attribution: '&copy; <a href="https://www.maptiler.com/">MapTiler</a> contributors',
+        maxZoom: 20,
+    }).addTo(map);
+
+    // Add user's location marker
+    createUserMarker(lat, lng);
 }
+
 
 // Add hotels dynamically without reloading the map
 function updateHotelsOnMap(hotels) {
@@ -32,7 +36,7 @@ function updateHotelsOnMap(hotels) {
     // Clear existing markers
     clearMarkers();
 
-    const bounds = new google.maps.LatLngBounds();
+    const bounds = L.latLngBounds();
 
     const cheapestHotel = calculateCheapestHotel(hotels);
     console.log('Cheapest Hotel:', cheapestHotel);
@@ -43,28 +47,36 @@ function updateHotelsOnMap(hotels) {
         window.hotelCurrency = currency; // Store currency globally
 
         if (location && location.latitude && location.longitude) {
-
             const isCheapest = hotel_name === cheapestHotel.hotel_name; // Compare by unique property
-            const hotelLocation = { lat: location.latitude, lng: location.longitude };
-            const marker = createCustomMarker(hotelLocation, hotel_name, price, map, booking_link, status, isCheapest);
+            const marker = createCustomMarker(
+                location.latitude,
+                location.longitude,
+                hotel_name,
+                price,
+                booking_link,
+                status,
+                isCheapest
+            );
 
             // Add the marker to the markers array
             markers.push(marker);
 
             // Extend the map bounds to include this marker
-            bounds.extend(hotelLocation);
+            bounds.extend([location.latitude, location.longitude]);
         } else {
             console.error(`Invalid location data for hotel: ${hotel_name}`);
         }
     });
 
     // Fit the map to show all markers
-    if (!bounds.isEmpty()) {
+    if (bounds.isValid()) {
         map.fitBounds(bounds);
     } else {
         console.warn('No valid hotels to display.');
     }
+    
 }
+
 
 // Clear all existing markers from the map
 function clearMarkers() {
@@ -89,96 +101,59 @@ let highlightedMarker = null; // Global variable to store the currently highligh
 
 
 // Create a custom marker using OverlayView
-function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, status, isCheapest = false) {
-    const CustomMarker = function (position, map) {
-        this.position = position;
-        this.map = map;
-        this.div = null;
-        this.setMap(map); // Calls Google Maps API to add this overlay
-    };
-
-    CustomMarker.prototype = new google.maps.OverlayView();
+function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, status, isCheapest = false) {
     const currency = window.hotelCurrency;
 
-    CustomMarker.prototype.onAdd = function () {
-        const div = document.createElement('div');
-        div.className = 'custom-marker'; // Base class
-
-        // Add status-based color class
-        if (status === 'green') {
-            div.classList.add('green-marker');
-        } else if (status === 'yellow') {
-            div.classList.add('yellow-marker');
-        } else if (status === 'red') {
-            div.classList.add('red-marker');
-        }
-
-        div.innerHTML = `
+    // Create marker icon with custom HTML
+    const iconHtml = `
+        <div class="custom-marker ${status}-marker ${isCheapest ? 'cheapest-marker' : ''}">
             <h4>${hotelPrice} ${currency}</h4>
-        `;
+            ${isCheapest ? '<div class="marker-tooltip">This is the cheapest hotel!</div>' : ''}
+        </div>
+    `;
 
-        if (isCheapest) {
-            div.classList.add('cheapest-marker');
-            const tooltip = document.createElement('div');
-            tooltip.className = 'marker-tooltip';
-            tooltip.innerText = 'This is the cheapest hotel!';
-            div.appendChild(tooltip);
+    // Define a custom divIcon for the marker
+    const customIcon = L.divIcon({
+        className: 'custom-marker-container',
+        html: iconHtml,
+        iconSize: [80, 60], // Size of the custom marker (adjust as needed)
+        iconAnchor: [40, 30], // Anchor point of the marker (centered)
+    });
+
+    // Create the marker and add it to the map
+    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+
+    // Add a click event listener to the marker
+    marker.on('click', () => {
+        console.log('Clicked on hotel:', hotelName);
+
+        if (highlightedMarker) {
+            const prevElement = highlightedMarker.getElement();
+            if (prevElement) prevElement.classList.remove('highlighted-marker');
         }
 
-        this.div = div;
-
-        const panes = this.getPanes();
-        panes.overlayMouseTarget.appendChild(div);
-
-        div.addEventListener('click', debounce((event) => {
-            event.stopPropagation();
-            event.preventDefault();
-            console.log('Clicked on hotel:', hotelName);
-
-            if (highlightedMarker) {
-                highlightedMarker.classList.remove('highlighted-marker');
-            }
-        
-            // Add highlight to the clicked marker
-            div.classList.add('highlighted-marker');
-            highlightedMarker = div; // Set the currently highlighted marker
-
-            fetchHotelDetails(location, hotelName, hotelPrice, location.lat, location.lng)
-                .then(data => {
-                    const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, reviewData } = data;
-
-                    showInfoPanel(hotelName, hotelPrice, photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, location.lat, location.lng, reviewData, booking_link);
-                })
-                .catch(error => {
-                    console.error('Error fetching place details:', error);
-                });
-        }, 300));
-    };
-
-    CustomMarker.prototype.draw = function () {
-        const overlayProjection = this.getProjection();
-        const position = overlayProjection.fromLatLngToDivPixel(this.position);
-
-        if (position) {
-            this.div.style.left = position.x - 40 + 'px'; // Adjust to center horizontally
-            this.div.style.top = position.y - 60 + 'px';  // Adjust to center vertically
+        // Add highlight to the clicked marker
+        const markerElement = marker.getElement();
+        if (markerElement) {
+            markerElement.classList.add('highlighted-marker');
+            highlightedMarker = marker; // Update the reference
         }
-    };
 
-    CustomMarker.prototype.onRemove = function () {
-        if (this.div) {
-            this.div.parentNode.removeChild(this.div);
-            this.div = null;
-        }
-    };
+        // Fetch hotel details and display in the info panel
+        fetchHotelDetails({ lat, lng }, hotelName, hotelPrice, lat, lng)
+            .then(data => {
+                const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, reviewData } = data;
 
-    // Instantiate the custom marker and add it to the markers array
-    const marker = new CustomMarker(location, map);
-    if (marker) {
-        markers.push(marker); // Only push valid markers
-    } else {
-        console.error("Failed to create marker:", location, hotelName, hotelPrice);
-    }
+                showInfoPanel(
+                    hotelName, hotelPrice, photos, hotelRating, userRatingsTotal,
+                    hotelWebsite, hotelPhoneNumber, openingHours, lat, lng, reviewData, booking_link
+                );
+            })
+            .catch(error => {
+                console.error('Error fetching place details:', error);
+            });
+    });
+   
 
     document.getElementById('close-btn').addEventListener('click', () => {
         // Close the info panel
@@ -188,72 +163,56 @@ function createCustomMarker(location, hotelName, hotelPrice, map, booking_link, 
         if (highlightedMarker) {
             highlightedMarker.classList.remove('highlighted-marker');
             highlightedMarker = null; // Reset the highlighted marker
-        }
-    });
+        } });
+    return marker; // Return the created marker
 }
 
 
 
-function createUserMarker(location, map) {
-    
-    if (location && location.lat && location.lng) {
-        // Create a div for custom marker content
-        const userMarkerContent = document.createElement('div');
-        userMarkerContent.innerHTML = `
-            <div style="
-                background-color: #4285F4;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                border: 2px solid #ffffff;
-                box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);">
-            </div>
-        `;
-        
-        // Create an AdvancedMarkerElement
-        const userMarker = new google.maps.marker.AdvancedMarkerElement({
-            position: location,
-            map: map,
-            title: "You are here",
-            content: userMarkerContent,
 
-        });
-
-        // Create an InfoWindow
-        const infoWindow = new google.maps.InfoWindow({
-            content: "<div><strong>You are here</strong></div>",
-        });
-
-        // Add a click listener for the marker to open the InfoWindow
-        userMarkerContent.addEventListener('click', () => {
-            infoWindow.open({
-                anchor: userMarker,
-                map,
-                shouldFocus: false,
-            });
-        });
-
-        // Add hover effects to display the InfoWindow
-        userMarkerContent.addEventListener('mouseover', () => {
-            infoWindow.open({
-                anchor: userMarker,
-                map,
-                shouldFocus: false,
-            });
-        });
-
-        userMarkerContent.addEventListener('mouseout', () => {
-            infoWindow.close();
-        });
-    } else {
+function createUserMarker(lat, lng) {
+    if (!lat || !lng) {
         console.error('Invalid user location data');
+        return;
     }
+
+    const userMarker = L.marker([lat, lng], {
+        title: "You are here",
+        icon: L.divIcon({
+            className: 'user-marker',
+            html: `
+                <div style="
+                    background-color: #4285F4;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    border: 2px solid #ffffff;
+                    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);">
+                </div>
+            `
+        })
+    }).addTo(map);
+
+    userMarker.bindPopup("<strong>You are here</strong>").openPopup();
 }
 
 
-// Function to get the photo and additional details of the hotel using Places API
-function fetchHotelDetails(location, hotelName, hotelPrice,lat,lng) {
-    return new Promise((resolve, reject) => {  // Return a new promise
+
+// Object to cache hotel data temporarily
+const hotelCache = {};
+
+function fetchHotelDetails(location, hotelName, hotelPrice, lat, lng) {
+    return new Promise((resolve, reject) => {
+        const cacheKey = `${lat},${lng}`; // Use lat/lng as a unique key for caching
+
+        if (hotelCache[cacheKey]) {
+            console.log('Using cached data for:', hotelName);
+            resolve(hotelCache[cacheKey]);
+            return; // Exit early to avoid API call
+        }
+
+        console.log('Fetching new data from Places API for:', hotelName);
+
         const service = new google.maps.places.PlacesService(document.createElement('div'));
         const request = {
             location: location,
@@ -262,20 +221,22 @@ function fetchHotelDetails(location, hotelName, hotelPrice,lat,lng) {
         };
 
         // Perform a text search to get basic details and place_id
-        service.textSearch(request, function(results, status) {
+
+        service.textSearch(request, function (results, status) {
             if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
                 const hotel = results[0];
                 const placeId = hotel.place_id;
 
-                // Use a promise to wait for place details before displaying the info window
+                // Fetch additional details
                 getPlaceDetails(service, placeId, hotelName, hotelPrice)
                     .then(data => {
-                        // Resolve the promise with the data
-                        resolve({
+                        // Store data in cache
+                        hotelCache[cacheKey] = {
                             ...data,
-                            lat: lat,  // Pass the latitude
-                            lng: lng   // Pass the longitude
-                        });
+                            lat: lat,
+                            lng: lng
+                        };
+                        resolve(hotelCache[cacheKey]);
                     })
                     .catch(error => {
                         reject('Error fetching place details: ' + error);
@@ -290,6 +251,7 @@ function fetchHotelDetails(location, hotelName, hotelPrice,lat,lng) {
 
 // Function to get place details using place_id with a promise
 function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
+    console.log('Fetching details for:', hotelName);
     return new Promise((resolve, reject) => {
         const request = {
             placeId: placeId,
