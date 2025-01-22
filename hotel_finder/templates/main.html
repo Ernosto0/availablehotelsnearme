@@ -1,278 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hotel Map</title>
 
     {% load static %}
 
-    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" >
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" >
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
 
     <script src="{% static 'script.js' %}"></script>
-</head>
-<body>
+  </head>
+  <body>
     <section class="container">
-        <div id="loading-spinner" class="spinner" style="display: none;"></div>
+      <!-- Info Button -->
+      <div class="info-button">
+        <i class="fa-solid fa-info"></i>
+      </div>
+      <!-- Info Button -->
 
-        
-
-
-        
-
-        <div id="info-panel">
-            <i class="fa-solid fa-xmark" id="close-btn"></i>
-            <div id="photo-gallery" class="gallery">
-                <img id="hotel-photo" class="photo-gallery-img active" src="initial-photo-url.jpg" alt="Hotel Photo">
-                <div class="info-buttons">
-                    <button id="prev-photo" onclick="prevPhoto()"><i class="fa-solid fa-arrow-left"></i></button>
-                    <button id="next-photo" onclick="nextPhoto()"><i class="fa-solid fa-arrow-right"></i></button>
-                </div>
-            </div>
-            <h2 id="hotel-name"></h2>
-            <div class="hotel-desc">
-                <p id="hotel-price"></p>
-                <p id="hotel-rating"></p>
-                <p id="hotel-phone"></p>
-                
-                <p id="hotel-opening-hours"></p>
-            </div>
-           
-            
-            
-            <div class="button-container">
-                <a id="hotel-website" href="#" target="_blank">Visit Website</a>
-                <button id="directions-btn">
-                    Get Directions
-                    <img src="/static/images/map.png" alt="Google Maps Icon" class="icon">
-                </button>
-                <button id="book-hotel-btn">
-                    Book Now
-                    <img src="/static/images/booking.png" alt="Book Now Icon" class="icon">
-                </button>
-            </div>
-            
-
-            <p id="hotel-distance"></p>
-
-            <div id="hotel-reviews-wrapper">
-                <div id="hotel-reviews" class="reviews-container">
-                    <!-- Reviews will be displayed here -->
-                </div>
-                <div class="review-navigation">
-                    <button id="prev-review" class="navigation-btn">Previous Review</button>
-                    <button id="next-review" class="navigation-btn">Next Review</button>
-                </div>
-            </div>
-            
-
-        </div>
-
-        <div id="map"></div>
-        
-
-        <div id="search-panel" class="search-panel">
-            <div id="panel-content">
-                <label for="adults">Adults:</label>
-                <input type="number" id="adults" name="adults" min="1" max="10" value="1">
-        
-                <label for="check-in">Check-in:</label>
-                <input type="date" id="check-in" name="check-in" value="2024-12-21">
-        
-                <label for="check-out">Check-out:</label>
-                <input type="date" id="check-out" name="check-out" value="2024-12-22">
-        
-                <button id="search-hotels-btn" class="map-button">Search Hotels</button>
-            </div>
-            <div id="hide-panel-handle">▲ Hide Panel</div>
-            <div id="panel-handle" class="panel-handle">▼</div>
-        </div>
-        
-        
-        
-
-    </section>
-    <section class="footer">
+      <!-- Web Info Panel -->
+      <div class="web-info-panel">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-links">
-                    <a href="#about">About Us</a>
-                    <a href="#contact">Contact</a>
-                    <a href="#terms">Terms & Conditions</a>
-                    <a href="#privacy">Privacy Policy</a>
-                </div>
-                <div class="footer-copyright">
-                    <p>&copy; 2024 AvailableHotelsAroundMe. All rights reserved.</p>
-                </div>
-            </div>
+          <div class="btn">
+            <i class="fa-solid fa-xmark web-panel-btn"></i>
+          </div>
+          <div class="text">
+            <h1>AvailableHotelsAroundMe</h1>
+            <p>
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+              Molestiae, eos.
+            </p>
+            <a href="">Link</a>
+          </div>
         </div>
+      </div>
+      <!-- Web Info Panel -->
+
+      <!-- Loading Spinner -->
+      <div id="loading-spinner" class="spinner" style="display: none"></div>
+      <!-- Loading Spinner -->
+
+      <!-- Hotel Info Panel -->
+      <div id="info-panel">
+        <i class="fa-solid fa-xmark" id="close-btn"></i>
+        <div id="photo-gallery" class="gallery">
+          <img
+            id="hotel-photo"
+            class="photo-gallery-img active"
+            src="initial-photo-url.jpg"
+            alt="Hotel Photo"
+          />
+          <div class="info-buttons">
+            <button id="prev-photo" onclick="prevPhoto()">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button id="next-photo" onclick="nextPhoto()">
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+        <h2 id="hotel-name"></h2>
+        <div class="hotel-desc">
+          <p id="hotel-price"></p>
+          <p id="hotel-rating"></p>
+          <p id="hotel-phone"></p>
+          <p id="hotel-opening-hours"></p>
+        </div>
+        <div class="button-container">
+          <a id="hotel-website" href="#" target="_blank">Visit Website</a>
+          <button id="directions-btn">
+            Get Directions
+            <img
+              src="/static/images/map.png"
+              alt="Google Maps Icon"
+              class="icon"
+            />
+          </button>
+          <button id="book-hotel-btn">
+            Book Now
+            <img
+              src="/static/images/booking.png"
+              alt="Book Now Icon"
+              class="icon"
+            />
+          </button>
+        </div>
+        <p id="hotel-distance"></p>
+
+        <div id="hotel-reviews-wrapper">
+          <div id="hotel-reviews" class="reviews-container">
+            <!-- Reviews will be displayed here -->
+          </div>
+          <div class="review-navigation">
+            <button id="prev-review" class="navigation-btn">
+              Previous Review
+            </button>
+            <button id="next-review" class="navigation-btn">Next Review</button>
+          </div>
+        </div>
+      </div>
+      <!-- Hotel Info Panel -->
+
+      <div id="map"></div>
+
+      <!-- Search Panel -->
+      <div id="search-panel" class="search-panel">
+        <div id="panel-content">
+          <label for="adults">Adults:</label>
+          <input
+            type="number"
+            id="adults"
+            name="adults"
+            min="1"
+            max="10"
+            value="1"
+          />
+
+          <label for="check-in">Check-in:</label>
+          <input type="date" id="check-in" name="check-in" value="2024-12-21" />
+
+          <label for="check-out">Check-out:</label>
+          <input
+            type="date"
+            id="check-out"
+            name="check-out"
+            value="2024-12-22"
+          />
+
+          <button id="search-hotels-btn" class="map-button">
+            Search Hotels
+          </button>
+        </div>
+        <div id="hide-panel-handle">▲ Hide Panel</div>
+        <div id="panel-handle" class="panel-handle">▼</div>
+      </div>
     </section>
-    
-        
+    <!-- Search Panel -->
+
+    <!-- Footer -->
+    <section class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-links">
+            <a href="#about">About Us</a>
+            <a href="#contact">Contact</a>
+            <a href="#terms">Terms & Conditions</a>
+            <a href="#privacy">Privacy Policy</a>
+          </div>
+          <div class="footer-copyright">
+            <p>&copy; 2024 AvailableHotelsAroundMe. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Footer -->
+
+    <!-- No Hotels Popup -->
     <div id="no-hotels-popup" class="popup hidden">
-        <p>No hotels available around your area.</p> <!-- This will be updated dynamically -->
-        <button id="popup-close-btn">Close</button>
+      <p>No hotels available around your area.</p>
+      <!-- This will be updated dynamically -->
+      <button id="popup-close-btn">Close</button>
     </div>
-    
-    
+    <!-- No Hotels Popup -->
 
     {% csrf_token %}
     <script type="text/javascript">
-        window.hotels = {{ hotels|safe }};
-        console.log("Embedded hotels data:", window.hotels);
-    
-        function getCSRFToken() {
-            const cookieValue = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('csrftoken='))
-                ?.split('=')[1];
-            return cookieValue || '';
-        }
-    
-        document.addEventListener('DOMContentLoaded', function () {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            // const latitude = position.coords.latitude;
-            // const longitude = position.coords.longitude;
+              window.hotels = {{ hotels|safe }};
+              console.log("Embedded hotels data:", window.hotels);
 
-            const latitude = 37.774929;
-            const longitude = -122.419416;
+              function getCSRFToken() {
+                  const cookieValue = document.cookie
+                      .split('; ')
+                      .find(row => row.startsWith('csrftoken='))
+                      ?.split('=')[1];
+                  return cookieValue || '';
+              }
 
-            // Send user's location to the backend
-            fetch('/set-user-location/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken(),
-                },
-                body: JSON.stringify({ latitude, longitude }),
-            })
-                
-        }, function (error) {
-            console.error('Geolocation error:', error.message);
-            alert('Failed to get location.');
-        });
-    } else {
-        alert('Geolocation is not supported by your browser.');
-    }
-});
+              document.addEventListener('DOMContentLoaded', function () {
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(function (position) {
+                  // const latitude = position.coords.latitude;
+                  // const longitude = position.coords.longitude;
 
-// Update fetchHotels function to use updateHotelsOnMap
-function fetchHotels(latitude, longitude) {
-    console.log('Fetching hotels...');
+                  const latitude = 37.774929;
+                  const longitude = -122.419416;
 
-    const loadingSpinner = document.getElementById('loading-spinner');
-    if (loadingSpinner) loadingSpinner.style.display = 'block';
+                  // Send user's location to the backend
+                  fetch('/set-user-location/', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'X-CSRFToken': getCSRFToken(),
+                      },
+                      body: JSON.stringify({ latitude, longitude }),
+                  })
 
-    // Get the value of the adults input field
-    const adults = document.getElementById('adults').value || 1; // Default to 1 if not set
+              }, function (error) {
+                  console.error('Geolocation error:', error.message);
+                  alert('Failed to get location.');
+              });
+          } else {
+              alert('Geolocation is not supported by your browser.');
+          }
+      });
 
-    fetch('/fetch-hotels/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),
-        },
-        body: JSON.stringify({ latitude, longitude, adults }), // Include adults in the payload
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Hotels fetched:', data.hotels);
+      // Update fetchHotels function to use updateHotelsOnMap
+      function fetchHotels(latitude, longitude) {
+          console.log('Fetching hotels...');
 
-            if (data.hotels && data.hotels.length > 0) {
-                // Dynamically update the hotels on the map
-                updateHotelsOnMap(data.hotels);
-            } else {
-                showNoHotelsPopup(adults);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching hotels:', error);
-            showNoHotelsPopup(adults);
+          const loadingSpinner = document.getElementById('loading-spinner');
+          if (loadingSpinner) loadingSpinner.style.display = 'block';
 
-        })
-        .finally(() => {
-            if (loadingSpinner) loadingSpinner.style.display = 'none';
-        });
-}
+          // Get the value of the adults input field
+          const adults = document.getElementById('adults').value || 1; // Default to 1 if not set
 
+          fetch('/fetch-hotels/', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCSRFToken(),
+              },
+              body: JSON.stringify({ latitude, longitude, adults }), // Include adults in the payload
+          })
+              .then(response => response.json())
+              .then(data => {
+                  console.log('Hotels fetched:', data.hotels);
 
+                  if (data.hotels && data.hotels.length > 0) {
+                      // Dynamically update the hotels on the map
+                      updateHotelsOnMap(data.hotels);
+                  } else {
+                      showNoHotelsPopup(adults);
+                  }
+              })
+              .catch(error => {
+                  console.error('Error fetching hotels:', error);
+                  showNoHotelsPopup(adults);
 
-       // Function to show the popup
-       function showNoHotelsPopup(adults = 1) {
-        console.log(`No hotels available popup for ${adults} adults.`);
-        const popup = document.getElementById('no-hotels-popup');
-
-        // Update the popup text
-        popup.querySelector('p').textContent = `No hotels available around your area for ${adults} adult(s).`;
-
-        popup.classList.remove('hidden');
-    }
-
-
-        // Close button functionality
-        document.getElementById('popup-close-btn').addEventListener('click', () => {
-            const popup = document.getElementById('no-hotels-popup');
-            popup.classList.add('hidden');
-        });
-
-        // Check if no hotels are available from the backend
-        const noHotelsAvailable = {{ no_hotels_available|default:"false"|lower }};
-        if (noHotelsAvailable) {
-            console.log('No hotels available');
-            
-            showNoHotelsPopup(adults);
-        }
-
-        document.getElementById('search-hotels-btn').addEventListener('click', function () {
-    console.log('Search Hotels button clicked.');
-
-    // Fetch hotels using user's location
-    if (window.userLocation) {
-        fetchHotels(window.userLocation.latitude, window.userLocation.longitude);
-    } else {
-        alert('User location is not available.');
-    }
-});
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const searchPanel = document.getElementById("search-panel");
-        const searchButton = document.getElementById("search-hotels-btn");
-        const hidePanelHandle = document.getElementById("hide-panel-handle");
-        const panelHandle = document.getElementById("panel-handle");
-
-        // When the search button is clicked
-        searchButton.addEventListener("click", function () {
-            searchPanel.classList.add("hidden");
-            panelHandle.classList.add("visible");
-        });
-
-        // When the hide panel handle is clicked
-        hidePanelHandle.addEventListener("click", function () {
-            searchPanel.classList.add("hidden");
-            panelHandle.classList.add("visible");
-        });
-
-        // When the handle is clicked
-        panelHandle.addEventListener("click", function () {
-            searchPanel.classList.remove("hidden");
-            panelHandle.classList.remove("visible");
-        });
-    });
+              })
+              .finally(() => {
+                  if (loadingSpinner) loadingSpinner.style.display = 'none';
+              });
+      }
 
 
 
+             // Function to show the popup
+             function showNoHotelsPopup(adults = 1) {
+              console.log(`No hotels available popup for ${adults} adults.`);
+              const popup = document.getElementById('no-hotels-popup');
 
+              // Update the popup text
+              popup.querySelector('p').textContent = `No hotels available around your area for ${adults} adult(s).`;
+
+              popup.classList.remove('hidden');
+          }
+
+
+              // Close button functionality
+              document.getElementById('popup-close-btn').addEventListener('click', () => {
+                  const popup = document.getElementById('no-hotels-popup');
+                  popup.classList.add('hidden');
+              });
+
+              // Check if no hotels are available from the backend
+              const noHotelsAvailable = {{ no_hotels_available|default:"false"|lower }};
+              if (noHotelsAvailable) {
+                  console.log('No hotels available');
+
+                  showNoHotelsPopup(adults);
+              }
+
+              document.getElementById('search-hotels-btn').addEventListener('click', function () {
+          console.log('Search Hotels button clicked.');
+
+          // Fetch hotels using user's location
+          if (window.userLocation) {
+              fetchHotels(window.userLocation.latitude, window.userLocation.longitude);
+          } else {
+              alert('User location is not available.');
+          }
+      });
+
+          document.addEventListener("DOMContentLoaded", function () {
+              const searchPanel = document.getElementById("search-panel");
+              const searchButton = document.getElementById("search-hotels-btn");
+              const hidePanelHandle = document.getElementById("hide-panel-handle");
+              const panelHandle = document.getElementById("panel-handle");
+
+              // When the search button is clicked
+              searchButton.addEventListener("click", function () {
+                  searchPanel.classList.add("hidden");
+                  panelHandle.classList.add("visible");
+              });
+
+              // When the hide panel handle is clicked
+              hidePanelHandle.addEventListener("click", function () {
+                  searchPanel.classList.add("hidden");
+                  panelHandle.classList.add("visible");
+              });
+
+              // When the handle is clicked
+              panelHandle.addEventListener("click", function () {
+                  searchPanel.classList.remove("hidden");
+                  panelHandle.classList.remove("visible");
+              });
+          });
     </script>
-     <script>
-        document.getElementById('close-btn').addEventListener("click", (e) => {
-        document.getElementById('info-panel').classList.remove("activate");
+    <script>
+      document.getElementById("close-btn").addEventListener("click", (e) => {
+        document.getElementById("info-panel").classList.remove("activate");
+      });
+
+      const infoButton = document.querySelector(".info-button");
+      const webInfoPanel = document.querySelector(".web-info-panel");
+      const webPanelBtn = document.querySelector(".web-panel-btn");
+      infoButton.addEventListener("click", () => {
+        webInfoPanel.style.opacity = "1";
+        webInfoPanel.style.pointerEvents = "auto";
+        webPanelBtn.addEventListener("click", () => {
+          webInfoPanel.style.opacity = "0";
+          webInfoPanel.style.pointerEvents = "none";
         });
+      });
     </script>
-</body>
+  </body>
 </html>
