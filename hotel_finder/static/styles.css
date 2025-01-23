@@ -18,14 +18,62 @@
   display: flex;
 }
 
+.info-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 9999;
+  background-color: var(--blue);
+  padding: 8px 18px;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+}
+
+.web-info-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 9999;
+  background-color: white;
+  height: 100vh;
+  width: 100vw;
+  transition: all .5s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.web-info-panel .container {
+  position: relative;
+  display: flex;  
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+}
+
+.web-info-panel .container .btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.web-info-panel .container .text {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
 /* Style the map container */
 #map {
   height: 100vh;
   width: 100vw;
   z-index: 0;
 }
-
-
 
 /* Marker style */
 /* Base marker styling */
@@ -90,7 +138,6 @@
   border-top-color: white; /* Keep inner arrow white */
 }
 
-
 .custom-marker h4 {
   margin: 0;
   font-size: 15px;
@@ -105,29 +152,26 @@
 
 /* Green status */
 .green-marker {
-  border-color: #00FF00; /* Green border */
-  color: #00FF00;       /* Green price text */
+  border-color: #00ff00; /* Green border */
+  color: #00ff00; /* Green price text */
 }
 
 /* Yellow status */
 .yellow-marker {
   border-color: #ffff00; /* Yellow border */
-  color: #FFFF00;        /* Yellow price text */
+  color: #ffff00; /* Yellow price text */
 }
 
 /* Red status */
 .red-marker {
-  border-color: #FF0000; /* Red border */
-  color: #FF0000;        /* Red price text */
+  border-color: #ff0000; /* Red border */
+  color: #ff0000; /* Red price text */
 }
 
 .custom-marker.cheapest-marker {
   border: 2px solid rgb(0, 255, 64); /* Highlight with a bold gold border */
   background-color: #fffacd; /* Light yellow background */
- 
 }
-
-
 
 .marker-tooltip {
   position: absolute;
@@ -143,9 +187,6 @@
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
   display: none;
 }
-
-
-
 
 .cheapest-marker:hover .marker-tooltip {
   display: block;
@@ -316,7 +357,6 @@
   display: inline-block; /* Ensure proper inline alignment */
 }
 
-
 #book-hotel-btn img.icon {
   width: 18px; /* Adjust image width */
   height: 18x; /* Adjust image height */
@@ -369,7 +409,6 @@
 }
 
 @media (max-width: 992px) {
-
   #info-panel {
     width: 45vw;
   }
@@ -377,7 +416,7 @@
   #info-panel.activate {
     opacity: 1;
     width: 45vw;
-    padding: 10px;
+    padding-top: 8vh;
   }
 }
 
@@ -412,7 +451,6 @@
     bottom: 0;
     height: 120vh;
     width: 100vw;
-    padding: 10px;
     z-index: 999;
   }
 
@@ -523,11 +561,10 @@
   background: #ffddd4;
 }
 
-
 /* CSS for Search Panel */
 .search-panel {
   position: absolute;
-  top: 20px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
@@ -536,21 +573,26 @@
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   width: 350px;
-  transition: top 0.5s ease, opacity 0.5s ease;
+  transition: top 0.5s ease, opacity 0.3s ease;
+  opacity: 1;
 }
 
 .search-panel.hidden {
-  top: -33%; /* Adjusted so 10% of the panel remains visible */
-  opacity: 1; /* Keep the opacity at 1 so the remaining part is visible */
+  top: -48vh;
+}
+
+.search-panel.removed {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .search-panel label,
 .search-panel input,
 .search-panel button {
-    display: block;
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .search-panel input[type="number"],
@@ -595,13 +637,16 @@
 /* Media query for responsive adjustments */
 @media (max-width: 768px) {
   .search-panel {
-      width: 90%;
-      padding: 10px 15px;
+    width: 90%;
+    padding: 10px 15px;
   }
 
   .search-panel input[type="number"],
   .search-panel input[type="date"] {
-      width: 100%;
+    width: 100%;
+  }
+  .search-panel.hidden {
+    top: -50vh;
   }
 }
 
@@ -634,4 +679,3 @@
 #hide-panel-handle:hover {
   color: #0056b3;
 }
-
