@@ -16,7 +16,16 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris
     }
 
     // Create a map instance using Leaflet
-    map = L.map(mapElement).setView([lat, lng], 15);
+    map = L.map(mapElement, {
+        center: [lat, lng],
+        zoom: 15,
+        zoomControl: false // Disable default zoom control position
+    });
+    
+    // Add the zoom control with a custom position
+    L.control.zoom({
+        position: 'bottomleft' // Options: 'topleft', 'topright', 'bottomleft', 'bottomright'
+    }).addTo(map);
 
     // Add MapTiler Streets tiles
     L.tileLayer(`https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj	`, {
