@@ -225,7 +225,6 @@
 
 /* Info panel floating on the left corner of the map */
 #info-panel {
-  display: none;
   width: 0;
   height: auto;
   max-height: 100vh;
@@ -239,7 +238,6 @@
 }
 
 #info-panel.activate {
-  display: block;
   opacity: 1;
   width: 35vw;
   padding: 10px;
@@ -580,7 +578,7 @@
 }
 
 .search-panel.hidden {
-  top: -340px;
+  top: -48vh;
 }
 
 .search-panel.removed {
@@ -648,7 +646,7 @@
     width: 100%;
   }
   .search-panel.hidden {
-    top: -340px;
+    top: -50vh;
   }
 }
 
