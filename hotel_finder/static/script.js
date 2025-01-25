@@ -212,7 +212,7 @@ const hotelCache = {};
 
 function fetchHotelDetails(location, hotelName, hotelPrice, lat, lng) {
     return new Promise((resolve, reject) => {
-        const cacheKey = `${lat},${lng}`; // Use lat/lng as a unique key for caching
+        const cacheKey = `${lat},${lng},${hotelName}`; // Include hotel name in cache key
 
         if (hotelCache[cacheKey]) {
             console.log('Using cached data for:', hotelName);
@@ -220,47 +220,41 @@ function fetchHotelDetails(location, hotelName, hotelPrice, lat, lng) {
             return; // Exit early to avoid API call
         }
 
-        console.log('Fetching new data from Places API for:', hotelName);
+        console.log(`Fetching new data from Places API for: ${hotelName} at (${lat}, ${lng})`);
 
         const service = new google.maps.places.PlacesService(document.createElement('div'));
         const request = {
-            location: location,
-            radius: 50,  // Search within a small radius around the location
-            query: hotelName
+            query: hotelName,
+            locationBias: { lat: lat, lng: lng },  // Restrict search to lat/lng
+            fields: ['place_id']  // Only request place_id to optimize
         };
 
-        // Perform a text search to get basic details and place_id
+        console.log('Requesting Place ID with:', request);
 
-        service.textSearch(request, function (results, status) {
+        service.findPlaceFromQuery(request, function (results, status) {
+            console.log('Google Places API Response:', results, 'Status:', status);
+
             if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-                const hotel = results[0];
-                const placeId = hotel.place_id;
+                const placeId = results[0].place_id;
+                console.log(`Found Place ID for ${hotelName}: ${placeId}`);
 
-                // Fetch additional details
                 getPlaceDetails(service, placeId, hotelName, hotelPrice)
                     .then(data => {
-                        // Store data in cache
-                        hotelCache[cacheKey] = {
-                            ...data,
-                            lat: lat,
-                            lng: lng
-                        };
+                        hotelCache[cacheKey] = { ...data, lat: lat, lng: lng };
                         resolve(hotelCache[cacheKey]);
                     })
-                    .catch(error => {
-                        reject('Error fetching place details: ' + error);
-                    });
+                    .catch(error => reject(`Error fetching place details: ${error}`));
             } else {
-                reject('Places search was not successful: ' + status);
+                reject(`Places search was not successful for ${hotelName}: ${status}`);
             }
         });
     });
 }
 
-
 // Function to get place details using place_id with a promise
 function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
-    console.log('Fetching details for:', hotelName);
+    console.log('Fetching details for:', hotelName, placeId);
+    
     return new Promise((resolve, reject) => {
         const request = {
             placeId: placeId,
@@ -271,28 +265,36 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
             ]
         };
 
+        console.log('Details Request for Place ID:', placeId, request);
+
         service.getDetails(request, function (place, status) {
+            console.log('Google Places API Details Response:', place, 'Status:', status);
+
             if (status === google.maps.places.PlacesServiceStatus.OK) {
-                const hotelRating = place.rating !== undefined ? place.rating : 'N/A';
-                const userRatingsTotal = place.user_ratings_total !== undefined ? place.user_ratings_total : 'No reviews';
+                const hotelRating = place.rating ?? 'N/A';
+                const userRatingsTotal = place.user_ratings_total ?? 'No reviews';
                 const hotelWebsite = place.website || '#';
                 const hotelPhoneNumber = place.formatted_phone_number || 'No phone number available';
-                const openingHours = place.opening_hours ? (place.opening_hours.isOpen() ? 'Open now' : 'Closed') : 'Hours not available';
-                const priceLevel = place.price_level !== undefined ? place.price_level : 'No price level available';
+                const openingHours = place.opening_hours 
+                    ? (place.opening_hours.isOpen() ? 'Open now' : 'Closed') 
+                    : 'Hours not available';
+                const priceLevel = place.price_level ?? 'No price level available';
                 
-                // Handle photos
-                const photos = Array.isArray(place.photos) && place.photos.length > 0
-                    ? place.photos.map(photo => photo.getUrl({ maxWidth: 300, maxHeight: 200 }))
-                    : ['https://via.placeholder.com/300x200']; // Fallback image
+                // Handle photos with fallback image
+                const photos = place.photos?.length 
+                    ? place.photos.map(photo => photo.getUrl({ maxWidth: 300, maxHeight: 200 })) 
+                    : ['https://via.placeholder.com/300x200'];
 
-                // Optionally, retrieve reviews (you can limit the number of reviews if necessary)
-                const reviewData  = place.reviews ? place.reviews.slice(0, 5).map(review => ({
+                // Retrieve and limit reviews
+                const reviewData  = place.reviews?.slice(0, 5).map(review => ({
                     author_name: review.author_name,
                     rating: review.rating,
                     text: review.text,
                     time: review.time
-                })) : [];
-                console.log(priceLevel, reviewData )
+                })) || [];
+
+                console.log('Retrieved details:', { hotelRating, userRatingsTotal, priceLevel, reviewData });
+
                 resolve({
                     photos,
                     hotelRating,
@@ -304,11 +306,13 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
                     reviewData 
                 });
             } else {
-                reject('Place details request failed: ' + status);
+                reject(`Place details request failed for ${hotelName}: ${status}`);
             }
         });
     });
 }
+
+
 
 
 
