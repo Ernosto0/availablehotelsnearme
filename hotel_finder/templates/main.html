@@ -145,10 +145,46 @@
           <button id="search-hotels-btn" class="map-button">
             Search Hotels
           </button>
-        </div>
-        <div id="hide-panel-handle">▲ Hide Panel</div>
+          <label for="radius-range">Radius (km):</label>
+          <input
+            type="range"
+            id="radius-range"
+            name="radius-range"
+            min="1"
+            max="10"
+            value="2"
+            oninput="updateRadiusRange(this.value)"
+          />
+          <span id="radius-range-value">2 km</span>
+
+          <div id="hide-panel-handle">▲ Hide Panel</div>
         <div id="panel-handle" class="panel-handle">▼</div>
+       
+        </div>
+
+        
+
+        
+    
+        <script>
+          function updateRadiusRange(value) {
+            document.getElementById('radius-range-value').textContent = `${value} km`;
+            
+            // Convert km to meters and update circle radius
+            if (userCircle) {
+                userCircle.setRadius(value * 1000);
+            }
+}           
+          
+
+        </script>
+
+
       </div>
+   
+    
+
+    
     </section>
     <!-- Search Panel -->
 
@@ -313,12 +349,20 @@
               hidePanelHandle.addEventListener("click", function () {
                   searchPanel.classList.add("hidden");
                   panelHandle.classList.add("visible");
+                  
+                  clearRadiusCircle();
+                  console.log("Radius circle cleared on hide panel.");
+                  
               });
 
               // When the handle is clicked
               panelHandle.addEventListener("click", function () {
                   searchPanel.classList.remove("hidden");
                   panelHandle.classList.remove("visible");
+                  if (circleCleared) {
+                  addRadiusCircle(window.userLocation.latitude, window.userLocation.longitude, 
+                      document.getElementById('radius-range').value * 1000);
+    }
               });
           });
     </script>

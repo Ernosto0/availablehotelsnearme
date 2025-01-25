@@ -5,7 +5,9 @@ let markers = []; // Array to keep track of all markers
 
 // Initialize the map with Leaflet
 // Initialize the map with Leaflet
-function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris
+let userCircle = null;  // Declare circle globally to update it later
+
+function initMap(lat = 48.8566, lng = 2.3522) {
     console.log('Initializing map with MapTiler tiles:', { lat, lng });
 
     const mapElement = document.getElementById("map");
@@ -24,17 +26,45 @@ function initMap(lat = 48.8566, lng = 2.3522) { // Default to Paris
     
     // Add the zoom control with a custom position
     L.control.zoom({
-        position: 'bottomleft' // Options: 'topleft', 'topright', 'bottomleft', 'bottomright'
+        position: 'bottomleft' 
     }).addTo(map);
 
     // Add MapTiler Streets tiles
-    L.tileLayer(`https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj	`, {
+    L.tileLayer(`https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj`, {
         attribution: '&copy; <a href="https://www.maptiler.com/">MapTiler</a> contributors',
         maxZoom: 20,
     }).addTo(map);
 
     // Add user's location marker
     createUserMarker(lat, lng);
+
+    // Add the radius circle around user's location
+    addRadiusCircle(lat, lng, 2 * 1000);  // Default 10 km
+}
+
+// Function to add/update circle around user's location
+function addRadiusCircle(lat, lng, radius) {
+    if (userCircle) {
+        userCircle.setLatLng([lat, lng]);  // Update circle position
+        userCircle.setRadius(radius);  // Update radius in meters
+    } else {
+        userCircle = L.circle([lat, lng], {
+            color: 'blue',
+            fillColor: '#add8e6',
+            fillOpacity: 0.3,
+            radius: radius // Radius in meters
+        }).addTo(map);
+    }
+}
+
+let circleCleared = false;  // Track if the circle has been cleared
+
+function clearRadiusCircle() {
+    if (userCircle) {
+        map.removeLayer(userCircle);
+        userCircle = null;
+        circleCleared = true;  // Mark that the circle was cleared
+    }
 }
 
 
@@ -44,7 +74,7 @@ function updateHotelsOnMap(hotels) {
 
     // Clear existing markers
     clearMarkers();
-
+    clearRadiusCircle();
     const bounds = L.latLngBounds();
 
     const cheapestHotel = calculateCheapestHotel(hotels);
