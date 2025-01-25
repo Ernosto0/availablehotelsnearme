@@ -7,6 +7,10 @@ let markers = []; // Array to keep track of all markers
 // Initialize the map with Leaflet
 let userCircle = null;  // Declare circle globally to update it later
 
+
+
+let markerClusterGroup = null; // Global cluster group
+
 function initMap(lat = 48.8566, lng = 2.3522) {
     console.log('Initializing map with MapTiler tiles:', { lat, lng });
 
@@ -17,30 +21,39 @@ function initMap(lat = 48.8566, lng = 2.3522) {
         return;
     }
 
-    // Create a map instance using Leaflet
     map = L.map(mapElement, {
         center: [lat, lng],
         zoom: 15,
-        zoomControl: false // Disable default zoom control position
+        zoomControl: false 
     });
-    
-    // Add the zoom control with a custom position
-    L.control.zoom({
-        position: 'bottomleft' 
-    }).addTo(map);
 
-    // Add MapTiler Streets tiles
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
     L.tileLayer(`https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj`, {
         attribution: '&copy; <a href="https://www.maptiler.com/">MapTiler</a> contributors',
         maxZoom: 20,
     }).addTo(map);
 
+    // Initialize the cluster group with adjusted settings
+    markerClusterGroup = L.markerClusterGroup({
+        maxClusterRadius: 110,  // Default is 80; lower value means clustering happens at a shorter distance
+        disableClusteringAtZoom: 16,  // Disable clustering at zoom level 14 and above
+        spiderfyOnMaxZoom: true,  // Expand markers when zooming in
+        showCoverageOnHover: false,  // Disable cluster coverage area when hovering
+        removeOutsideVisibleBounds: true  // Optimize map performance
+    });
+
+    // Add the cluster group to the map
+    map.addLayer(markerClusterGroup);
+
     // Add user's location marker
     createUserMarker(lat, lng);
 
-    // Add the radius circle around user's location
-    addRadiusCircle(lat, lng, 2 * 1000);  // Default 10 km
+    // Add radius circle
+    addRadiusCircle(lat, lng, 2 * 1000);
 }
+
+
 
 // Function to add/update circle around user's location
 function addRadiusCircle(lat, lng, radius) {
@@ -72,21 +85,24 @@ function clearRadiusCircle() {
 function updateHotelsOnMap(hotels) {
     console.log('Updating hotels on map:', hotels);
 
-    // Clear existing markers
+    if (!markerClusterGroup) {
+        console.error('Marker cluster group is not initialized.');
+        return;
+    }
+
     clearMarkers();
     clearRadiusCircle();
     const bounds = L.latLngBounds();
 
     const cheapestHotel = calculateCheapestHotel(hotels);
-    console.log('Cheapest Hotel:', cheapestHotel);
-    window.cheapestHotel = cheapestHotel; // Store it globally for later use
+    window.cheapestHotel = cheapestHotel;
 
     hotels.forEach(hotel => {
         const { hotel_name, price, location, booking_link, currency, status } = hotel;
-        window.hotelCurrency = currency; // Store currency globally
+        window.hotelCurrency = currency;
 
         if (location && location.latitude && location.longitude) {
-            const isCheapest = hotel_name === cheapestHotel.hotel_name; // Compare by unique property
+            const isCheapest = hotel_name === cheapestHotel.hotel_name;
             const marker = createCustomMarker(
                 location.latitude,
                 location.longitude,
@@ -97,43 +113,33 @@ function updateHotelsOnMap(hotels) {
                 isCheapest
             );
 
-            // Add the marker to the markers array
-            markers.push(marker);
-
-            // Extend the map bounds to include this marker
+            markerClusterGroup.addLayer(marker);  // Add marker to cluster group
             bounds.extend([location.latitude, location.longitude]);
         } else {
             console.error(`Invalid location data for hotel: ${hotel_name}`);
         }
     });
 
-    // Fit the map to show all markers
     if (bounds.isValid()) {
-        map.fitBounds(bounds);
+        setTimeout(() => {
+            map.fitBounds(bounds);  // Fit map after markers are added
+        }, 500); // Add a short delay to ensure clusters update properly
     } else {
         console.warn('No valid hotels to display.');
     }
-    
+    // Add cluster group to the map and refresh clusters
+    markerClusterGroup.addTo(map);
+    markerClusterGroup.refreshClusters();
 }
+
+
 
 
 // Clear all existing markers from the map
 function clearMarkers() {
-    if (!markers || !Array.isArray(markers)) {
-        console.error("Markers array is not defined or not an array");
-        markers = [];
-        return;
+    if (markerClusterGroup) {
+        markerClusterGroup.clearLayers(); // Remove all clustered markers
     }
-
-    markers = markers.filter(marker => {
-        if (marker && marker instanceof google.maps.OverlayView) {
-            marker.setMap(null); // Removes the marker from the map
-            return false; // Remove from the array
-        } else {
-            console.warn("Encountered invalid marker:", marker);
-            return false; // Remove invalid markers
-        }
-    });
 }
 
 let highlightedMarker = null; // Global variable to store the currently highlighted marker
