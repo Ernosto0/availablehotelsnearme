@@ -33,7 +33,9 @@ def fetch_hotels(request):
         try:
             body = json.loads(request.body)
             adults = body.get('adults', 1)
-            print(adults)  # Default to 1 if not provided
+            km = body.get('km', 1)
+            print("adults:",adults)  # Default to 1 if not provided
+            print('km:',km)
         except json.JSONDecodeError:
             print("Error parsing request body")
             adults = 1  # Default to 1 adult
@@ -50,8 +52,8 @@ def fetch_hotels(request):
         #     return JsonResponse({'error': 'Unable to obtain access token'}, status=500)
         available_hotels = test_hotels
         available_hotels = calculate_price_status(available_hotels)
-        # Fetch hotels by geolocation
-        # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=1)
+        # # Fetch hotels by geolocation
+        # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
         # if hotel_ids:
         #     check_in_date = datetime.now().strftime('%Y-%m-%d')
         #     check_out_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -106,7 +108,7 @@ def get_access_token():
         print(response.json())
         return None
 
-def get_hotels_by_geolocation(access_token, latitude, longitude, radius=1):
+def get_hotels_by_geolocation(access_token, latitude, longitude, radius):
     print('Fetching hotels by geolocation...')
     url = "https://api.amadeus.com/v1/reference-data/locations/hotels/by-geocode"  # Test URL
 
@@ -138,7 +140,7 @@ def chunk_list(lst, chunk_size,):
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
 
-def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults=1):
+def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults):
     print('Checking hotel availability...')
     url = "https://api.amadeus.com/v3/shopping/hotel-offers"
     headers = {'Authorization': f'Bearer {access_token}'}
@@ -191,7 +193,8 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
                                 'longitude': longitude
                             },
                             'booking_link': booking_link,
-                            'currency':currency
+                            'currency':currency,
+                            'hotel_id': hotel.get('hotel', {}).get('hotelId')
                         })
         else:
             print(f"Failed to check availability. Status Code: {response.status_code}")

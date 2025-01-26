@@ -284,13 +284,15 @@
           // Get the value of the adults input field
           const adults = document.getElementById('adults').value || 1; // Default to 1 if not set
 
+          const km = document.getElementById('radius-range').value;
+
           fetch('/fetch-hotels/', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
                   'X-CSRFToken': getCSRFToken(),
               },
-              body: JSON.stringify({ latitude, longitude, adults }), // Include adults in the payload
+              body: JSON.stringify({ latitude, longitude, adults, km}), // Include adults in the payload
           })
               .then(response => response.json())
               .then(data => {
