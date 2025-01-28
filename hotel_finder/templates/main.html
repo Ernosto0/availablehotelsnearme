@@ -163,22 +163,22 @@
 
           <button id="search-hotels-btn" class="map-button">
             Search Hotels
-          </button>
-          <label for="radius-range">Radius (km):</label>
-          <input
+            </button>
+            <label for="radius-range">Radius (km):</label>
+            <input
             type="range"
             id="radius-range"
             name="radius-range"
             min="1"
-            max="10"
+            max="5"
+            step="0.1"
             value="2"
             oninput="updateRadiusRange(this.value)"
-          />
-          <span id="radius-range-value">2 km</span>
+            />
+            <span id="radius-range-value">2 km</span>
 
-          <div id="hide-panel-handle">▲ Hide Panel</div>
-        <div id="panel-handle" class="panel-handle">▼</div>
-       
+            <div id="hide-panel-handle">▲ Hide Panel</div>
+            <div id="panel-handle" class="panel-handle">▼</div>
         </div>
 
         
