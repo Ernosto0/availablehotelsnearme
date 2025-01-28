@@ -328,7 +328,16 @@
               popup.classList.remove('hidden');
           }
 
+          
+            function showNoLocationPopup() {
+              console.log('No location available popup.');
+              const popup = document.getElementById('no-hotels-popup');
 
+              // Update the popup text
+              popup.querySelector('p').textContent = 'Location not available. Please enable location services.';
+
+              popup.classList.remove('hidden');
+            }
               // Close button functionality
               document.getElementById('popup-close-btn').addEventListener('click', () => {
                   const popup = document.getElementById('no-hotels-popup');
@@ -350,7 +359,8 @@
           if (window.userLocation) {
               fetchHotels(window.userLocation.latitude, window.userLocation.longitude);
           } else {
-              alert('User location is not available.');
+              // alert('User location is not available.');
+              showNoLocationPopup();
           }
       });
 
