@@ -116,7 +116,7 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
     const customIcon = L.divIcon({
         className: 'custom-marker-container',
         html: iconHtml,
-        iconSize: [90, 35], // Size of the custom marker (adjust as needed)
+        iconSize: [85, 35], // Size of the custom marker (adjust as needed)
         iconAnchor: [40, 30], // Anchor point of the marker (centered)
     });
 
