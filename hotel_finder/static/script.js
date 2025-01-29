@@ -171,7 +171,8 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
     // Add a click event listener to the marker
     marker.on('click', () => {
         console.log('Clicked on hotel:', hotelName);
-
+        
+        document.getElementById('search-panel').style.display = 'none';
         if (highlightedMarker) {
             const prevElement = highlightedMarker.getElement();
             if (prevElement) prevElement.classList.remove('highlighted-marker');
@@ -203,7 +204,8 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
     document.getElementById('close-btn').addEventListener('click', () => {
         // Close the info panel
         document.getElementById('info-panel').classList.remove('activate');
-    
+        document.getElementById('search-panel').style.display = 'block';
+        
         // Remove highlight from the currently highlighted marker
         if (highlightedMarker) {
             highlightedMarker.classList.remove('highlighted-marker');
