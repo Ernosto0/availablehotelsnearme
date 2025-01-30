@@ -4,7 +4,6 @@
 let markers = []; // Array to keep track of all markers
 
 // Initialize the map with Leaflet
-// Initialize the map with Leaflet
 let userCircle = null;  // Declare circle globally to update it later
 
 
@@ -13,7 +12,7 @@ let markerClusterGroup = null; // Global cluster group
 
 function initMap(lat = 48.8566, lng = 2.3522) {
     console.log('Initializing map with MapTiler tiles:', { lat, lng });
-
+    
     const mapElement = document.getElementById("map");
 
     if (!mapElement) {
@@ -23,7 +22,7 @@ function initMap(lat = 48.8566, lng = 2.3522) {
 
     map = L.map(mapElement, {
         center: [lat, lng],
-        zoom: 15,
+        zoom: 14,
         zoomControl: false 
     });
 
@@ -51,6 +50,8 @@ function initMap(lat = 48.8566, lng = 2.3522) {
 
     // Add radius circle
     addRadiusCircle(lat, lng, 2 * 1000);
+
+    searchPanel.classList.add("visible");  // Show the search panel
 }
 
 
