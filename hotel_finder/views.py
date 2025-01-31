@@ -49,7 +49,8 @@ def fetch_hotels(request):
         latitude = 37.7749  # Use session-stored latitude
         longitude = -122.4194  # Use session-stored longitude
 
-        search_id = random.randint(1000, 9999)  # Generate a random search ID
+        global search_id
+        search_id = createSearchId()
 
         logger.info(f"User searching hotels: Location=({latitude}, {longitude}), Adults={adults}, Radius={km}km, Search ID={search_id}")
 
@@ -61,34 +62,40 @@ def fetch_hotels(request):
         
 
 
-        # available_hotels = test_hotels
-        available_hotels = calculate_price_status(available_hotels)
+        available_hotels = test_hotels
+        
 
         # Fetch hotels by geolocation
-        hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
+        # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
+
+        available_hotels = calculate_price_status(available_hotels)
+
+        return JsonResponse({'hotels': available_hotels})
+
+        # if hotel_ids:
+        #     check_in_date = datetime.now().strftime('%Y-%m-%d')
+        #     check_out_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        #     # available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults=adults)
+
+            
+            
+        #     # Calculate price status for each hotel
+        #     available_hotels = calculate_price_status(available_hotels)
+
+        #     logger.info(f"Hotels found: {len(available_hotels)} Search ID={search_id}")
+        #     for hotel in available_hotels[:5]:  # Log only first 5 to avoid clutter
+        #         logger.debug(f"Hotel: {hotel['hotel_name']} | Price: {hotel.get('price')} ")
 
 
-        if hotel_ids:
-            check_in_date = datetime.now().strftime('%Y-%m-%d')
-            check_out_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-            available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults=adults)
-           
-            logger.info(f"Hotels found: {len(available_hotels)} Search ID={search_id}")
-            for hotel in available_hotels[:5]:  # Log only first 5 to avoid clutter
-                logger.debug(f"Hotel: {hotel['hotel_name']} | Price: {hotel.get('price')} ")
-
-
-            return JsonResponse({'hotels': available_hotels})
-        else:
-            logger.warning('No hotels found')
-            return JsonResponse({'hotels': []})
+        #     return JsonResponse({'hotels': available_hotels})
+        # else:
+            # logger.warning('No hotels found')
+            # return JsonResponse({'hotels': []})
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 
-  # Store user location globally (or use session for user-specific data)
-
-from django.views.decorators.csrf import csrf_exempt
+# Store user location globally (or use session for user-specific data)
 
 @csrf_exempt
 def set_user_location(request):
@@ -304,3 +311,36 @@ def calculate_price_status(hotels):
             hotel['status'] = 'yellow'
     
     return hotels
+
+# Use our new logger for Google Places API logs
+places_logger = logging.getLogger('google_places')
+
+@csrf_exempt
+def log_google_places(request):
+    
+    places_logger.info('Logging Google Places API request')
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            log_level = data.get('level', 'INFO')  # Default to INFO if not provided
+            message = data.get('message', 'No message provided')
+
+            if log_level == 'DEBUG':
+                places_logger.debug(f" Search ID= {search_id} {message}" )
+            elif log_level == 'WARNING':
+                places_logger.warning(f" Search ID= {search_id} {message}")
+            elif log_level == 'ERROR':
+                places_logger.error(f" Search ID= {search_id} {message}")
+            else:
+                places_logger.info(f" Search ID= {search_id} {message}")  
+
+            return JsonResponse({'status': 'logged'})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+# Create temporary user ID for logging
+
+def createSearchId():
+    return random.randint(1000, 9999)
