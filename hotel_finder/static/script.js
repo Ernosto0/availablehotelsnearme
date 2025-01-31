@@ -251,44 +251,49 @@ const hotelCache = {};
 
 function fetchHotelDetails(location, hotelName, hotelPrice, lat, lng) {
     return new Promise((resolve, reject) => {
-        const cacheKey = `${lat},${lng},${hotelName}`; // Include hotel name in cache key
+        const cacheKey = `${lat},${lng},${hotelName}`;
 
         if (hotelCache[cacheKey]) {
-            console.log('Using cached data for:', hotelName);
+            logToDjango('INFO', `Using cached data for: ${hotelName}`);
             resolve(hotelCache[cacheKey]);
-            return; // Exit early to avoid API call
+            return;
         }
 
+        logToDjango('INFO', `Fetching Places API for: ${hotelName} at (${lat}, ${lng})`);
         console.log(`Fetching new data from Places API for: ${hotelName} at (${lat}, ${lng})`);
 
         const service = new google.maps.places.PlacesService(document.createElement('div'));
         const request = {
             query: hotelName,
-            locationBias: { lat: lat, lng: lng },  // Restrict search to lat/lng
-            fields: ['place_id']  // Only request place_id to optimize
+            locationBias: { lat: lat, lng: lng },
+            fields: ['place_id']
         };
 
-        console.log('Requesting Place ID with:', request);
-
         service.findPlaceFromQuery(request, function (results, status) {
-            console.log('Google Places API Response:', results, 'Status:', status);
+            logToDjango('DEBUG', `Places API response for ${hotelName}: ${JSON.stringify(results)} | Status: ${status}`);
+            console.log('Google Places API Details Response:', 'Status:', status);
 
             if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
                 const placeId = results[0].place_id;
-                console.log(`Found Place ID for ${hotelName}: ${placeId}`);
+                logToDjango('INFO', `Found Place ID for ${hotelName}: ${placeId}`);
 
                 getPlaceDetails(service, placeId, hotelName, hotelPrice)
                     .then(data => {
                         hotelCache[cacheKey] = { ...data, lat: lat, lng: lng };
                         resolve(hotelCache[cacheKey]);
                     })
-                    .catch(error => reject(`Error fetching place details: ${error}`));
+                    .catch(error => {
+                        logToDjango('ERROR', `Error fetching place details: ${error}`);
+                        reject(error);
+                    });
             } else {
+                logToDjango('WARNING', `Places search failed for ${hotelName}: ${status}`);
                 reject(`Places search was not successful for ${hotelName}: ${status}`);
             }
         });
     });
 }
+
 
 // Function to get place details using place_id with a promise
 function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
@@ -333,6 +338,7 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
                 })) || [];
 
                 console.log('Retrieved details:', { hotelRating, userRatingsTotal, priceLevel, reviewData });
+                logToDjango('Retrieved details:', { hotelRating, userRatingsTotal, priceLevel, reviewData });
 
                 resolve({
                     photos,
@@ -351,8 +357,16 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
     });
 }
 
-
-
+// Function to log messages to Django backend
+function logToDjango(level, message) {
+    fetch('/log_google_places/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ level, message })
+    }).catch(error => console.error('Failed to send log:', error));
+}
 
 
 

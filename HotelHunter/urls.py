@@ -25,4 +25,5 @@ urlpatterns = [
     path('', hotel_finder.views.display_hotel_map),
     path('set-user-location/', hotel_finder.views.set_user_location, name='set_user_location'),
     path('fetch-hotels/', hotel_finder.views.fetch_hotels, name='fetch_hotels'),
+    path('log_google_places/', hotel_finder.views.log_google_places, name='log_google_places'),
 ]

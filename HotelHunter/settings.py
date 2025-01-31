@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+# impoe os module for logger configuration
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -123,3 +126,52 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Logger configuration
+
+
+
+import os
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'hotel_search_file': {  # Log file for hotel search logs
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'hotel_search.log'),
+            'formatter': 'verbose',
+        },
+        'google_places_file': {  # Log file for Google Places API logs
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'google_places.log'),
+            'formatter': 'verbose',
+        },
+        'console': {  # Console output for debugging
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} [{levelname}] {module} - {message}',
+            'style': '{',
+        },
+    },
+    'loggers': {
+        'hotel_search': {
+            'handlers': ['hotel_search_file', 'console'],  # Only log to hotel_search.log
+            'level': 'DEBUG',
+            'propagate': False,  # Prevent duplication in other loggers
+        },
+        'google_places': {
+            'handlers': ['google_places_file', 'console'],  # Only log to google_places.log
+            'level': 'DEBUG',
+            'propagate': False,  # Prevent duplication in other loggers
+        },
+    },
+}

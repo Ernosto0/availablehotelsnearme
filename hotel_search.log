@@ -1,0 +1,65 @@
+2025-01-31 18:55:12,986 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=1813
+2025-01-31 18:55:17,402 [DEBUG] views - Processing hotel: Best Western Red Coach Inn | Location: (37.78343, -122.41951)
+2025-01-31 18:55:17,403 [DEBUG] views - Processing hotel: San Francisco Proper a Member of Design Hotels | Location: (37.78088, -122.41268)
+2025-01-31 18:55:17,403 [DEBUG] views - Processing hotel: Motel 6 San Francisco CA Civic Center | Location: (37.78322, -122.41738)
+2025-01-31 18:55:17,404 [DEBUG] views - Processing hotel: SF Central Hotel | Location: (37.77223, -122.42444)
+2025-01-31 18:55:17,404 [DEBUG] views - Processing hotel: Signature San Francisco | Location: (37.77735, -122.4082)
+2025-01-31 18:55:17,405 [DEBUG] views - Processing hotel: Rodeway Inn Civic Center | Location: (37.78286, -122.42196)
+2025-01-31 18:55:17,405 [DEBUG] views - Processing hotel: BEI San Francisco, Trademark Collection by Wyndham | Location: (37.77764, -122.41428)
+2025-01-31 18:55:17,405 [DEBUG] views - Processing hotel: SoMa House Hotel | Location: (37.77879, -122.41007)
+2025-01-31 18:55:17,406 [DEBUG] views - Processing hotel: Hotel Garrett | Location: (37.77886, -122.411)
+2025-01-31 18:55:17,406 [DEBUG] views - Processing hotel: CIVIC CENTER MOTOR INN | Location: (37.77267, -122.41087)
+2025-01-31 18:55:17,406 [DEBUG] views - Processing hotel: Hotel Fiona | Location: (37.77865, -122.41041)
+2025-01-31 18:55:17,407 [DEBUG] views - Processing hotel: YOTEL San Francisco | Location: (37.78034, -122.41203)
+2025-01-31 18:55:17,407 [DEBUG] views - Processing hotel: San Francisco Inn | Location: (37.77276, -122.41038)
+2025-01-31 18:55:17,410 [INFO] views - Hotels found: 13 Search ID=1813
+2025-01-31 18:55:17,410 [DEBUG] views - Hotel: Best Western Red Coach Inn | Price: 173 
+2025-01-31 18:55:17,410 [DEBUG] views - Hotel: San Francisco Proper a Member of Design Hotels | Price: 241 
+2025-01-31 18:55:17,410 [DEBUG] views - Hotel: Motel 6 San Francisco CA Civic Center | Price: 129 
+2025-01-31 18:55:17,411 [DEBUG] views - Hotel: SF Central Hotel | Price: 112 
+2025-01-31 18:55:17,411 [DEBUG] views - Hotel: Signature San Francisco | Price: 135 
+2025-01-31 18:57:38,097 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=5800
+2025-01-31 18:57:42,420 [DEBUG] views - Processing hotel: Best Western Red Coach Inn | Location: (37.78343, -122.41951)
+2025-01-31 18:57:42,421 [DEBUG] views - Processing hotel: San Francisco Proper a Member of Design Hotels | Location: (37.78088, -122.41268)
+2025-01-31 18:57:42,421 [DEBUG] views - Processing hotel: Motel 6 San Francisco CA Civic Center | Location: (37.78322, -122.41738)
+2025-01-31 18:57:42,422 [DEBUG] views - Processing hotel: SF Central Hotel | Location: (37.77223, -122.42444)
+2025-01-31 18:57:42,422 [DEBUG] views - Processing hotel: Signature San Francisco | Location: (37.77735, -122.4082)
+2025-01-31 18:57:42,422 [DEBUG] views - Processing hotel: Rodeway Inn Civic Center | Location: (37.78286, -122.42196)
+2025-01-31 18:57:42,422 [DEBUG] views - Processing hotel: BEI San Francisco, Trademark Collection by Wyndham | Location: (37.77764, -122.41428)
+2025-01-31 18:57:42,423 [DEBUG] views - Processing hotel: SoMa House Hotel | Location: (37.77879, -122.41007)
+2025-01-31 18:57:42,423 [DEBUG] views - Processing hotel: Hotel Garrett | Location: (37.77886, -122.411)
+2025-01-31 18:57:42,423 [DEBUG] views - Processing hotel: CIVIC CENTER MOTOR INN | Location: (37.77267, -122.41087)
+2025-01-31 18:57:42,424 [DEBUG] views - Processing hotel: Hotel Fiona | Location: (37.77865, -122.41041)
+2025-01-31 18:57:42,424 [DEBUG] views - Processing hotel: YOTEL San Francisco | Location: (37.78034, -122.41203)
+2025-01-31 18:57:42,424 [DEBUG] views - Processing hotel: San Francisco Inn | Location: (37.77276, -122.41038)
+2025-01-31 18:57:42,426 [INFO] views - Hotels found: 13 Search ID=5800
+2025-01-31 18:57:42,426 [DEBUG] views - Hotel: Best Western Red Coach Inn | Price: 173 
+2025-01-31 18:57:42,427 [DEBUG] views - Hotel: San Francisco Proper a Member of Design Hotels | Price: 241 
+2025-01-31 18:57:42,427 [DEBUG] views - Hotel: Motel 6 San Francisco CA Civic Center | Price: 129 
+2025-01-31 18:57:42,427 [DEBUG] views - Hotel: SF Central Hotel | Price: 112 
+2025-01-31 18:57:42,428 [DEBUG] views - Hotel: Signature San Francisco | Price: 135 
+2025-01-31 18:58:35,103 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=1767
+2025-01-31 18:58:39,252 [DEBUG] views - Processing hotel: Best Western Red Coach Inn | Location: (37.78343, -122.41951)
+2025-01-31 18:58:39,252 [DEBUG] views - Processing hotel: San Francisco Proper a Member of Design Hotels | Location: (37.78088, -122.41268)
+2025-01-31 18:58:39,253 [DEBUG] views - Processing hotel: Motel 6 San Francisco CA Civic Center | Location: (37.78322, -122.41738)
+2025-01-31 18:58:39,254 [DEBUG] views - Processing hotel: SF Central Hotel | Location: (37.77223, -122.42444)
+2025-01-31 18:58:39,254 [DEBUG] views - Processing hotel: Signature San Francisco | Location: (37.77735, -122.4082)
+2025-01-31 18:58:39,254 [DEBUG] views - Processing hotel: Rodeway Inn Civic Center | Location: (37.78286, -122.42196)
+2025-01-31 18:58:39,255 [DEBUG] views - Processing hotel: BEI San Francisco, Trademark Collection by Wyndham | Location: (37.77764, -122.41428)
+2025-01-31 18:58:39,255 [DEBUG] views - Processing hotel: SoMa House Hotel | Location: (37.77879, -122.41007)
+2025-01-31 18:58:39,255 [DEBUG] views - Processing hotel: Hotel Garrett | Location: (37.77886, -122.411)
+2025-01-31 18:58:39,255 [DEBUG] views - Processing hotel: CIVIC CENTER MOTOR INN | Location: (37.77267, -122.41087)
+2025-01-31 18:58:39,256 [DEBUG] views - Processing hotel: Hotel Fiona | Location: (37.77865, -122.41041)
+2025-01-31 18:58:39,256 [DEBUG] views - Processing hotel: YOTEL San Francisco | Location: (37.78034, -122.41203)
+2025-01-31 18:58:39,256 [DEBUG] views - Processing hotel: San Francisco Inn | Location: (37.77276, -122.41038)
+2025-01-31 18:58:39,259 [INFO] views - Hotels found: 13 Search ID=1767
+2025-01-31 18:58:39,259 [DEBUG] views - Hotel: Best Western Red Coach Inn | Price: 173 
+2025-01-31 18:58:39,259 [DEBUG] views - Hotel: San Francisco Proper a Member of Design Hotels | Price: 241 
+2025-01-31 18:58:39,259 [DEBUG] views - Hotel: Motel 6 San Francisco CA Civic Center | Price: 129 
+2025-01-31 18:58:39,260 [DEBUG] views - Hotel: SF Central Hotel | Price: 112 
+2025-01-31 18:58:39,260 [DEBUG] views - Hotel: Signature San Francisco | Price: 135 
+2025-01-31 19:00:19,425 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=5103
+2025-01-31 19:00:35,923 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=5815
+2025-01-31 19:04:27,065 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=1627
+2025-01-31 19:12:37,875 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=2559
+2025-01-31 19:14:16,950 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=6357
