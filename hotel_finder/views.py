@@ -52,7 +52,7 @@ def fetch_hotels(request):
         global search_id
         search_id = createSearchId()
 
-        logger.info(f"User searching hotels: Location=({latitude}, {longitude}), Adults={adults}, Radius={km}km, Search ID={search_id}")
+        logger.info(f"User searching hotels: Location=({latitude}, {longitude}), Adults={adults}, Radius={km}km, Search ID={search_id.get("id")}, Create Time={search_id.get('time')}")
 
         # Get access token
         access_token = get_access_token()
@@ -326,13 +326,14 @@ def log_google_places(request):
             message = data.get('message', 'No message provided')
 
             if log_level == 'DEBUG':
-                places_logger.debug(f" Search ID= {search_id} {message}" )
+                places_logger.debug("-----------------")
+                places_logger.debug(f" Search ID= {search_id.get("id")}, Search time={search_id.get("time")} {message}" )
             elif log_level == 'WARNING':
-                places_logger.warning(f" Search ID= {search_id} {message}")
+                places_logger.warning(message)
             elif log_level == 'ERROR':
-                places_logger.error(f" Search ID= {search_id} {message}")
+                places_logger.error(message)
             else:
-                places_logger.info(f" Search ID= {search_id} {message}")  
+                places_logger.info(message)  
 
             return JsonResponse({'status': 'logged'})
         except json.JSONDecodeError:
@@ -343,4 +344,7 @@ def log_google_places(request):
 # Create temporary user ID for logging
 
 def createSearchId():
-    return random.randint(1000, 9999)
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    id = random.randint(1000, 9999)
+    search_id = {'id': id, 'time': create_time}
+    return search_id
