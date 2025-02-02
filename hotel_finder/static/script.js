@@ -189,11 +189,11 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
         // Fetch hotel details and display in the info panel
         fetchHotelDetails({ lat, lng }, hotelName, hotelPrice, lat, lng)
             .then(data => {
-                const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, openingHours, reviewData } = data;
+                const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber,  reviewData } = data;
 
                 showInfoPanel(
                     hotelName, hotelPrice, photos, hotelRating, userRatingsTotal,
-                    hotelWebsite, hotelPhoneNumber, openingHours, lat, lng, reviewData, booking_link
+                    hotelWebsite, hotelPhoneNumber, lat, lng, reviewData, booking_link
                 );
             })
             .catch(error => {
@@ -319,9 +319,6 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
                 const userRatingsTotal = place.user_ratings_total ?? 'No reviews';
                 const hotelWebsite = place.website || '#';
                 const hotelPhoneNumber = place.formatted_phone_number || 'No phone number available';
-                const openingHours = place.opening_hours 
-                    ? (place.opening_hours.isOpen() ? 'Open now' : 'Closed') 
-                    : 'Hours not available';
                 const priceLevel = place.price_level ?? 'No price level available';
                 
                 // Handle photos with fallback image
@@ -346,7 +343,6 @@ function getPlaceDetails(service, placeId, hotelName, hotelPrice) {
                     userRatingsTotal,
                     hotelWebsite,
                     hotelPhoneNumber,
-                    openingHours,
                     priceLevel,
                     reviewData 
                 });
@@ -385,7 +381,6 @@ function showInfoPanel(
     userRatingsTotal,
     hotelWebsite,
     hotelPhoneNumber,
-    openingHours,
     lat,
     lng,
     reviewData,
@@ -415,7 +410,6 @@ function showInfoPanel(
     document.getElementById('hotel-rating').innerText = `Rating: ${hotelRating} (${userRatingsTotal} reviews)`;
     document.getElementById('hotel-phone').innerText = `Phone: ${hotelPhoneNumber}`;
     document.getElementById('hotel-website').href = hotelWebsite;
-    document.getElementById('hotel-opening-hours').innerText = `Status: ${openingHours}`;
 
     const reviewsContainer = document.getElementById('hotel-reviews');
     reviewsContainer.innerHTML = '';  // Clear previous reviews
