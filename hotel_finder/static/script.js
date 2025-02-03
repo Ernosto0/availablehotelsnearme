@@ -45,13 +45,15 @@ function initMap(lat = 48.8566, lng = 2.3522) {
     // Add the cluster group to the map
     map.addLayer(markerClusterGroup);
 
+   
+
     // Add user's location marker
     createUserMarker(lat, lng);
 
     // Add radius circle
     addRadiusCircle(lat, lng, 2 * 1000);
 
-    searchPanel.classList.add("visible");  // Show the search panel
+    updateWeatherWidget(lat, lng);
 }
 
 
@@ -697,14 +699,31 @@ function fetchUserLocation(latitude, longitude) {
         });
 }
 
-
-function debounce(func, delay) {
-    let timer;
-    return function (...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => func.apply(this, args), delay);
-    };
-}
+function updateWeatherWidget(lat, lon) {
+    const apiKey = 'e64e643580dd413cac1100435250302';  // Replace with your actual WeatherAPI.com key
+    const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}`;
+    console.log('Fetching weather data from:', url);
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        // Get current temperature in Celsius and the weather icon
+        const temperature = data.current.temp_c;
+        console.log('Current temperature:', temperature);
+        const iconUrl = "https:" + data.current.condition.icon;
+  
+        // Update the weather widget with the icon and temperature text below it
+        const widget = document.getElementById('weather-widget');
+        console.log('Weather widget:', widget);
+        if (widget) {
+          widget.innerHTML = `
+            <img src="${iconUrl}" alt="Weather Icon">
+            <div class="temp">${temperature}°C</div>
+          `;
+        }
+      })
+      .catch(error => console.error('Error fetching weather data:', error));
+  }
+  
 
 // Load Google Maps API dynamically
 let isGoogleMapsAPILoaded = false;
