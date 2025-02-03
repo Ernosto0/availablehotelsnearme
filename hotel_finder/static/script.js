@@ -54,6 +54,14 @@ function initMap(lat = 48.8566, lng = 2.3522) {
     addRadiusCircle(lat, lng, 2 * 1000);
 
     updateWeatherWidget(lat, lng);
+
+
+    // Handle map text visibility
+    const mapText = document.getElementById('map-text');
+      if (mapText) {
+        mapText.style.display = 'none';
+      }
+
 }
 
 

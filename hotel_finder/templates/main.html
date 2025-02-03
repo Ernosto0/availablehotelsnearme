@@ -138,7 +138,11 @@
       </div>
       <!-- Hotel Info Panel -->
 
-      <div id="map"></div>
+      <div id="map" style="position: relative;">
+        <div id="map-text" class="map-text">
+          Please allow location access.
+        </div>
+      </div>
 
       <!-- Search Panel -->
       <div id="search-panel" class="search-panel">
@@ -257,7 +261,8 @@
 
                   const latitude = 37.774929;
                   const longitude = -122.419416;
-
+                  
+                  
                   // Send user's location to the backend
                   fetch('/set-user-location/', {
                       method: 'POST',
