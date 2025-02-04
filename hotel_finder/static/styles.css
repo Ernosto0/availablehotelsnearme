@@ -481,6 +481,8 @@
   }
 }
 
+
+
 #hotel-reviews-wrapper {
   max-height: 250px;
   overflow-y: auto;
@@ -739,12 +741,11 @@
   position: absolute;
   top: 7px;
   right: 7px;
-  background-color: rgba(255,255,255,0.8);
   padding: 7px;
   border-radius: 2px;
   text-align: center;
   z-index: 1000;  /* Ensure it appears above the map */
-  font-family: Arial, sans-serif;
+ 
 }
 #weather-widget img {
   display: block;
@@ -754,7 +755,8 @@
 }
 #weather-widget .temp {
   margin-top: 2px;
-  font-size: 16px;
+  font-size: 18px;
+  font-family: 'Roboto', sans-serif;
 }
 
 
@@ -767,7 +769,14 @@
   background-color: rgba(255, 255, 255, 0.8);
   padding: 10px 20px;
   border-radius: 5px;
-  font-size: 26px;
+  font-size: 28px;
   color: #333;
   text-align: center;
+}
+
+
+@media (max-width: 480px) {
+  #weather-widget {
+    top: 20px;
+  }
 }

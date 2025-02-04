@@ -251,7 +251,7 @@ function createUserMarker(lat, lng) {
         })
     }).addTo(map);
 
-    userMarker.bindPopup("<strong>You are here</strong>").openPopup();
+   
 }
 
 
