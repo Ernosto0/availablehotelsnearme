@@ -146,48 +146,59 @@
       </div>
 
       <!-- Search Panel -->
-      <div id="search-panel" class="search-panel">
-        <div id="panel-content">
-          <label for="adults">Adults:</label>
-          <input
-            type="number"
-            id="adults"
-            name="adults"
-            min="1"
-            max="10"
-            value="1"
-          />
-
+  <!-- Search Panel -->
+<div id="search-panel" class="search-panel">
+  <div id="panel-content">
+    <!-- Date and related inputs container -->
+    <div class="date-container">
+      <!-- Left column: Check-in and Adults -->
+      <div class="date-column">
+        <div class="date-field">
           <label for="check-in">Check-in:</label>
           <input type="date" id="check-in" name="check-in" value="2024-12-21" />
-
-          <label for="check-out">Check-out:</label>
-          <input
-            type="date"
-            id="check-out"
-            name="check-out"
-            value="2024-12-22"
-          />
-
-          <button id="search-hotels-btn" class="map-button">
-            Search Hotels
-            </button>
-            <label for="radius-range">Radius (km):</label>
-            <input
-            type="range"
-            id="radius-range"
-            name="radius-range"
-            min="1"
-            max="5"
-            step="0.1"
-            value="2"
-            oninput="updateRadiusRange(this.value)"
-            />
-            <span id="radius-range-value">2 km</span>
-
-            <div id="hide-panel-handle">▲ Hide Panel</div>
-            <div id="panel-handle" class="panel-handle">▼</div>
         </div>
+        <div class="input-field">
+          <label for="adults">Adults:</label>
+          <input type="number" id="adults" name="adults" min="1" max="10" value="1" />
+        </div>
+      </div>
+      <!-- Right column: Check-out and new input -->
+      <div class="date-column">
+        <div class="date-field">
+          <label for="check-out">Check-out:</label>
+          <input type="date" id="check-out" name="check-out" value="2024-12-22" />
+        </div>
+        <div class="input-field">
+          <label for="new-input">New Input:</label>
+          <input type="text" id="new-input" name="new-input" placeholder="Your input..." />
+        </div>
+      </div>
+    </div>
+
+    <!-- Other Panel Content -->
+    
+
+    <label for="radius-range">Search Radius: <span id="radius-range-value">2 km</span> </label>
+    <input
+      type="range"
+      id="radius-range"
+      name="radius-range"
+      min="1"
+      max="5"
+      step="0.1"
+      value="2"
+      oninput="updateRadiusRange(this.value)"
+    />
+
+    <button id="search-hotels-btn" class="map-button">
+      Search Hotels
+    </button>
+    <div id="hide-panel-handle">▲ Hide Panel</div>
+    <div id="panel-handle" class="panel-handle">▼</div>
+    </div>
+  </div>
+
+
 
         
 

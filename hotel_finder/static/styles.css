@@ -231,7 +231,7 @@
 
 /* Info panel floating on the left corner of the map */
 #info-panel {
-  display: none;
+  display: absolute;
   width: 0;
   height: auto;
   max-height: 100vh;
@@ -247,7 +247,7 @@
 #info-panel.activate {
   display: block;
   opacity: 1;
-  width: 35vw;
+  width: 45vw;
   padding: 10px;
 }
 
@@ -569,10 +569,7 @@
 
 #popup-close-btn:hover {
   background: #ffddd4;
-}
-
-/* CSS for Search Panel */
-.search-panel {
+}.search-panel {
   position: absolute;
   top: 10px;
   left: 50%;
@@ -587,15 +584,22 @@
   opacity: 1;
 }
 
-.search-panel.hidden {
-  top: -440px;
+/* New container for date fields and related inputs */
+.date-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.search-panel.removed {
-  opacity: 0;
-  pointer-events: none;
+/* Each column takes up equal width and stacks its items */
+.date-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
+/* General styling for labels, inputs, and buttons */
 .search-panel label,
 .search-panel input,
 .search-panel button {
@@ -605,11 +609,12 @@
   box-sizing: border-box;
 }
 
+/* Styling for date and number inputs */
 .search-panel input[type="number"],
-.search-panel input[type="date"] {
+.search-panel input[type="date"],
+.date-column input[type="text"] {
   width: calc(100% - 20px);
   padding: 8px 10px;
-  margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 14px;
@@ -617,11 +622,25 @@
   box-sizing: border-box;
 }
 
+/* Focus states for inputs */
 .search-panel input[type="number"]:focus,
-.search-panel input[type="date"]:focus {
+.search-panel input[type="date"]:focus,
+.date-column input[type="text"]:focus {
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
+
+/* Existing panel state classes */
+.search-panel.hidden {
+  top: -340px;
+}
+
+.search-panel.removed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
 
 .map-button {
   background-color: #007bff;
@@ -656,7 +675,7 @@
     width: 100%;
   }
   .search-panel.hidden {
-    top: -440px;
+    top: -340px;
   }
 }
 
@@ -778,5 +797,18 @@
 @media (max-width: 480px) {
   #weather-widget {
     top: 20px;
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .footer .container {
+    width: 200%;
   }
 }
