@@ -384,6 +384,8 @@
           }
       });
 
+
+          // Handle the search panel visibility
           document.addEventListener("DOMContentLoaded", function () {
               const searchPanel = document.getElementById("search-panel");
               const searchButton = document.getElementById("search-hotels-btn");
@@ -413,6 +415,36 @@
     }
               });
           });
+
+          
+          
+          // Handle weather widget visibility for mobile
+          document.addEventListener("DOMContentLoaded", function () {
+              const infoPanel = document.getElementById("info-panel");
+              const weatherWidget = document.getElementById("weather-widget");
+              const closeBtn = document.getElementById("close-btn");
+
+              function toggleWeatherWidget() {
+                  if (window.innerWidth <= 768) { // Only apply on mobile
+                      if (infoPanel.classList.contains("activate")) {
+                          weatherWidget.style.display = "none";
+                      } else {
+                          weatherWidget.style.display = "block";
+                      }
+                  }
+              }
+
+              // Listen for panel open/close changes
+              infoPanel.addEventListener("transitionend", toggleWeatherWidget);
+              
+              // Also trigger when clicking the close button
+              closeBtn.addEventListener("click", function () {
+                  infoPanel.classList.remove("activate");
+                  toggleWeatherWidget();
+              });
+          });
+
+
     </script>
     <script>
       document.getElementById("close-btn").addEventListener("click", (e) => {
