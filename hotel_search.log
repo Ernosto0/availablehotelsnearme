@@ -63,3 +63,103 @@
 2025-01-31 19:04:27,065 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=1627
 2025-01-31 19:12:37,875 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=2559
 2025-01-31 19:14:16,950 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=6357
+2025-01-31 19:47:25,757 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID={'id': 7889, 'time': '20250131194725'}
+2025-01-31 19:49:26,501 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=8806, Create Time=20250131194926
+2025-01-31 19:50:26,109 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=8551, Create Time=2025-01-31 19:50:26
+2025-01-31 19:51:46,662 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=9343, Create Time=2025-01-31 19:51:46
+2025-01-31 19:53:13,798 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=9640, Create Time=2025-01-31 19:53:13
+2025-02-02 17:27:10,835 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=5531, Create Time=2025-02-02 17:27:10
+2025-02-02 17:27:59,777 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=3488, Create Time=2025-02-02 17:27:59
+2025-02-03 13:21:55,438 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=1933, Create Time=2025-02-03 13:21:55
+2025-02-03 18:46:52,129 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=2730, Create Time=2025-02-03 18:46:52
+2025-02-03 18:48:10,988 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=9960, Create Time=2025-02-03 18:48:10
+2025-02-03 18:50:07,459 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=1168, Create Time=2025-02-03 18:50:07
+2025-02-03 18:57:24,841 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=7584, Create Time=2025-02-03 18:57:24
+2025-02-04 20:16:25,590 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=8645, Create Time=2025-02-04 20:16:25
+2025-02-05 00:09:52,022 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=2230, Create Time=2025-02-05 00:09:52
+2025-02-05 00:10:17,829 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=1117, Create Time=2025-02-05 00:10:17
+2025-02-05 00:10:27,685 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=2522, Create Time=2025-02-05 00:10:27
+2025-02-05 00:13:53,924 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=5707, Create Time=2025-02-05 00:13:53
+2025-02-05 00:15:01,430 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=1620, Create Time=2025-02-05 00:15:01
+2025-02-05 00:15:16,148 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1.1km, Search ID=2283, Create Time=2025-02-05 00:15:16
+2025-02-05 00:15:24,719 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=9295, Create Time=2025-02-05 00:15:24
+2025-02-05 00:16:12,899 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=8885, Create Time=2025-02-05 00:16:12
+2025-02-05 00:19:45,683 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=8209, Create Time=2025-02-05 00:19:45
+2025-02-05 00:23:07,799 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=5430, Create Time=2025-02-05 00:23:07
+2025-02-05 00:24:34,538 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=4901, Create Time=2025-02-05 00:24:34
+2025-02-07 01:47:55,834 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=7008, Create Time=2025-02-07 01:47:55
+2025-02-07 01:48:15,921 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=6644, Create Time=2025-02-07 01:48:15
+2025-02-07 01:52:03,640 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=9851, Create Time=2025-02-07 01:52:03
+2025-02-07 01:54:19,144 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=9923, Create Time=2025-02-07 01:54:19
+2025-02-07 01:54:41,041 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=3982, Create Time=2025-02-07 01:54:41
+2025-02-07 01:55:33,749 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=8110, Create Time=2025-02-07 01:55:33
+2025-02-07 01:55:42,947 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=3430, Create Time=2025-02-07 01:55:42
+2025-02-07 01:57:03,533 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=1467, Create Time=2025-02-07 01:57:03
+2025-02-07 01:58:12,969 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1.1km, Search ID=6423, Create Time=2025-02-07 01:58:12
+2025-02-07 02:05:56,076 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=7229, Create Time=2025-02-07 02:05:56
+2025-02-07 02:06:08,149 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=8964, Create Time=2025-02-07 02:06:08
+2025-02-07 02:07:46,400 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=7121, Create Time=2025-02-07 02:07:46
+2025-02-07 02:08:12,507 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=4047, Create Time=2025-02-07 02:08:12
+2025-02-07 02:09:05,459 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=5570, Create Time=2025-02-07 02:09:05
+2025-02-07 02:10:03,141 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=5009, Create Time=2025-02-07 02:10:03
+2025-02-07 02:11:51,571 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1km, Search ID=8135, Create Time=2025-02-07 02:11:51
+2025-02-07 02:12:18,963 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=8834, Create Time=2025-02-07 02:12:18
+2025-02-07 02:13:02,393 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=1.9km, Search ID=2426, Create Time=2025-02-07 02:13:02
+2025-02-07 02:30:41,728 [INFO] views - User searching hotels: Location=(37.7749, -122.4194), Adults=1, Radius=2km, Search ID=6038, Create Time=2025-02-07 02:30:41
+2025-02-12 14:07:59,048 [INFO] views - User searching hotels: Location=(37.774929, -122.419416), Adults=1, Radius=1km, Search ID=2487, Create Time=2025-02-12 14:07:59
+2025-02-12 14:08:03,985 [DEBUG] views - Processing hotel: Best Western Red Coach Inn | Location: (37.78343, -122.41951)
+2025-02-12 14:08:03,985 [DEBUG] views - Processing hotel: Motel 6 San Francisco CA Civic Center | Location: (37.78322, -122.41738)
+2025-02-12 14:08:03,986 [DEBUG] views - Processing hotel: SF Central Hotel | Location: (37.77223, -122.42444)
+2025-02-12 14:08:03,986 [DEBUG] views - Processing hotel: Signature San Francisco | Location: (37.77735, -122.4082)
+2025-02-12 14:08:03,986 [DEBUG] views - Processing hotel: Rodeway Inn Civic Center | Location: (37.78286, -122.42196)
+2025-02-12 14:08:03,986 [DEBUG] views - Processing hotel: BEI San Francisco, Trademark Collection by Wyndham | Location: (37.77764, -122.41428)
+2025-02-12 14:08:03,987 [DEBUG] views - Processing hotel: SoMa House Hotel | Location: (37.77879, -122.41007)
+2025-02-12 14:08:03,987 [DEBUG] views - Processing hotel: Hotel Garrett | Location: (37.77886, -122.411)
+2025-02-12 14:08:03,987 [DEBUG] views - Processing hotel: CIVIC CENTER MOTOR INN | Location: (37.77267, -122.41087)
+2025-02-12 14:08:03,988 [DEBUG] views - Processing hotel: Hotel Fiona | Location: (37.77865, -122.41041)
+2025-02-12 14:08:03,988 [DEBUG] views - Processing hotel: YOTEL San Francisco | Location: (37.78034, -122.41203)
+2025-02-12 14:08:03,988 [DEBUG] views - Processing hotel: San Francisco Inn | Location: (37.77276, -122.41038)
+2025-02-12 14:08:03,990 [INFO] views - Hotels found: 12 Search ID={'id': 2487, 'time': '2025-02-12 14:07:59'}
+2025-02-12 14:08:03,991 [DEBUG] views - Hotel: Best Western Red Coach Inn | Price: 142 
+2025-02-12 14:08:03,991 [DEBUG] views - Hotel: Motel 6 San Francisco CA Civic Center | Price: 117 
+2025-02-12 14:08:03,991 [DEBUG] views - Hotel: SF Central Hotel | Price: 78 
+2025-02-12 14:08:03,992 [DEBUG] views - Hotel: Signature San Francisco | Price: 135 
+2025-02-12 14:08:03,992 [DEBUG] views - Hotel: Rodeway Inn Civic Center | Price: 81 
+2025-02-12 14:09:55,908 [INFO] views - User searching hotels: Location=(37.774929, -122.419416), Adults=1, Radius=1km, Search ID=6735, Create Time=2025-02-12 14:09:55
+2025-02-12 14:10:00,243 [DEBUG] views - Processing hotel: Best Western Red Coach Inn | Location: (37.78343, -122.41951)
+2025-02-12 14:10:00,244 [DEBUG] views - Processing hotel: Motel 6 San Francisco CA Civic Center | Location: (37.78322, -122.41738)
+2025-02-12 14:10:00,245 [DEBUG] views - Processing hotel: SF Central Hotel | Location: (37.77223, -122.42444)
+2025-02-12 14:10:00,245 [DEBUG] views - Processing hotel: Signature San Francisco | Location: (37.77735, -122.4082)
+2025-02-12 14:10:00,245 [DEBUG] views - Processing hotel: Rodeway Inn Civic Center | Location: (37.78286, -122.42196)
+2025-02-12 14:10:00,246 [DEBUG] views - Processing hotel: BEI San Francisco, Trademark Collection by Wyndham | Location: (37.77764, -122.41428)
+2025-02-12 14:10:00,246 [DEBUG] views - Processing hotel: SoMa House Hotel | Location: (37.77879, -122.41007)
+2025-02-12 14:10:00,246 [DEBUG] views - Processing hotel: Hotel Garrett | Location: (37.77886, -122.411)
+2025-02-12 14:10:00,246 [DEBUG] views - Processing hotel: CIVIC CENTER MOTOR INN | Location: (37.77267, -122.41087)
+2025-02-12 14:10:00,247 [DEBUG] views - Processing hotel: Hotel Fiona | Location: (37.77865, -122.41041)
+2025-02-12 14:10:00,247 [DEBUG] views - Processing hotel: YOTEL San Francisco | Location: (37.78034, -122.41203)
+2025-02-12 14:10:00,247 [DEBUG] views - Processing hotel: San Francisco Inn | Location: (37.77276, -122.41038)
+2025-02-12 14:10:00,250 [INFO] views - Hotels found: 12 Search ID={'id': 6735, 'time': '2025-02-12 14:09:55'}
+2025-02-12 14:10:00,251 [DEBUG] views - Hotel: Best Western Red Coach Inn | Price: 142 
+2025-02-12 14:10:00,252 [DEBUG] views - Hotel: Motel 6 San Francisco CA Civic Center | Price: 117 
+2025-02-12 14:10:00,252 [DEBUG] views - Hotel: SF Central Hotel | Price: 78 
+2025-02-12 14:10:00,252 [DEBUG] views - Hotel: Signature San Francisco | Price: 135 
+2025-02-12 14:10:00,253 [DEBUG] views - Hotel: Rodeway Inn Civic Center | Price: 81 
+2025-02-12 14:53:24,124 [INFO] views - User searching hotels: Location=(37.774929, -122.419416), Adults=1, Radius=1km, Search ID=6987, Create Time=2025-02-12 14:53:24
+2025-02-12 14:53:27,333 [DEBUG] views - Processing hotel: Best Western Red Coach Inn | Location: (37.78343, -122.41951)
+2025-02-12 14:53:27,333 [DEBUG] views - Processing hotel: Motel 6 San Francisco CA Civic Center | Location: (37.78322, -122.41738)
+2025-02-12 14:53:27,334 [DEBUG] views - Processing hotel: SF Central Hotel | Location: (37.77223, -122.42444)
+2025-02-12 14:53:27,334 [DEBUG] views - Processing hotel: Signature San Francisco | Location: (37.77735, -122.4082)
+2025-02-12 14:53:27,334 [DEBUG] views - Processing hotel: Rodeway Inn Civic Center | Location: (37.78286, -122.42196)
+2025-02-12 14:53:27,334 [DEBUG] views - Processing hotel: BEI San Francisco, Trademark Collection by Wyndham | Location: (37.77764, -122.41428)
+2025-02-12 14:53:27,335 [DEBUG] views - Processing hotel: SoMa House Hotel | Location: (37.77879, -122.41007)
+2025-02-12 14:53:27,335 [DEBUG] views - Processing hotel: Hotel Garrett | Location: (37.77886, -122.411)
+2025-02-12 14:53:27,335 [DEBUG] views - Processing hotel: CIVIC CENTER MOTOR INN | Location: (37.77267, -122.41087)
+2025-02-12 14:53:27,336 [DEBUG] views - Processing hotel: Hotel Fiona | Location: (37.77865, -122.41041)
+2025-02-12 14:53:27,336 [DEBUG] views - Processing hotel: YOTEL San Francisco | Location: (37.78034, -122.41203)
+2025-02-12 14:53:27,336 [DEBUG] views - Processing hotel: San Francisco Inn | Location: (37.77276, -122.41038)
+2025-02-12 14:53:27,338 [INFO] views - Hotels found: 12 Search ID={'id': 6987, 'time': '2025-02-12 14:53:24'}
+2025-02-12 14:53:27,338 [DEBUG] views - Hotel: Best Western Red Coach Inn | Price: 142 
+2025-02-12 14:53:27,338 [DEBUG] views - Hotel: Motel 6 San Francisco CA Civic Center | Price: 117 
+2025-02-12 14:53:27,338 [DEBUG] views - Hotel: SF Central Hotel | Price: 78 
+2025-02-12 14:53:27,339 [DEBUG] views - Hotel: Signature San Francisco | Price: 135 
+2025-02-12 14:53:27,339 [DEBUG] views - Hotel: Rodeway Inn Civic Center | Price: 81 

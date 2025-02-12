@@ -46,13 +46,14 @@ def fetch_hotels(request):
             km = 1  # Default to 1 km
 
         
-        latitude = 37.7749  # Use session-stored latitude
-        longitude = -122.4194  # Use session-stored longitude
+        latitude = user_location.get('latitude')
+        longitude = user_location.get('longitude')
+        
 
         global search_id
         search_id = createSearchId()
 
-        logger.info(f"User searching hotels: Location=({latitude}, {longitude}), Adults={adults}, Radius={km}km, Search ID={search_id.get("id")}, Create Time={search_id.get('time')}")
+        logger.info(f"User searching hotels: Location=({latitude}, {longitude}), Adults={adults}, Radius={km}km, Search ID={search_id.get('id')}, Create Time={search_id.get('time')}")
 
         # Get access token
         access_token = get_access_token()
@@ -66,31 +67,31 @@ def fetch_hotels(request):
         
 
         # Fetch hotels by geolocation
-        # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
+        hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
 
         available_hotels = calculate_price_status(available_hotels)
 
-        return JsonResponse({'hotels': available_hotels})
+        
 
-        # if hotel_ids:
-        #     check_in_date = datetime.now().strftime('%Y-%m-%d')
-        #     check_out_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-        #     # available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults=adults)
+        if hotel_ids:
+            check_in_date = datetime.now().strftime('%Y-%m-%d')
+            check_out_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+            available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults=adults)
 
             
             
-        #     # Calculate price status for each hotel
-        #     available_hotels = calculate_price_status(available_hotels)
+            # Calculate price status for each hotel
+            available_hotels = calculate_price_status(available_hotels)
 
-        #     logger.info(f"Hotels found: {len(available_hotels)} Search ID={search_id}")
-        #     for hotel in available_hotels[:5]:  # Log only first 5 to avoid clutter
-        #         logger.debug(f"Hotel: {hotel['hotel_name']} | Price: {hotel.get('price')} ")
+            logger.info(f"Hotels found: {len(available_hotels)} Search ID={search_id}")
+            for hotel in available_hotels[:5]:  # Log only first 5 to avoid clutter
+                logger.debug(f"Hotel: {hotel['hotel_name']} | Price: {hotel.get('price')} ")
 
 
-        #     return JsonResponse({'hotels': available_hotels})
-        # else:
-            # logger.warning('No hotels found')
-            # return JsonResponse({'hotels': []})
+            return JsonResponse({'hotels': available_hotels})
+        else:
+            logger.warning('No hotels found')
+            return JsonResponse({'hotels': []})
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
@@ -144,7 +145,7 @@ def get_hotels_by_geolocation(access_token, latitude, longitude, radius):
     params = {
         'latitude': latitude,
         'longitude': longitude,
-        'radius': radius,  # Search within 1 km
+        'radius': radius,  
         'radiusUnit': 'KM'
     }
 
@@ -173,9 +174,9 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
     url = "https://api.amadeus.com/v3/shopping/hotel-offers"
     headers = {'Authorization': f'Bearer {access_token}'}
     available_hotels = []
-    # currency = get_user_currency()
+    currency = get_user_currency()
 
-    currency = 'USD' # Hardcoded currency for now. Change to user's currency then final deployment
+    # currency = 'USD' # Hardcoded currency for now. Change to user's currency then final deployment
     print("searching for", adults, "adults")
     print(check_in_date, check_out_date)
     # Split hotel_ids into chunks of 20
@@ -207,6 +208,7 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
 
                 #booking links
                 booking_link = generate_booking_com_link(hotel_name)
+
                 offers = hotel.get('offers', [])
                 
                 if offers:
@@ -327,7 +329,8 @@ def log_google_places(request):
 
             if log_level == 'DEBUG':
                 places_logger.debug("-----------------")
-                places_logger.debug(f" Search ID= {search_id.get("id")}, Search time={search_id.get("time")} {message}" )
+                places_logger.debug(f" Search ID= {search_id.get('id')}, Search time={search_id.get('time')} {message}" )
+
             elif log_level == 'WARNING':
                 places_logger.warning(message)
             elif log_level == 'ERROR':
