@@ -28,7 +28,7 @@ function initMap(lat = 48.8566, lng = 2.3522) {
 
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-    L.tileLayer(`https://api.maptiler.com/maps/basic/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj`, {
+    L.tileLayer(`https://api.maptiler.com/maps/dataviz/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj`, {
         attribution: '&copy; <a href="https://www.maptiler.com/">MapTiler</a> contributors',
         maxZoom: 20,
     }).addTo(map);
@@ -520,7 +520,6 @@ function showInfoPanel(
 
 }
 
-// Function to generate star icons based on rating
 // Function to generate star icons based on rating
 function generateStars(rating) {
     const fullStar = '<img src="/static/images/yellow-star.png" class="star-icon">';
