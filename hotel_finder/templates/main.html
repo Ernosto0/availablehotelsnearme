@@ -192,10 +192,18 @@
           <label for="check-out">Check-out:</label>
           <input type="date" id="check-out" name="check-out" value="2024-12-22" />
         </div>
+      
         <div class="input-field">
-          <label for="new-input">New Input:</label>
-          <input type="text" id="new-input" name="new-input" placeholder="Your input..." />
+          <label>Price Levels:</label>
+          <div class="price-levels">
+            <input type="checkbox" id="price-low" name="price-level" value="low" class="checkbox-green" checked title="Low Price Range" />
+            <input type="checkbox" id="price-medium" name="price-level" value="medium" class="checkbox-yellow" title="Medium Price Range" />
+            <input type="checkbox" id="price-high" name="price-level" value="high" class="checkbox-red" title="High Price Range" />
+          </div>
         </div>
+        
+        
+        
       </div>
     </div>
 
@@ -320,23 +328,28 @@
 
       // Update fetchHotels function to use updateHotelsOnMap
       function fetchHotels(latitude, longitude) {
-          console.log('Fetching hotels...');
+            console.log('Fetching hotels...');
 
-          const loadingSpinner = document.getElementById('loading-spinner');
-          if (loadingSpinner) loadingSpinner.style.display = 'block';
+            const loadingSpinner = document.getElementById('loading-spinner');
+            if (loadingSpinner) loadingSpinner.style.display = 'block';
 
-          // Get the value of the adults input field
-          const adults = document.getElementById('adults').value || 1; // Default to 1 if not set
+            const checkInInput = document.getElementById("check-in").value;  // Get value
+            const checkOutInput = document.getElementById("check-out").value; // Get value
+            const adults = document.getElementById('adults').value || 1; // Default to 1
+            const km = document.getElementById('radius-range').value;
 
-          const km = document.getElementById('radius-range').value;
+            // Get checked price levels
+            const checkboxes = Array.from(document.querySelectorAll(".price-levels input[type='checkbox']:checked"))
+                                    .map(checkbox => checkbox.value);  // Extract only checked values
 
+          
           fetch('/fetch-hotels/', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
                   'X-CSRFToken': getCSRFToken(),
               },
-              body: JSON.stringify({ latitude, longitude, adults, km}), // Include adults in the payload
+              body: JSON.stringify({ latitude, longitude, adults, km,checkInInput,checkOutInput,checkboxes}), 
           })
               .then(response => response.json())
               .then(data => {
@@ -486,6 +499,90 @@
           webInfoPanel.style.pointerEvents = "none";
         });
       });
+
+      // handle the checkboxes
+      document.addEventListener("DOMContentLoaded", function () {
+    const checkboxes = document.querySelectorAll(".price-levels input[type='checkbox']");
+    const searchButton = document.getElementById("search-hotels-btn");
+    const warningMessage = document.createElement("div");
+
+    // Create warning message
+    warningMessage.id = "price-warning";
+    warningMessage.textContent = "Please select at least one price level!";
+    warningMessage.style.cssText = `
+        display: none;
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+    `;
+
+    // Append warning below price levels
+    document.querySelector(".price-levels").after(warningMessage);
+
+    // Disable button initially
+    searchButton.disabled = true;
+    searchButton.style.opacity = "0.5"; // Make it look disabled
+
+    // Function to check selected checkboxes
+    function updateButtonState() {
+        let checkedBoxes = document.querySelectorAll(".price-levels input[type='checkbox']:checked");
+
+        if (checkedBoxes.length > 0) {
+            searchButton.disabled = false;
+            searchButton.style.opacity = "1"; // Enable button
+        } else {
+            searchButton.disabled = true;
+            searchButton.style.opacity = "0.5"; // Keep button disabled
+        }
+    }
+
+    // Enforce max 2 selections and update button state
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+            let checkedBoxes = document.querySelectorAll(".price-levels input[type='checkbox']:checked");
+
+            if (checkedBoxes.length > 2) {
+                this.checked = false;
+                alert("You can select up to 2 price levels only.");
+            }
+
+            updateButtonState();
+        });
+    });
+
+    // Validate before search
+    searchButton.addEventListener("click", function (event) {
+        let checkedBoxes = document.querySelectorAll(".price-levels input[type='checkbox']:checked");
+
+        if (checkedBoxes.length === 0) {
+            event.preventDefault();
+            warningMessage.style.display = "block";
+
+            // Hide warning after 2 seconds
+            setTimeout(() => {
+                warningMessage.style.display = "none";
+            }, 2000);
+        }
+    });
+
+    // Run check on page load in case "Low" is preselected
+    updateButtonState();
+});
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date();
+        const tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+
+        // Format date to YYYY-MM-DD (required for input[type="date"])
+        const formatDate = (date) => date.toISOString().split('T')[0];
+
+        // Set default values
+        document.getElementById("check-in").value = formatDate(today);
+        document.getElementById("check-out").value = formatDate(tomorrow);
+    });
+
     </script>
   </body>
 </html>

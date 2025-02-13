@@ -35,12 +35,20 @@ function initMap(lat = 48.8566, lng = 2.3522) {
 
     // Initialize the cluster group with adjusted settings
     markerClusterGroup = L.markerClusterGroup({
-        maxClusterRadius: 110,  // Default is 80; lower value means clustering happens at a shorter distance
-        disableClusteringAtZoom: 16,  // Disable clustering at zoom level 14 and above
-        spiderfyOnMaxZoom: true,  // Expand markers when zooming in
-        showCoverageOnHover: false,  // Disable cluster coverage area when hovering
-        removeOutsideVisibleBounds: true  // Optimize map performance
+        maxClusterRadius: 80,
+        disableClusteringAtZoom: 16,
+        spiderfyOnMaxZoom: true,
+        removeOutsideVisibleBounds: true,
+    
+        iconCreateFunction: function (cluster) {
+            return L.divIcon({
+                html: '', // ❌ No number text inside the cluster
+                className: 'custom-cluster-icon',
+                iconSize: L.point(40, 40) // Adjust size if needed
+            });
+        }
     });
+    
 
     // Add the cluster group to the map
     map.addLayer(markerClusterGroup);

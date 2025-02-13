@@ -610,6 +610,7 @@ html, body {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
+  align-items: flex-start;
 }
 
 /* Each column takes up equal width and stacks its items */
@@ -629,6 +630,85 @@ html, body {
   width: 100%;
   box-sizing: border-box;
 }
+
+/* Grouping Adults input and Price Levels on the same row */
+.adults-price-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust spacing */
+}
+
+/* Making sure inputs and labels stay aligned */
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.price-levels {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Make the checkboxes align in one row and wrap if needed */
+/* Remove default checkboxes */
+.price-levels input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Green checkbox for Low price */
+.checkbox-green {
+  background-color: #28a745;
+}
+
+/* Yellow checkbox for Medium price */
+.checkbox-yellow {
+  background-color: #ffc107;
+}
+
+/* Red checkbox for High price */
+.checkbox-red {
+  background-color: #dc3545;
+}
+
+/* Add a subtle hover effect */
+.price-levels input[type="checkbox"]:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Add a check mark when selected */
+.price-levels input[type="checkbox"]:checked {
+  border: 3px solid white;
+  box-shadow: inset 0 0 0 3px black;
+}
+
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.adults-price-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.adults-price-container .input-field,
+.adults-price-container .price-levels {
+  flex: 1;
+}
+
+
 
 /* Styling for date and number inputs */
 .search-panel input[type="number"],
@@ -834,3 +914,13 @@ html, body {
   }
 }
 
+.custom-cluster-icon {
+  background-color: rgba(0, 102, 255, 0.7);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}

@@ -1,16 +1,17 @@
 import json
 import logging
 import random
-from django.http import JsonResponse
-from django.shortcuts import render
-import requests
+from django.http import JsonResponse # type: ignore
+from django.shortcuts import render # type: ignore
+import requests # type: ignore
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators.csrf import csrf_exempt # type: ignore
+from hotel_finder.tests import test_hotels
 logger = logging.getLogger('hotel_search')
 
-test_hotels = [{'hotel_name': 'Best Western Red Coach Inn', 'room_type': 'STANDARD_ROOM', 'price': 115, 'location': {'latitude': 37.78343, 'longitude': -122.41951}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Best+Western+Red+Coach+Inn', 'currency': 'USD'}, {'hotel_name': 'San Francisco Proper a Member of Design Hotels', 'room_type': 'STANDARD_ROOM', 'price': 241, 'location': {'latitude': 37.78088, 'longitude': -122.41268}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=San+Francisco+Proper+a+Member+of+Design+Hotels', 'currency': 'USD'}, {'hotel_name': 'SF Central Hotel', 'room_type': 'STANDARD_ROOM', 'price': 95, 'location': {'latitude': 37.77223, 'longitude': -122.42444}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=SF+Central+Hotel', 'currency': 'USD'}, {'hotel_name': 'Signature San Francisco', 'room_type': 'STANDARD_ROOM', 'price': 135, 'location': {'latitude': 37.77735, 'longitude': -122.4082}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Signature+San+Francisco', 'currency': 'USD'}, {'hotel_name': 'Rodeway Inn Civic Center', 'room_type': 'STANDARD_ROOM', 'price': 74, 'location': {'latitude': 37.78286, 'longitude': -122.42196}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Rodeway+Inn+Civic+Center', 'currency': 'USD'}, {'hotel_name': 'SoMa House Hotel', 'room_type': 'SUPERIOR_ROOM', 'price': 120, 'location': {'latitude': 37.77879, 'longitude': -122.41007}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=SoMa+House+Hotel', 'currency': 'USD'}, {'hotel_name': 'Hotel Garrett', 'room_type': 'SUPERIOR_ROOM', 'price': 92, 'location': {'latitude': 37.77886, 'longitude': -122.411}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Hotel+Garrett', 'currency': 'USD'}, {'hotel_name': 'CIVIC CENTER MOTOR INN', 'room_type': 'STANDARD_ROOM', 'price': 142, 'location': {'latitude': 37.77267, 'longitude': -122.41087}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=CIVIC+CENTER+MOTOR+INN', 'currency': 'USD'}, {'hotel_name': 'Hotel Fiona', 'room_type': 'DELUXE_ROOM', 'price': 119, 'location': {'latitude': 37.77865, 'longitude': -122.41041}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=Hotel+Fiona', 'currency': 'USD'}, {'hotel_name': 'YOTEL San Francisco', 'room_type': 'STANDARD_ROOM', 'price': 163, 'location': {'latitude': 37.78034, 'longitude': -122.41203}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=YOTEL+San+Francisco', 'currency': 'USD'}, {'hotel_name': 'San Francisco Inn', 'room_type': 'STANDARD_ROOM', 'price': 136, 'location': {'latitude': 37.77276, 'longitude': -122.41038}, 'booking_link': 'https://www.booking.com/searchresults.html?ss=San+Francisco+Inn', 'currency': 'USD'}]
+
+
 user_location = {}
 
 def display_hotel_map(request):
@@ -40,11 +41,17 @@ def fetch_hotels(request):
             body = json.loads(request.body)
             adults = body.get('adults', 1)
             km = body.get('km', 1)
+            check_in = body.get("checkInInput")
+            check_out = body.get("checkOutInput")
+            price_levels = body.get("checkboxes", [])
         except json.JSONDecodeError:
             logging.error('Error parsing request body')
             adults = 1  # Default to 1 adult
             km = 1  # Default to 1 km
-
+            check_in = None
+            check_out = None
+            price_levels = []
+        print(f"Check-in: {check_in}, Check-out: {check_out}, Adults: {adults}, Radius: {km}km, Price Levels: {price_levels}")
         
         latitude = 37.7749  # Use session-stored latitude
         longitude = -122.4194  # Use session-stored longitude
@@ -73,9 +80,8 @@ def fetch_hotels(request):
         return JsonResponse({'hotels': available_hotels})
 
         # if hotel_ids:
-        #     check_in_date = datetime.now().strftime('%Y-%m-%d')
-        #     check_out_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-        #     # available_hotels = check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults=adults)
+        #     
+        #     # available_hotels = check_hotel_availability(hotel_ids, check_in, check_out, access_token, adults=adults)
 
             
             
