@@ -8,7 +8,14 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.views.decorators.csrf import csrf_exempt # type: ignore
 from hotel_finder.tests import test_hotels
+from django.conf import settings # type: ignore
+import os
 logger = logging.getLogger('hotel_search')
+
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 
@@ -18,7 +25,8 @@ def display_hotel_map(request):
     # Render the page without hotel data initially
     context = {
         'hotels': json.dumps([]),  # Empty list
-        'no_hotels_available': False  # Default to no hotels available
+        'no_hotels_available': False,  # Default to no hotels available
+        "GOOGLE_MAPS_API_KEY": settings.GOOGLE_MAPS_API_KEY
     }
     return render(request, 'main.html', context)
 
@@ -68,39 +76,33 @@ def fetch_hotels(request):
             return JsonResponse({'error': 'Unable to obtain access token'}, status=500)
         
 
-
-        available_hotels = test_hotels
-        
-        available_hotels = calculate_price_status(available_hotels)
-
-        available_hotels = filterByPriceLevel(available_hotels, price_levels)
-
-        # print(filterByPriceLevel(available_hotels, price_levels))
         # Fetch hotels by geolocation
-        # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
+        hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
 
         
 
-        return JsonResponse({'hotels': available_hotels})
+      
 
-        # if hotel_ids:
-        #     
-        #     # available_hotels = check_hotel_availability(hotel_ids, check_in, check_out, access_token, adults=adults)
-
+        if hotel_ids:
             
+            available_hotels = check_hotel_availability(hotel_ids, check_in, check_out, access_token, adults=adults)
             
-        #     # Calculate price status for each hotel
-        #     
+            # Calculate price status for each hotel
 
-        #     logger.info(f"Hotels found: {len(available_hotels)} Search ID={search_id}")
-        #     for hotel in available_hotels[:5]:  # Log only first 5 to avoid clutter
-        #         logger.debug(f"Hotel: {hotel['hotel_name']} | Price: {hotel.get('price')} ")
+            available_hotels = calculate_price_status(available_hotels)
+
+            available_hotels = filterByPriceLevel(available_hotels, price_levels)
+            
+
+            logger.info(f"Hotels found: {len(available_hotels)} Search ID={search_id}")
+            for hotel in available_hotels[:5]:  # Log only first 5 to avoid clutter
+                logger.debug(f"Hotel: {hotel['hotel_name']} | Price: {hotel.get('price')} ")
 
 
-        #     return JsonResponse({'hotels': available_hotels})
-        # else:
-            # logger.warning('No hotels found')
-            # return JsonResponse({'hotels': []})
+            return JsonResponse({'hotels': available_hotels})
+        else:
+            logger.warning('No hotels found')
+            return JsonResponse({'hotels': []})
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
@@ -142,8 +144,12 @@ def set_user_location(request):
 
 def get_access_token():
     
-    client_id = '3wcQWRrX2lgSRESxG5lbfVebTQbOPfZj'
-    client_secret = 'Xjzpxk6nNJKX4ymL'
+    client_id = os.getenv("AMADEUS_CLIENT_ID")
+    client_secret = os.getenv("AMADEUS_CLIENT_SECRET")
+    print(client_id)
+    print(client_secret)
+
+
     url = 'https://api.amadeus.com/v1/security/oauth2/token'  
 
     data = {
@@ -159,7 +165,7 @@ def get_access_token():
     
     else:
         logger.error(f"Failed to get access token. Status Code: {response.status_code}")
-        logger.infor(response.json())
+        logger.info(response.json())
         return None
 
 def get_hotels_by_geolocation(access_token, latitude, longitude, radius):

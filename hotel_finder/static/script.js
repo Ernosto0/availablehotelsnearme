@@ -730,36 +730,44 @@ let isGoogleMapsAPILoaded = false;
 function loadGoogleMapsAPI(lat, lng) {
     if (isGoogleMapsAPILoaded) {
         console.log("Google Maps API already loaded.");
-        console.log("Initializing map with user location in loadGoogleMapsAPI function:", { lat, lng }); 
-        initMap(lat, lng); // Pass the correct lat/lng dynamically
+        console.log("Initializing map with user location in loadGoogleMapsAPI function:", { lat, lng });
+        initMap(lat, lng);
         return;
     }
 
     if (typeof google !== "undefined" && typeof google.maps !== "undefined") {
         console.log("Google Maps API already available.");
         console.log("Initializing map with user location in loadGoogleMapsAPI function:", { lat, lng });
-        initMap(lat, lng); // Pass the correct lat/lng dynamically
+        initMap(lat, lng);
         isGoogleMapsAPILoaded = true;
         return;
     }
 
+    // Use the API key injected from Django
+    const apiKey = typeof GOOGLE_MAPS_API_KEY !== "undefined" ? GOOGLE_MAPS_API_KEY : "";
+
+    if (!apiKey) {
+        console.error("Google Maps API key is missing!");
+        return;
+    }
+
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDvxJfUnj_5qojubJNy8IcGkESmG7D9dlI&libraries=places,marker&callback=initMapCallback`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&callback=initMapCallback`;
     script.async = true;
     script.defer = true;
 
     document.head.appendChild(script);
 
-    // Define a global callback to dynamically initialize the map
     window.initMapCallback = function () {
         console.log("Google Maps API initialized via callback.");
         console.log("Initializing map with user location in initMapCallback function:", { lat, lng });
-        initMap(lat, lng); // Pass the correct lat/lng dynamically
+        initMap(lat, lng);
         isGoogleMapsAPILoaded = true;
     };
 
     console.log("Google Maps API script added.");
 }
+
 
 
 function getCSRFToken() {
