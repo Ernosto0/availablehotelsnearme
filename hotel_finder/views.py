@@ -71,7 +71,8 @@ def fetch_hotels(request):
 
         available_hotels = test_hotels
         
-
+        available_hotels = calculate_price_status(available_hotels)
+        
         # Fetch hotels by geolocation
         # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
 
@@ -86,7 +87,7 @@ def fetch_hotels(request):
             
             
         #     # Calculate price status for each hotel
-        #     available_hotels = calculate_price_status(available_hotels)
+        #     
 
         #     logger.info(f"Hotels found: {len(available_hotels)} Search ID={search_id}")
         #     for hotel in available_hotels[:5]:  # Log only first 5 to avoid clutter
