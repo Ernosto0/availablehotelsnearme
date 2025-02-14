@@ -72,11 +72,14 @@ def fetch_hotels(request):
         available_hotels = test_hotels
         
         available_hotels = calculate_price_status(available_hotels)
-        
+
+        available_hotels = filterByPriceLevel(available_hotels, price_levels)
+
+        # print(filterByPriceLevel(available_hotels, price_levels))
         # Fetch hotels by geolocation
         # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
 
-        available_hotels = calculate_price_status(available_hotels)
+        
 
         return JsonResponse({'hotels': available_hotels})
 
@@ -103,6 +106,22 @@ def fetch_hotels(request):
 
 
 # Store user location globally (or use session for user-specific data)
+
+def filterByPriceLevel(hotels, price_levels):
+    """
+    Filter hotels by price level.
+    """
+    if not price_levels:
+        return hotels  # Return all hotels if no price levels are selected
+
+    filtered_hotels = []
+    for hotel in hotels:
+        price_status = hotel.get('status', 'unknown')
+        if price_status in price_levels:
+            filtered_hotels.append(hotel)
+
+    return filtered_hotels
+
 
 @csrf_exempt
 def set_user_location(request):
