@@ -22,7 +22,7 @@ function initMap(lat = 48.8566, lng = 2.3522) {
 
     map = L.map(mapElement, {
         center: [lat, lng],
-        zoom: 14,
+        zoom: 16,
         zoomControl: false 
     });
 
@@ -30,7 +30,7 @@ function initMap(lat = 48.8566, lng = 2.3522) {
 
     L.tileLayer(`https://api.maptiler.com/maps/dataviz/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj`, {
         attribution: '&copy; <a href="https://www.maptiler.com/">MapTiler</a> contributors',
-        maxZoom: 20,
+        maxZoom: 25,
     }).addTo(map);
 
     // Initialize the cluster group with adjusted settings
@@ -99,8 +99,6 @@ function clearRadiusCircle() {
     }
 }
 
-
-// Add hotels dynamically without reloading the map
 function updateHotelsOnMap(hotels) {
     console.log('Updating hotels on map:', hotels);
 
@@ -111,46 +109,32 @@ function updateHotelsOnMap(hotels) {
 
     clearMarkers();
     clearRadiusCircle();
-    const bounds = L.latLngBounds();
-
-    const cheapestHotel = calculateCheapestHotel(hotels);
-    window.cheapestHotel = cheapestHotel;
 
     hotels.forEach(hotel => {
         const { hotel_name, price, location, booking_link, currency, status } = hotel;
         window.hotelCurrency = currency;
 
         if (location && location.latitude && location.longitude) {
-            const isCheapest = hotel_name === cheapestHotel.hotel_name;
             const marker = createCustomMarker(
                 location.latitude,
                 location.longitude,
                 hotel_name,
                 price,
                 booking_link,
-                status,
-                isCheapest
+                status
             );
-
-            markerClusterGroup.addLayer(marker);  // Add marker to cluster group
-            bounds.extend([location.latitude, location.longitude]);
+            markerClusterGroup.addLayer(marker);
         } else {
             console.error(`Invalid location data for hotel: ${hotel_name}`);
         }
     });
 
-    if (bounds.isValid()) {
-        setTimeout(() => {
-            map.fitBounds(bounds);  // Fit map after markers are added
-        }, 500); // Add a short delay to ensure clusters update properly
-    } else {
-        console.warn('No valid hotels to display.');
-    }
     // Add cluster group to the map and refresh clusters
     markerClusterGroup.addTo(map);
     markerClusterGroup.refreshClusters();
-}
 
+    map.setZoom(16);  // Adjust the zoom level as needed
+}
 
 
 
