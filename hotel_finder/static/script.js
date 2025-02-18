@@ -30,7 +30,7 @@ function initMap(lat = 48.8566, lng = 2.3522) {
 
     L.tileLayer(`https://api.maptiler.com/maps/dataviz/{z}/{x}/{y}.png?key=X7HwJPbLsgS0Hv3KpPyj`, {
         attribution: '&copy; <a href="https://www.maptiler.com/">MapTiler</a> contributors',
-        maxZoom: 25,
+        maxZoom: 18,
     }).addTo(map);
 
     // Initialize the cluster group with adjusted settings
@@ -38,7 +38,7 @@ function initMap(lat = 48.8566, lng = 2.3522) {
         maxClusterRadius: 80,
         disableClusteringAtZoom: 16,
         spiderfyOnMaxZoom: true,
-        removeOutsideVisibleBounds: true,
+        removeOutsideVisibleBounds: false,
     
         iconCreateFunction: function (cluster) {
             return L.divIcon({
@@ -100,6 +100,10 @@ function clearRadiusCircle() {
 }
 
 function updateHotelsOnMap(hotels) {
+
+    const maxHotels = 20; // Limit to 20 hotels
+    hotels.sort((a, b) => a.price - b.price); // Sort by price (optional)
+    const limitedHotels = hotels.slice(0, maxHotels); // Take the closest ones
     console.log('Updating hotels on map:', hotels);
 
     if (!markerClusterGroup) {
@@ -107,8 +111,10 @@ function updateHotelsOnMap(hotels) {
         return;
     }
 
-    clearMarkers();
+    clearMarkers(); // Clear old markers
     clearRadiusCircle();
+
+    const markersToAdd = []; // Store markers before adding
 
     hotels.forEach(hotel => {
         const { hotel_name, price, location, booking_link, currency, status } = hotel;
@@ -123,17 +129,17 @@ function updateHotelsOnMap(hotels) {
                 booking_link,
                 status
             );
-            markerClusterGroup.addLayer(marker);
+            markersToAdd.push(marker); // Collect markers
         } else {
             console.error(`Invalid location data for hotel: ${hotel_name}`);
         }
     });
 
-    // Add cluster group to the map and refresh clusters
-    markerClusterGroup.addTo(map);
-    markerClusterGroup.refreshClusters();
-
-    map.setZoom(16);  // Adjust the zoom level as needed
+    markerClusterGroup.addLayers(markersToAdd); // Add markers in bulk (better performance)
+    map.addLayer(markerClusterGroup); // Ensure the cluster is added
+    if (map.getZoom() < 14) {
+        map.setZoom(16);
+    }
 }
 
 
@@ -474,12 +480,6 @@ function showInfoPanel(
          };
      }
 
-    if (hotelName === window.cheapestHotel.hotel_name) {
-        document.getElementById('hotel-name').innerText = `${hotelName} (Cheapest!)`;
-    } else {
-        document.getElementById('hotel-name').innerText = hotelName;
-    }
-    
 
      document.getElementById('next-review').onclick = () => {
         if (currentReviewIndex < reviews.length - 1) {

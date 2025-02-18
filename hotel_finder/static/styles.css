@@ -924,3 +924,21 @@ html, body {
   justify-content: center;
   border: 2px solid white;
 }
+
+
+.custom-marker {
+  transform: translateZ(0);
+  will-change: transform;
+
+}
+
+* {
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+
+.web-info-panel {
+  transform: translateZ(0);
+  will-change: transform;
+}
