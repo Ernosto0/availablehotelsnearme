@@ -36,10 +36,10 @@ function initMap(lat = 48.8566, lng = 2.3522) {
     // Initialize the cluster group with adjusted settings
     markerClusterGroup = L.markerClusterGroup({
         maxClusterRadius: 80,
-        disableClusteringAtZoom: 16,
-        spiderfyOnMaxZoom: true,
+        disableClusteringAtZoom: 15,
+        spiderfyOnMaxZoom: false,
         removeOutsideVisibleBounds: false,
-    
+        
         iconCreateFunction: function (cluster) {
             return L.divIcon({
                 html: '', // ❌ No number text inside the cluster
@@ -101,9 +101,6 @@ function clearRadiusCircle() {
 
 function updateHotelsOnMap(hotels) {
 
-    const maxHotels = 20; // Limit to 20 hotels
-    hotels.sort((a, b) => a.price - b.price); // Sort by price (optional)
-    const limitedHotels = hotels.slice(0, maxHotels); // Take the closest ones
     console.log('Updating hotels on map:', hotels);
 
     if (!markerClusterGroup) {
