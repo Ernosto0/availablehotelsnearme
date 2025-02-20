@@ -741,15 +741,16 @@ function loadGoogleMapsAPI(lat, lng) {
     }
 
     // Use the API key injected from Django
-    const apiKey = typeof GOOGLE_MAPS_API_KEY !== "undefined" ? GOOGLE_MAPS_API_KEY : "";
+    const googleapiKey = typeof GOOGLE_MAPS_API_KEY !== "undefined" ? GOOGLE_MAPS_API_KEY : "";
 
-    if (!apiKey) {
-        console.error("Google Maps API key is missing!");
+    console.log("Google API key:", googleapiKey);
+    if (!googleapiKey) {
+        console.error("Google API key is missing! key",googleapiKey);
         return;
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&callback=initMapCallback`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleapiKey}&libraries=places,marker&callback=initMapCallback`;
     script.async = true;
     script.defer = true;
 

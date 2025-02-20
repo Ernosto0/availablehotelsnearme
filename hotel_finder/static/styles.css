@@ -321,10 +321,18 @@ html, body {
 }
 
 #hotel-price {
-  font-size: 20px;
+  font-size: 24px;
   text-transform: uppercase;
   margin-bottom: 15px;
   text-align: center;
+}
+
+#hotel-rating {
+  font-size: 20px;
+}
+
+#hotel-phone {
+  font-size: 18px;
 }
 
 .button-container {
@@ -392,6 +400,47 @@ html, body {
 #close-btn:hover {
   background-color: var(--darkblue);
 }
+
+
+#call-hotel-btn {
+  color: white;
+  background-color: var(--blue);
+  padding: 8px 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  margin: 5px 0;
+  text-decoration: none;
+  transition: 250ms all ease-in-out;
+  cursor: pointer;
+  border: 2px solid black;
+  font-size: 18px;
+  gap: 8px; /* Adds spacing between the text and the icon */
+}
+
+#call-hotel-btn i {
+  font-size: 20px; /* Adjust icon size */
+}
+
+#call-hotel-btn:hover {
+  border: 2px solid black;
+  background-color: white;
+  color: var(--darkblue);
+}
+
+#hotel-distance {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+  margin-top: 10px;
+  padding: 5px;
+  border-radius: 5px;
+  display: inline-block;
+  width: auto;
+}
+
 
 .footer {
   background-color: #333;
