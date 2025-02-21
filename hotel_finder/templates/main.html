@@ -44,9 +44,9 @@
 
     <script>
       const GOOGLE_MAPS_API_KEY = "{{ GOOGLE_MAPS_API_KEY }}";
-      console.log("Google Maps API Key:", GOOGLE_MAPS_API_KEY);
+      
     </script>
-    <!-- Your custom JS file -->
+    <!-- JS file -->
     <script src="{% static 'script.js' %}"></script>
 </head>
 
@@ -90,7 +90,7 @@
             <h2>How to Use It?</h2>
             <ul>
                 <li><strong>Allow Location Access</strong> – The app will use your location to show nearby hotels.</li>
-                <li><strong>Browse the Map</strong> – See all available hotels in a 10-15 km radius.</li>
+                <li><strong>Browse the Map</strong> – See all available hotels in radius that you choose.</li>
                 <li><strong>Check Prices & Availability</strong> – Tap on a hotel to view details, including price and availability.</li>
                 <li><strong>Book Easily</strong> – Click the link to complete your booking on a trusted partner site.</li>
             </ul>
@@ -131,7 +131,15 @@
         <div class="hotel-desc">
           <p id="hotel-price"></p>
           <p id="hotel-rating"></p>
-          <p id="hotel-phone"></p>
+          <p id="hotel-phone">
+            <i class="fa-solid fa-phone"></i>
+            <span id="phone-number-text"></span>
+          </p>
+          <button id="call-hotel-btn">
+            Call Now for More Info
+            <i class="fa-solid fa-phone"></i>
+          </button>
+  
         </div>
         <div class="button-container">
           <a id="hotel-website" href="#" target="_blank">Visit Website</a>
@@ -588,6 +596,28 @@
         document.getElementById("check-out").value = formatDate(tomorrow);
     });
 
+    // Handle the phone number button
+            
+    document.addEventListener("DOMContentLoaded", function () {
+    const phoneNumber = "+1234567890"; // Replace with dynamic phone number
+    const phoneText = document.getElementById("phone-number-text");
+    const callButton = document.getElementById("call-hotel-btn");
+
+    if (!phoneText || !callButton) {
+        console.error("Missing #phone-number-text or #call-hotel-btn in the DOM.");
+        return;
+    }
+
+    if (phoneNumber) {
+        phoneText.textContent = phoneNumber;
+        callButton.style.display = "inline-block"; // Show button if number exists
+        callButton.addEventListener("click", function () {
+            window.location.href = `tel:${phoneNumber}`;
+        });
+    } else {
+        callButton.style.display = "none"; // Hide button if no number
+    }
+});
     </script>
   </body>
 </html>

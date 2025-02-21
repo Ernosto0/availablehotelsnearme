@@ -195,7 +195,7 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
         fetchHotelDetails({ lat, lng }, hotelName, hotelPrice, lat, lng)
             .then(data => {
                 const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber,  reviewData } = data;
-
+                updatePhoneNumber(hotelPhoneNumber);
                 showInfoPanel(
                     hotelName, hotelPrice, photos, hotelRating, userRatingsTotal,
                     hotelWebsite, hotelPhoneNumber, lat, lng, reviewData, booking_link
@@ -415,6 +415,8 @@ function showInfoPanel(
     document.getElementById('hotel-rating').innerText = `Rating: ${hotelRating} (${userRatingsTotal} reviews)`;
     document.getElementById('hotel-phone').innerText = `Phone: ${hotelPhoneNumber}`;
     document.getElementById('hotel-website').href = hotelWebsite;
+
+    document.getElementById("info-panel").classList.add("activate");
 
     const reviewsContainer = document.getElementById('hotel-reviews');
     reviewsContainer.innerHTML = '';  // Clear previous reviews
@@ -776,3 +778,24 @@ function getCSRFToken() {
     return cookieValue || '';
 }
 
+
+function updatePhoneNumber(hotelPhoneNumber) {
+    const phoneText = document.getElementById("phone-number-text");
+    const callButton = document.getElementById("call-hotel-btn");
+
+    if (!phoneText || !callButton) {
+        console.error("Error: #phone-number-text or #call-hotel-btn not found in DOM.");
+        return;
+    }
+
+    if (hotelPhoneNumber) {
+        phoneText.textContent = hotelPhoneNumber;
+        callButton.style.display = "inline-block"; // Show the button
+        callButton.onclick = function () {
+            window.location.href = `tel:${hotelPhoneNumber}`;
+        };
+    } else {
+        phoneText.textContent = "No phone number available";
+        callButton.style.display = "none"; // Hide the button if no number
+    }
+}

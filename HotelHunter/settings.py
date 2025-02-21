@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
-# impoe os module for logger configuration
+# import os module for logger configuration
 import os
 
 from dotenv import load_dotenv
@@ -20,8 +20,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-print("KEEEYYY",GOOGLE_MAPS_API_KEY)
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+print('key',GOOGLE_MAPS_API_KEY)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
