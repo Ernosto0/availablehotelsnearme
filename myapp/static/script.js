@@ -148,8 +148,6 @@ function clearMarkers() {
     }
 }
 
-let highlightedMarker = null; // Global variable to store the currently highlighted marker
-
 
 // Create a custom marker using OverlayView
 function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, status, isCheapest = false) {
@@ -167,34 +165,34 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
     const customIcon = L.divIcon({
         className: 'custom-marker-container',
         html: iconHtml,
-        iconSize: [85, 35], // Size of the custom marker (adjust as needed)
-        iconAnchor: [40, 30], // Anchor point of the marker (centered)
+        iconSize: [85, 35], // Default size
+        iconAnchor: [40, 30],
     });
 
-    // Create the marker and add it to the map
+    // Create the marker
     const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
 
-    // Add a click event listener to the marker
+    // Add a click event listener to highlight the marker
     marker.on('click', () => {
         console.log('Clicked on hotel:', hotelName);
-        
-        document.getElementById('search-panel').style.display = 'none';
-        if (highlightedMarker) {
-            const prevElement = highlightedMarker.getElement();
-            if (prevElement) prevElement.classList.remove('highlighted-marker');
+
+        // Remove highlight from all markers
+        document.querySelectorAll('.custom-marker').forEach(el => {
+            el.classList.remove('highlighted-marker');
+        });
+
+        // Highlight the clicked marker
+        const markerElement = marker._icon;
+        if (markerElement) {
+            markerElement.querySelector('.custom-marker').classList.add('highlighted-marker');
         }
 
-        // Add highlight to the clicked marker
-        const markerElement = marker.getElement();
-        if (markerElement) {
-            markerElement.classList.add('highlighted-marker');
-            highlightedMarker = marker; // Update the reference
-        }
+        document.getElementById('search-panel').style.display = 'none';
 
         // Fetch hotel details and display in the info panel
         fetchHotelDetails({ lat, lng }, hotelName, hotelPrice, lat, lng)
             .then(data => {
-                const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber,  reviewData } = data;
+                const { photos, hotelRating, userRatingsTotal, hotelWebsite, hotelPhoneNumber, reviewData } = data;
                 updatePhoneNumber(hotelPhoneNumber);
                 showInfoPanel(
                     hotelName, hotelPrice, photos, hotelRating, userRatingsTotal,
@@ -205,19 +203,19 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
                 console.error('Error fetching place details:', error);
             });
     });
-   
 
+    // Close the info panel and reset marker on close button click
     document.getElementById('close-btn').addEventListener('click', () => {
-        // Close the info panel
         document.getElementById('info-panel').classList.remove('activate');
         document.getElementById('search-panel').style.display = 'block';
-        
-        // Remove highlight from the currently highlighted marker
-        if (highlightedMarker) {
-            highlightedMarker.classList.remove('highlighted-marker');
-            highlightedMarker = null; // Reset the highlighted marker
-        } });
-    return marker; // Return the created marker
+
+        // Remove highlight when closing
+        document.querySelectorAll('.custom-marker').forEach(el => {
+            el.classList.remove('highlighted-marker');
+        });
+    });
+
+    return marker;
 }
 
 
