@@ -6,7 +6,7 @@ let markers = []; // Array to keep track of all markers
 // Initialize the map with Leaflet
 let userCircle = null;  // Declare circle globally to update it later
 
-
+let isFetchingDetails = false;  
 
 let markerClusterGroup = null; // Global cluster group
 
@@ -174,21 +174,28 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
 
     // Add a click event listener to highlight the marker
     marker.on('click', () => {
+        if (isFetchingDetails) {
+            console.warn("Please wait! A request is already in progress.");
+            return;  // Prevent multiple clicks
+        }
+    
         console.log('Clicked on hotel:', hotelName);
-
+    
         // Remove highlight from all markers
         document.querySelectorAll('.custom-marker').forEach(el => {
-            el.classList.remove('highlighted-marker');
+            el.classList.remove('highlighted-marker', 'bouncing-marker');
         });
-
+    
         // Highlight the clicked marker
         const markerElement = marker._icon;
         if (markerElement) {
-            markerElement.querySelector('.custom-marker').classList.add('highlighted-marker');
+            markerElement.querySelector('.custom-marker').classList.add('highlighted-marker', 'bouncing-marker');
         }
-
+    
         document.getElementById('search-panel').style.display = 'none';
-
+    
+        isFetchingDetails = true;  // Lock new API calls
+    
         // Fetch hotel details and display in the info panel
         fetchHotelDetails({ lat, lng }, hotelName, hotelPrice, lat, lng)
             .then(data => {
@@ -201,8 +208,12 @@ function createCustomMarker(lat, lng, hotelName, hotelPrice, booking_link, statu
             })
             .catch(error => {
                 console.error('Error fetching place details:', error);
+            })
+            .finally(() => {
+                isFetchingDetails = false;  // Unlock new API calls after request completes
             });
     });
+    
 
     // Close the info panel and reset marker on close button click
     document.getElementById('close-btn').addEventListener('click', () => {
