@@ -4,10 +4,9 @@ import random
 from django.http import JsonResponse # type: ignore
 from django.shortcuts import render # type: ignore
 import requests # type: ignore
-from datetime import datetime, timedelta
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.views.decorators.csrf import csrf_exempt # type: ignore
-from myapp.tests import test_hotels
 from django.conf import settings # type: ignore
 import os
 logger = logging.getLogger('hotel_search')
@@ -16,9 +15,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from myapp.tests import test_hotels
-
 user_location = {}
+
 
 def display_hotel_map(request):
     # Render the page without hotel data initially
@@ -29,7 +27,6 @@ def display_hotel_map(request):
         "WEATHER_API_KEY": settings.WEATHER_API_KEY
     }
     return render(request, 'main.html', context)
-
 
 
 
@@ -61,8 +58,12 @@ def fetch_hotels(request):
             price_levels = []
         print(f"Check-in: {check_in}, Check-out: {check_out}, Adults: {adults}, Radius: {km}km, Price Levels: {price_levels}")
         
-        latitude = 37.7749  # Use session-stored latitude
-        longitude = -122.4194  # Use session-stored longitude
+        # !! ONLY FOR TESTING !!
+        # latitude = 37.7749  
+        # longitude = -122.4194  
+
+        latitude = user_location.get('latitude')
+        longitude = user_location.get('longitude')
 
         global search_id
         search_id = createSearchId()
@@ -77,17 +78,8 @@ def fetch_hotels(request):
         
 
         # Fetch hotels by geolocation
-        # hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
+        hotel_ids = get_hotels_by_geolocation(access_token, latitude, longitude, radius=km)
 
-        available_hotels = test_hotels
-        
-        available_hotels = calculate_price_status(available_hotels)
-
-        available_hotels = filterByPriceLevel(available_hotels, price_levels)
-
-
-        return JsonResponse({'hotels': available_hotels})
-      
 
         if hotel_ids:
             
@@ -177,21 +169,21 @@ def get_access_token():
 
 def get_hotels_by_geolocation(access_token, latitude, longitude, radius):
     print('Fetching hotels by geolocation...')
-    url = "https://api.amadeus.com/v1/reference-data/locations/hotels/by-geocode"  # Test URL
+    url = "https://api.amadeus.com/v1/reference-data/locations/hotels/by-geocode"  
 
     headers = {'Authorization': f'Bearer {access_token}'}
     params = {
         'latitude': latitude,
         'longitude': longitude,
-        'radius': radius,  # Search within 1 km
+        'radius': radius,  
         'radiusUnit': 'KM'
     }
 
     response = requests.get(url, headers=headers, params=params)
     if response.status_code == 200:
         hotels = response.json().get('data', [])
-        # Limit results to the first 30 hotels
-        limited_hotels = hotels[:100]  # Limit to 30 hotels
+        # Limit results to the first 70 hotels
+        limited_hotels = hotels[:70]  
         hotel_ids = [hotel['hotelId'] for hotel in limited_hotels]
         print(f"Found {len(hotel_ids)} hotels near the location ({latitude}, {longitude}).")
         return hotel_ids
@@ -208,15 +200,13 @@ def chunk_list(lst, chunk_size,):
         yield lst[i:i + chunk_size]
 
 def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_token, adults):
-    print('Checking hotel availability...')
     url = "https://api.amadeus.com/v3/shopping/hotel-offers"
     headers = {'Authorization': f'Bearer {access_token}'}
     available_hotels = []
     currency = get_user_currency()
 
     currency = 'USD' # Hardcoded currency for now. Change to user's currency then final deployment
-    print("searching for", adults, "adults")
-    print(check_in_date, check_out_date)
+   
     # Split hotel_ids into chunks of 20
     hotel_chunks = list(chunk_list(hotel_ids, 20))
 
@@ -267,7 +257,6 @@ def check_hotel_availability(hotel_ids, check_in_date, check_out_date, access_to
         else:
             print(f"Failed to check availability. Status Code: {response.status_code}")
         print(f"Processed {len(hotel_batch)} hotels.")
-        print(available_hotels)
         return available_hotels  # Return available hotels for this batch
 
 
