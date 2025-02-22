@@ -21,7 +21,9 @@ load_dotenv()
 
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
-print('key',GOOGLE_MAPS_API_KEY)
+WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
+
+print(WEATHER_API_KEY)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 

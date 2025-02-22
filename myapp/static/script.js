@@ -698,8 +698,12 @@ function fetchUserLocation(latitude, longitude) {
 }
 
 function updateWeatherWidget(lat, lon) {
-    const apiKey = 'e64e643580dd413cac1100435250302';  // Replace with your actual WeatherAPI.com key
-    const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}`;
+    const WeatherapiKey = typeof WEATHER_API_KEY!== "undefined" ? WEATHER_API_KEY : "";
+    if (!WeatherapiKey ) {
+        console.error("Google API key is missing! key",WeatherapiKey );
+        return;
+    }
+    const url = `http://api.weatherapi.com/v1/current.json?key=${WeatherapiKey}&q=${lat},${lon}`;
     console.log('Fetching weather data from:', url);
     fetch(url)
       .then(response => response.json())
@@ -745,7 +749,6 @@ function loadGoogleMapsAPI(lat, lng) {
     // Use the API key injected from Django
     const googleapiKey = typeof GOOGLE_MAPS_API_KEY !== "undefined" ? GOOGLE_MAPS_API_KEY : "";
 
-    console.log("Google API key:", googleapiKey);
     if (!googleapiKey) {
         console.error("Google API key is missing! key",googleapiKey);
         return;

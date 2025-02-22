@@ -25,7 +25,8 @@ def display_hotel_map(request):
     context = {
         'hotels': json.dumps([]),  # Empty list
         'no_hotels_available': False,  # Default to no hotels available
-        "GOOGLE_MAPS_API_KEY": settings.GOOGLE_MAPS_API_KEY
+        "GOOGLE_MAPS_API_KEY": settings.GOOGLE_MAPS_API_KEY,
+        "WEATHER_API_KEY": settings.WEATHER_API_KEY
     }
     return render(request, 'main.html', context)
 
