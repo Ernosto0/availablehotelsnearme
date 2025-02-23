@@ -685,7 +685,76 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         console.error("Footer or scroll button not found in the DOM.");
     }
+
 });
+// Search panel handle for mobile
+document.addEventListener("DOMContentLoaded", function () {
+    const searchPanel = document.getElementById("search-panel");
+    const weatherWidget = document.getElementById("weather-widget");
+    const searchHotelsBtn = document.getElementById("search-hotels-btn");
+    const hidePanelHandle = document.getElementById("hide-panel-handle");
+    const panelHandle = document.getElementById("panel-handle");
+
+    function isMobile() {
+        return window.innerWidth <= 768; // Adjust for mobile breakpoint
+    }
+
+    function hideWeatherWidget() {
+        if (isMobile()) {
+            weatherWidget.style.display = "none";
+        }
+    }
+
+    function showWeatherWidget() {
+        if (isMobile()) {
+            weatherWidget.style.display = "block";
+        }
+    }
+
+    function toggleSearchPanel() {
+        if (searchPanel.classList.contains("hidden")) {
+            searchPanel.classList.remove("hidden");
+            hideWeatherWidget();
+        } else {
+            searchPanel.classList.add("hidden");
+            showWeatherWidget();
+        }
+    }
+
+    // Open search panel when clicking the Search Hotels button
+    searchHotelsBtn.addEventListener("click", function () {
+        searchPanel.classList.remove("hidden");
+        hideWeatherWidget();
+    });
+
+    // Close search panel when clicking Hide Panel
+    hidePanelHandle.addEventListener("click", function () {
+        searchPanel.classList.add("hidden");
+        showWeatherWidget();
+    });
+
+    // Show search panel when clicking ▼ (panelHandle)
+    panelHandle.addEventListener("click", function () {
+        searchPanel.classList.remove("hidden");
+        hideWeatherWidget();
+    });
+
+    // Ensure correct state when resizing the window
+    window.addEventListener("resize", function () {
+        if (!isMobile()) {
+            weatherWidget.style.display = "block"; // Always show on desktop
+        } else {
+            const isPanelHidden = searchPanel.classList.contains("hidden");
+            weatherWidget.style.display = isPanelHidden ? "block" : "none";
+        }
+    });
+
+    // Initialize visibility on page load
+    if (isMobile() && !searchPanel.classList.contains("hidden")) {
+        hideWeatherWidget();
+    }
+});
+
 
 
     </script>

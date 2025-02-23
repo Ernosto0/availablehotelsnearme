@@ -979,10 +979,18 @@ html, body {
 
 @media (max-width: 480px) {
   #weather-widget {
-    top: 20px;
-    margin-right: 10px;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  /* Hide weather widget when search panel is shown */
+  .search-panel.active + #weather-widget {
+    opacity: 0;
+    pointer-events: none;
   }
 }
+
+
+
 
 @media (max-width: 768px) {
   .footer {
