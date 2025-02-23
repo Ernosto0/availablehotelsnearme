@@ -974,6 +974,7 @@ html, body {
   will-change: transform;
 }
 
+/* Highlighted marker */
 .highlighted-marker {
   transform: scale(1.3); /* Make the marker bigger */
   border: 2px solid rgb(33, 28, 180); /* Add a border */

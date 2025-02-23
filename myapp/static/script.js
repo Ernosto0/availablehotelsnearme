@@ -686,7 +686,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-
+// Send user location to the backend
 function fetchUserLocation(latitude, longitude) {
     console.log('User location:', latitude, longitude);
     fetch('/set-user-location/', {
