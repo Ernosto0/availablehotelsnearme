@@ -712,7 +712,7 @@ function updateWeatherWidget(lat, lon) {
         console.error("Google API key is missing! key",WeatherapiKey );
         return;
     }
-    const url = `http://api.weatherapi.com/v1/current.json?key=${WeatherapiKey}&q=${lat},${lon}`;
+    const url = `https://api.weatherapi.com/v1/current.json?key=${WeatherapiKey}&q=${lat},${lon}`;
     console.log('Fetching weather data from:', url);
     fetch(url)
       .then(response => response.json())
