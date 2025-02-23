@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function () {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
         };
-        console.log('User location:', window.userLocation);
+       
 
         
         loadGoogleMapsAPI(window.userLocation.latitude, window.userLocation.longitude);
@@ -729,15 +729,15 @@ let isGoogleMapsAPILoaded = false;
 
 function loadGoogleMapsAPI(lat, lng) {
     if (isGoogleMapsAPILoaded) {
-        console.log("Google Maps API already loaded.");
-        console.log("Initializing map with user location in loadGoogleMapsAPI function:", { lat, lng });
+        console.log("GoogleAPI already loaded.");
+        
         initMap(lat, lng);
         return;
     }
 
     if (typeof google !== "undefined" && typeof google.maps !== "undefined") {
-        console.log("Google Maps API already available.");
-        console.log("Initializing map with user location in loadGoogleMapsAPI function:", { lat, lng });
+        console.log("Google API already available.");
+        
         initMap(lat, lng);
         isGoogleMapsAPILoaded = true;
         return;
@@ -759,8 +759,8 @@ function loadGoogleMapsAPI(lat, lng) {
     document.head.appendChild(script);
 
     window.initMapCallback = function () {
-        console.log("Google Maps API initialized via callback.");
-        console.log("Initializing map with user location in initMapCallback function:", { lat, lng });
+        console.log("Google Mapsinitialized via callback.");
+       
         initMap(lat, lng);
         isGoogleMapsAPILoaded = true;
     };
