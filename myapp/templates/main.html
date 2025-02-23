@@ -244,7 +244,10 @@
     </div>
   </div>
 
-
+      <!-- Scroll to Footer Button -->
+      <button id="scroll-to-footer" class="scroll-button">
+        <i class="fa-solid fa-arrow-down"></i>
+      </button>
 
         
 
@@ -272,6 +275,9 @@
     </section>
     <!-- Search Panel -->
 
+
+
+
     <!-- Footer -->
     <section class="footer">
       <div class="container">
@@ -281,6 +287,7 @@
             <a href="mailto:ernosto20.03@gmail.com">Contact</a>
             <a href="https://www.termsfeed.com/live/cce3fbcb-ebe4-493c-ae9f-09ef72d08027" >Terms & Conditions</a>
             <a href="https://www.termsfeed.com/live/0613654f-e4d9-4028-b601-c3640f5b99cb">Privacy Policy</a>
+            <a href="https://github.com/Ernosto0">My Github</a>
           </div>
           <div class="footer-copyright">
             <p>&copy; 2024 AvailableHotelsAroundMe. All rights reserved.</p>
@@ -666,6 +673,20 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// Scroll to footer button functionality
+
+document.addEventListener("DOMContentLoaded", function () {
+    const scrollButton = document.getElementById("scroll-to-footer");
+    const footer = document.querySelector(".footer"); // Ensure this matches your footer class
+
+    if (scrollButton && footer) {
+        scrollButton.addEventListener("click", function () {
+            footer.scrollIntoView({ behavior: "smooth" });
+        });
+    } else {
+        console.error("Footer or scroll button not found in the DOM.");
+    }
+});
 
 
     </script>

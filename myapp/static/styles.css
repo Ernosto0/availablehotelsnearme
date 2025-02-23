@@ -40,6 +40,7 @@ html, body {
   pointer-events: none;
   transition: opacity 0.4s ease-in-out;
   z-index: 1000;
+  padding: 20px; /* Add padding to prevent content from touching edges */
 }
 
 /* Inner Container */
@@ -51,6 +52,11 @@ html, body {
   border-radius: 10px;
   text-align: center;
   position: relative;
+  max-height: 80vh; /* Prevent it from taking full height */
+  overflow-y: auto; /* Allow scrolling if content is long */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Keep content at the top */
 }
 
 /* Close Button */
@@ -66,6 +72,26 @@ html, body {
 .web-info-panel.active {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* Responsive Adjustments for Small Screens */
+@media (max-width: 768px) {
+  .panel-container {
+    width: 95%;
+    max-width: none; /* Allow full width */
+    max-height: 85vh; /* Allow more space */
+    padding: 15px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Fix expanding issue */
+  }
+
+  .close-btn {
+    font-size: 20px; /* Smaller close button */
+    top: 5px;
+    right: 10px;
+  }
 }
 
 /* Ensure Close Button is Clickable */
@@ -94,6 +120,16 @@ html, body {
 
 .info-button:hover {
   background: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .info-button {
+    bottom: 30px; /* Moves the button up for mobile devices */
+    left: 10px; /* Slightly adjust left position */
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
 }
 
 /* Style the map container */
@@ -997,6 +1033,39 @@ html, body {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.hidden {
-  display: none;
+/* Scroll to Footer Button */
+.scroll-button {
+  position: fixed;
+  bottom: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: background 0.3s ease;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
 }
+
+.scroll-button:hover {
+  background: #0056b3;
+}
+
+/* Adjust button for mobile screens */
+@media (max-width: 768px) {
+  .scroll-button {
+      bottom: 30px; /* Moves up for better visibility */
+      right: 10px;
+      width: 45px;
+      height: 45px;
+      font-size: 20px;
+  }
+}
+
