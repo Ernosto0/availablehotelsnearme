@@ -37,6 +37,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["www.availablehotelsnear.me",
     "availablehotelsnear.me",
+    "127.0.0.1"
 ]
 
 
