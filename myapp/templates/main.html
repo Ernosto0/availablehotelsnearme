@@ -108,6 +108,47 @@
       <!-- Loading Spinner -->
       <div id="loading-spinner" class="spinner" style="display: none"></div>
       
+      <!-- Location Access Popup -->
+<div id="location-popup" class="popup hidden">
+  <p></p>
+  <button id="location-popup-close">Close</button>
+</div>
+
+<style>
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 9999;
+    width: 80%;
+    max-width: 400px;
+    display: none;
+}
+
+.popup button {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    background: #ff4b4b;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup:not(.hidden) {
+    display: block;
+}
+</style>
 
       <!-- Hotel Info Panel -->
       <div id="info-panel">
@@ -340,10 +381,10 @@
 
               }, function (error) {
                   console.error('Geolocation error:', error.message);
-                  alert('Failed to get location.');
+                  
               });
           } else {
-              alert('Geolocation is not supported by your browser.');
+              console.error('Geolocation is not supported by your browser.');
           }
       });
 
@@ -755,6 +796,71 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    function checkLocationAccess() {
+        if (!navigator.geolocation) {
+            showLocationPopup("Geolocation is not supported by your browser.");
+            return;
+        }
+
+        // Check permission status
+        navigator.permissions.query({ name: "geolocation" }).then(function (result) {
+            if (result.state === "denied") {
+                showLocationPopup("Location access is blocked. Please enable location services in your browser settings.");
+            } else {
+                requestUserLocation();
+            }
+        });
+    }
+
+    function requestUserLocation() {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                console.log("User location:", position.coords.latitude, position.coords.longitude);
+
+                fetch('/set-user-location/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: JSON.stringify({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    }),
+                });
+
+            },
+            function (error) {
+                console.error("Geolocation error:", error.message);
+
+                if (error.code === error.PERMISSION_DENIED) {
+                    showLocationPopup("You denied location access. Please enable it in your browser settings.");
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    showLocationPopup("Location is unavailable. Please check your device settings.");
+                } else if (error.code === error.TIMEOUT) {
+                    showLocationPopup("Location request timed out. Try again.");
+                } else {
+                    showLocationPopup("An unknown error occurred while retrieving your location.");
+                }
+            }
+        );
+    }
+
+    function showLocationPopup(message) {
+        const popup = document.getElementById('location-popup');
+        popup.querySelector('p').textContent = message;
+        popup.classList.remove('hidden');
+    }
+
+    // Check location access on page load
+    checkLocationAccess();
+
+    // Close popup event
+    document.getElementById('location-popup-close').addEventListener('click', function () {
+        document.getElementById('location-popup').classList.add('hidden');
+    });
+});
 
 
     </script>

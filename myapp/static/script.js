@@ -675,13 +675,13 @@ document.addEventListener('DOMContentLoaded', function () {
             
         }, function (error) {
             console.error('Error getting location:', error.message);
-            alert('Unable to get your location. Default location will be used.');
+           
              // Default to Paris (latitude, longitude)
         });
         
     } else {
         console.error('Geolocation is not supported by this browser.');
-        alert('Geolocation is not supported by your browser.');
+        
         // Fallback to default behavior
     }
 });
