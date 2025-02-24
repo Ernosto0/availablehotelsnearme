@@ -105,17 +105,14 @@
 
      
 
-      <!-- Loading Spinner -->
-      <div id="loading-spinner" class="spinner" style="display: none"></div>
-      
-      <!-- Location Access Popup -->
-<div id="location-popup" class="popup hidden">
+<!-- Location Access Popup -->
+<div id="location-access-popup" class="location-popup hidden">
   <p></p>
-  <button id="location-popup-close">Close</button>
+  <button id="location-access-popup-close">Close</button>
 </div>
 
 <style>
-.popup {
+.location-popup {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -131,7 +128,7 @@
     display: none;
 }
 
-.popup button {
+.location-popup button {
     margin-top: 10px;
     padding: 10px;
     border: none;
@@ -141,14 +138,16 @@
     border-radius: 5px;
 }
 
-.popup.hidden {
+.location-popup.hidden {
     display: none;
 }
 
-.popup:not(.hidden) {
+.location-popup:not(.hidden) {
     display: block;
 }
 </style>
+
+<div id="loading-spinner" class="spinner"></div>
 
       <!-- Hotel Info Panel -->
       <div id="info-panel">
@@ -390,49 +389,53 @@
 
       // Update fetchHotels function to use updateHotelsOnMap
       function fetchHotels(latitude, longitude) {
-            console.log('Fetching hotels...');
+        console.log('Fetching hotels...');
 
-            const loadingSpinner = document.getElementById('loading-spinner');
-            if (loadingSpinner) loadingSpinner.style.display = 'block';
+        const loadingSpinner = document.getElementById('loading-spinner');
 
-            const checkInInput = document.getElementById("check-in").value;  // Get value
-            const checkOutInput = document.getElementById("check-out").value; // Get value
-            const adults = document.getElementById('adults').value || 1; // Default to 1
-            const km = document.getElementById('radius-range').value;
+        if (!loadingSpinner) {
+            console.error("Loading spinner not found in DOM.");
+            return;
+        }
 
-            // Get checked price levels
-            const checkboxes = Array.from(document.querySelectorAll(".price-levels input[type='checkbox']:checked"))
-                                    .map(checkbox => checkbox.value);  // Extract only checked values
+        loadingSpinner.style.display = 'block'; // Show spinner
 
-          
-          fetch('/fetch-hotels/', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': getCSRFToken(),
-              },
-              body: JSON.stringify({ latitude, longitude, adults, km,checkInInput,checkOutInput,checkboxes}), 
-          })
-              .then(response => response.json())
-              .then(data => {
-                  console.log('Hotels fetched:', data.hotels);
+        const checkInInput = document.getElementById("check-in").value;
+        const checkOutInput = document.getElementById("check-out").value;
+        const adults = document.getElementById('adults').value || 1;
+        const km = document.getElementById('radius-range').value;
 
-                  if (data.hotels && data.hotels.length > 0) {
-                      // Dynamically update the hotels on the map
-                      updateHotelsOnMap(data.hotels);
-                  } else {
-                      showNoHotelsPopup(adults);
-                  }
-              })
-              .catch(error => {
-                  console.error('Error fetching hotels:', error);
-                  showNoHotelsPopup(adults);
+        // Get checked price levels
+        const checkboxes = Array.from(document.querySelectorAll(".price-levels input[type='checkbox']:checked"))
+                                .map(checkbox => checkbox.value);
 
-              })
-              .finally(() => {
-                  if (loadingSpinner) loadingSpinner.style.display = 'none';
-              });
-      }
+        fetch('/fetch-hotels/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({ latitude, longitude, adults, km, checkInInput, checkOutInput, checkboxes }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Hotels fetched:', data.hotels);
+
+            if (data.hotels && data.hotels.length > 0) {
+                updateHotelsOnMap(data.hotels);
+            } else {
+                showNoHotelsPopup(adults);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching hotels:', error);
+            showNoHotelsPopup(adults);
+        })
+        .finally(() => {
+            loadingSpinner.style.display = 'none'; // Hide spinner after request completes
+        });
+    }
+
 
 
 
@@ -754,17 +757,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function toggleSearchPanel() {
         if (searchPanel.classList.contains("hidden")) {
-            searchPanel.classList.remove("hidden");
+            
             hideWeatherWidget();
         } else {
-            searchPanel.classList.add("hidden");
+            
             showWeatherWidget();
         }
     }
 
     // Open search panel when clicking the Search Hotels button
     searchHotelsBtn.addEventListener("click", function () {
-        searchPanel.classList.remove("hidden");
+        
         hideWeatherWidget();
     });
 
