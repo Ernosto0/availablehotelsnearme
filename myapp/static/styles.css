@@ -124,7 +124,7 @@ html, body {
 
 @media (max-width: 768px) {
   .info-button {
-    bottom: 50px; /* Moves the button up for mobile devices */
+    bottom: 60px; /* Moves the button up for mobile devices */
     left: 10px; /* Slightly adjust left position */
     width: 45px;
     height: 45px;
@@ -1069,7 +1069,7 @@ html, body {
 /* Adjust button for mobile screens */
 @media (max-width: 768px) {
   .scroll-button {
-      bottom: 50px; /* Moves up for better visibility */
+      bottom: 60px; /* Moves up for better visibility */
       right: 10px;
       width: 45px;
       height: 45px;

@@ -107,7 +107,7 @@
 
 <!-- Location Access Popup -->
 <div id="location-access-popup" class="location-popup hidden">
-  <p></p>
+  <p id="location-access-message">Location access is required to find nearby hotels.</p>
   <button id="location-access-popup-close">Close</button>
 </div>
 
@@ -132,7 +132,7 @@
     margin-top: 10px;
     padding: 10px;
     border: none;
-    background: #ff4b4b;
+    background: #4babff;
     color: white;
     cursor: pointer;
     border-radius: 5px;
@@ -350,42 +350,83 @@
               window.hotels = {{ hotels|safe }};
               console.log("Embedded hotels data:", window.hotels);
 
-              function getCSRFToken() {
-                  const cookieValue = document.cookie
-                      .split('; ')
-                      .find(row => row.startsWith('csrftoken='))
-                      ?.split('=')[1];
-                  return cookieValue || '';
-              }
-
               document.addEventListener('DOMContentLoaded', function () {
-          if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(function (position) {
-                  const latitude = position.coords.latitude;
-                  const longitude = position.coords.longitude;
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        return cookieValue || '';
+    }
 
-                  // const latitude = 37.774929; // !!!Default to San Francisco Just use for local testing!!!
-                  // const longitude = -122.419416;
-                  
-                  
-                  // Send user's location to the backend
-                  fetch('/set-user-location/', {
-                      method: 'POST',
-                      headers: {
-                          'Content-Type': 'application/json',
-                          'X-CSRFToken': getCSRFToken(),
-                      },
-                      body: JSON.stringify({ latitude, longitude }),
-                  })
+    function showLocationPopup(message) {
+        const popup = document.getElementById('location-access-popup');
+        const messageElement = document.getElementById('location-access-message');
 
-              }, function (error) {
-                  console.error('Geolocation error:', error.message);
-                  
-              });
-          } else {
-              console.error('Geolocation is not supported by your browser.');
-          }
-      });
+        if (popup && messageElement) {
+            messageElement.textContent = message;
+            popup.classList.remove('hidden');
+        } else {
+            console.error("Location access popup elements not found.");
+        }
+    }
+
+    function checkLocationPermissions() {
+        if (navigator.permissions) {
+            navigator.permissions.query({ name: "geolocation" }).then(permissionStatus => {
+                if (permissionStatus.state === "denied") {
+                    showLocationPopup("Location access denied. Please enable location access in your browser settings.");
+                } else {
+                    showLocationPopup("Location services are turned off. Please enable location services in your device settings.");
+                }
+            }).catch(() => {
+                showLocationPopup("Unable to access location. Please check your device settings.");
+            });
+        } else {
+            showLocationPopup("Location error. Please enable location services.");
+        }
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                // Send user's location to the backend
+                fetch('/set-user-location/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: JSON.stringify({ latitude, longitude }),
+                });
+
+            }, function (error) {
+                console.error('Geolocation error:', error.message);
+
+                if (error.code === error.PERMISSION_DENIED) {
+                    checkLocationPermissions();
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    showLocationPopup("Location services are turned off. Please enable location services in your device settings.");
+                } else if (error.code === error.TIMEOUT) {
+                    showLocationPopup("Location request timed out. Try again.");
+                } else {
+                    showLocationPopup("Unable to get your location. Please check your device settings.");
+                }
+            }
+        );
+    } else {
+        console.error('Geolocation is not supported by your browser.');
+        showLocationPopup("Your browser does not support location services.");
+    }
+
+    document.getElementById('location-access-popup-close').addEventListener('click', function () {
+        document.getElementById('location-access-popup').classList.add('hidden');
+    });
+});
+
 
       // Update fetchHotels function to use updateHotelsOnMap
       function fetchHotels(latitude, longitude) {
@@ -799,71 +840,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    function checkLocationAccess() {
-        if (!navigator.geolocation) {
-            showLocationPopup("Geolocation is not supported by your browser.");
-            return;
-        }
 
-        // Check permission status
-        navigator.permissions.query({ name: "geolocation" }).then(function (result) {
-            if (result.state === "denied") {
-                showLocationPopup("Location access is blocked. Please enable location services in your browser settings.");
-            } else {
-                requestUserLocation();
-            }
-        });
-    }
-
-    function requestUserLocation() {
-        navigator.geolocation.getCurrentPosition(
-            function (position) {
-                console.log("User location:", position.coords.latitude, position.coords.longitude);
-
-                fetch('/set-user-location/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCSRFToken(),
-                    },
-                    body: JSON.stringify({
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                    }),
-                });
-
-            },
-            function (error) {
-                console.error("Geolocation error:", error.message);
-
-                if (error.code === error.PERMISSION_DENIED) {
-                    showLocationPopup("You denied location access. Please enable it in your browser settings.");
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    showLocationPopup("Location is unavailable. Please check your device settings.");
-                } else if (error.code === error.TIMEOUT) {
-                    showLocationPopup("Location request timed out. Try again.");
-                } else {
-                    showLocationPopup("An unknown error occurred while retrieving your location.");
-                }
-            }
-        );
-    }
-
-    function showLocationPopup(message) {
-        const popup = document.getElementById('location-popup');
-        popup.querySelector('p').textContent = message;
-        popup.classList.remove('hidden');
-    }
-
-    // Check location access on page load
-    checkLocationAccess();
-
-    // Close popup event
-    document.getElementById('location-popup-close').addEventListener('click', function () {
-        document.getElementById('location-popup').classList.add('hidden');
-    });
-});
 
 
     </script>
