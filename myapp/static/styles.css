@@ -103,7 +103,7 @@ html, body {
 /* Info Button */
 .info-button {
   position: fixed;
-  bottom: 20px;
+  bottom: 50px;
   left: 20px;
   background: #007bff;
   color: white;
@@ -124,7 +124,7 @@ html, body {
 
 @media (max-width: 768px) {
   .info-button {
-    bottom: 60px; /* Moves the button up for mobile devices */
+    bottom: 40px; /* Moves the button up for mobile devices */
     left: 10px; /* Slightly adjust left position */
     width: 45px;
     height: 45px;
@@ -1053,7 +1053,7 @@ html, body {
 /* Scroll to Footer Button */
 .scroll-button {
   position: fixed;
-  bottom: 20px; /* Adjust as needed */
+  bottom: 50px; /* Adjust as needed */
   right: 20px; /* Adjust as needed */
   background: #007bff;
   color: white;
@@ -1078,7 +1078,7 @@ html, body {
 /* Adjust button for mobile screens */
 @media (max-width: 768px) {
   .scroll-button {
-      bottom: 60px; /* Moves up for better visibility */
+      bottom: 40px; /* Moves up for better visibility */
       right: 10px;
       width: 45px;
       height: 45px;
