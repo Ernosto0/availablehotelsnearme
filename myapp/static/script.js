@@ -654,7 +654,7 @@ function calculateCheapestHotel(hotels) {
 }
 
 
-// Call this function when the DOM is ready
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM is ready');
     // Check if the user's browser supports Geolocation API

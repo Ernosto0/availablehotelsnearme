@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AvailableHotelsAroundMe</title>
+    <title>Available Hotels Near You – Instant Prices, Availability & Reviews</title>
+    <meta name="description" content="Find available hotels near you instantly. Compare real-time prices, check reviews, and get the best deals on nearby hotels. Easy & fast search!" />
+
+
 
     {% load static %}
 
@@ -43,6 +46,45 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
 
 
+  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+  <meta property="og:title" content="Available Hotels Near You – Instant Prices, Availability & Reviews" />
+  <meta property="og:description" content="Find available hotels near you instantly. Compare real-time prices, check reviews, and get the best deals!" />
+  <meta property="og:image" content="{% static 'images/preview.png' %}" />
+  <meta property="og:url" content="https://AvailableHotelsAround.me" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Available Hotels Near You – Instant Prices, Availability & Reviews" />
+  <meta name="twitter:description" content="Find available hotels near you instantly. Compare real-time prices, check reviews, and get the best deals!" />
+  <meta name="twitter:image" content="{% static 'images/preview.png' %}" />
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I find available hotels near me?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Simply allow location access, and our map will show you all nearby hotels with real-time prices."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I book a hotel?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Click on a hotel, compare prices, and follow the link to a trusted booking site."
+          }
+        }
+      ]
+    }
+    </script>
+    
+
     <script>
       const GOOGLE_MAPS_API_KEY = "{{ GOOGLE_MAPS_API_KEY }}";
       const WEATHER_API_KEY = "{{ WEATHER_API_KEY }}";
@@ -52,6 +94,21 @@
 </head>
 
   <body>
+    <h1 class="hidden-h1">Find Available Hotels Near You – Instant Prices & Reviews</h1>
+    
+    <section class="hidden-faq">
+      <h2>Frequently Asked Questions</h2>
+      <div>
+        <h3>How do I find available hotels near me?</h3>
+        <p>Simply allow location access, and our map will show you all nearby hotels with real-time prices.</p>
+      </div>
+      <div>
+        <h3>How do I book a hotel?</h3>
+        <p>Click on a hotel, compare prices, and follow the link to a trusted booking site.</p>
+      </div>
+    </section>
+    
+
 
     <div id="weather-widget" class="weather-widget"></div>
     <section class="container">
@@ -277,7 +334,7 @@
     />
 
     <button id="search-hotels-btn" class="map-button">
-      Search Hotels
+      Search available hotels
     </button>
     <div id="hide-panel-handle">▲ Hide Panel</div>
     <div id="panel-handle" class="panel-handle">▼</div>
