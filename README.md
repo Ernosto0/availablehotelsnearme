@@ -32,7 +32,7 @@ The app was available on www.availablehotelsnear.me address for a few month. But
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/availablehotelsnearme.git
+https://github.com/Ernosto0/availablehotelsnearme.git
 cd availablehotelsnearme
 ```
 
