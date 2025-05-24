@@ -2,6 +2,8 @@
 
 A Django-based web application that helps users find available hotels in their vicinity in real time map. The application integrates with multiple hotel booking APIs and search services to provide real-time hotel availability information.
 
+The app was available on www.availablehotelsnear.me address for a few month. But it is not anymore. 
+
 ## Features
 
 - Real-time hotel availability search
